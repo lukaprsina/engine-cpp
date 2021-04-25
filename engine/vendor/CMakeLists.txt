@@ -10,4 +10,7 @@ project(vendor)
 #add_subdirectory(glm)
 #add_subdirectory(spdlog)
 #vma
-#add_subdirectory(volk)
+
+#volk
+add_subdirectory(volk)
+target_link_libraries(Engine PRIVATE volk)

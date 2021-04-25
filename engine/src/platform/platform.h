@@ -1,5 +1,8 @@
 #pragma once
 
+#include "core/application.h"
+#include "core/window.h"
+
 namespace engine
 {
     enum class ExitCode
@@ -9,12 +12,6 @@ namespace engine
         FatalError = 2   /* App encountered an unexpected error */
     };
 
-    class Window
-    {
-    };
-    class Application
-    {
-    };
     class Timer
     {
     };
@@ -34,13 +31,13 @@ namespace engine
         Application &GetApplication() { return *m_App; };
 
         static void SetArguments(const std::vector<std::string> &arguments) { m_Arguments = arguments; };
-        std::vector<std::string> &GetArguments() { return Platform::m_Arguments; };
+        std::vector<std::string> &GetArguments() { return m_Arguments; };
 
-        static void SetExternalStorageDirectory(const std::string &directory);
-        std::string GetExternalStorageDirectory() { return Platform::m_ExternalStorageDirectory; };
+        static void SetExternalStorageDirectory(const std::string &directory) { m_ExternalStorageDirectory = directory; };
+        std::string &GetExternalStorageDirectory() { return m_ExternalStorageDirectory; };
 
-        static void SetTempDirectory(const std::string &dir);
-        std::string GetTempDirectory() { return Platform::m_TempDirectory; };
+        static void SetTempDirectory(const std::string &directory) { m_TempDirectory = directory; };
+        std::string &GetTempDirectory() { return m_TempDirectory; };
 
     protected:
         std::unique_ptr<Window> m_Window;

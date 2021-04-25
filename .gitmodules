@@ -1,0 +1,12 @@
+[submodule "Engine/vendor/docopt"]
+	path = Engine/vendor/docopt
+	url = https://github.com/docopt/docopt.cpp
+[submodule "Engine/vendor/volk"]
+	path = Engine/vendor/volk
+	url = https://github.com/zeux/volk
+[submodule "engine/vendor/volk"]
+	path = engine/vendor/volk
+	url = https://github.com/zeux/volk
+[submodule "engine/vendor/docopt"]
+	path = engine/vendor/docopt
+	url = https://github.com/docopt/docopt.cpp
