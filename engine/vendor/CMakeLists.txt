@@ -6,7 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(vendor)
 
 #add_subdirectory(docopt)
-#add_subdirectory(glfw)
+
+#glfw
+add_subdirectory(glfw)
+
 #add_subdirectory(glm)
 #add_subdirectory(spdlog)
 #vma

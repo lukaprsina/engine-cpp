@@ -1,9 +1,8 @@
 #pragma once
 
 #include "core/application.h"
-#include "core/window.h"
-
-#include <volk.h>
+#include "window/window.h"
+#include "common/vulkan_common.h"
 
 namespace engine
 {

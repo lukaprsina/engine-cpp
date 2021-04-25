@@ -1,7 +1,7 @@
 #include "platform/unix_platform.h"
 
-#include "core/glfw_window.h"
-#include "core/headless_window.h"
+#include "window/glfw_window.h"
+#include "window/headless_window.h"
 
 namespace engine
 {
@@ -37,11 +37,11 @@ namespace engine
     {
         if (m_App->IsHeadless())
         {
-            m_Window = std::make_unique<HeadlessWindow>();
+            m_Window = std::make_unique<HeadlessWindow>(*this);
         }
         else
         {
-            m_Window = std::make_unique<GlfwWindow>();
+            m_Window = std::make_unique<GlfwWindow>(*this);
         }
     }
 }

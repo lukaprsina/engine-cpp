@@ -10,3 +10,6 @@
 [submodule "engine/vendor/docopt"]
 	path = engine/vendor/docopt
 	url = https://github.com/docopt/docopt.cpp
+[submodule "engine/vendor/glfw"]
+	path = engine/vendor/glfw
+	url = https://github.com/glfw/glfw
