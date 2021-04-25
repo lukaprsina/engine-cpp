@@ -3,6 +3,8 @@
 #include "core/application.h"
 #include "core/window.h"
 
+#include <volk.h>
+
 namespace engine
 {
     enum class ExitCode
@@ -44,7 +46,7 @@ namespace engine
         std::unique_ptr<Application> m_App;
         Timer m_Timer;
 
-        virtual void CreateWindow() = 0;
+        virtual void CreatePlatformWindow() = 0;
 
     private:
         static std::vector<std::string> m_Arguments;

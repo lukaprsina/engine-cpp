@@ -17,7 +17,7 @@ namespace engine
         virtual ~UnixPlatform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app) override;
-        virtual void CreateWindow() override;
+        virtual void CreatePlatformWindow() override;
 
     private:
         UnixType m_Type;

@@ -11,7 +11,7 @@ namespace engine
     {
         ENG_ASSERT(app && "Application isn't valid!");
         m_App = std::move(app);
-        CreateWindow();
+        CreatePlatformWindow();
         return true;
     }
 

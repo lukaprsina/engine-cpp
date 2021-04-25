@@ -1,38 +1,24 @@
-#include <volk.h>
-
-// https://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-//define something for Windows (32-bit and 64-bit, this part is common)
-#ifdef _WIN64
-//define something for Windows (64-bit only)
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+#	include "platform/android/android_platform.h"
+void android_main(android_app *state)
+{
+	engine::AndroidPlatform platform{state};
+#elif defined(VK_USE_PLATFORM_WIN32_KHR)
+#	include "platform/windows_platform.h"
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                     PSTR lpCmdLine, INT nCmdShow)
+{
+	engine::WindowsPlatform platform{hInstance, hPrevInstance,
+	                              lpCmdLine, nCmdShow};
 #else
-//define something for Windows (32-bit only)
-#endif
-#elif __APPLE__
-#include <TargetConditionals.h>
-#if TARGET_IPHONE_SIMULATOR
-// iOS Simulator
-#elif TARGET_OS_IPHONE
-// iOS device
-#elif TARGET_OS_MAC
-// Other kinds of Mac OS
-#else
-#error "Unknown Apple platform"
-#endif
-#elif __linux__
-// linux
-#include "platform/unix_platform.h"
-
+#	include "platform/unix_platform.h"
 int main(int argc, char *argv[])
 {
-    engine::UnixPlatform platform(engine::UnixType::Linux, argc, argv);
-
-#elif __unix__ // all unices not caught above
-// Unix
-#elif defined(_POSIX_VERSION)
-// POSIX
-#else
-#error "Unknown compiler"
+#	if defined(VK_USE_PLATFORM_MACOS_MVK)
+	engine::UnixPlatform platform{engine::UnixType::Mac, argc, argv};
+#	elif defined(VK_USE_PLATFORM_XCB_KHR)
+	engine::UnixPlatform platform{engine::UnixType::Linux, argc, argv};
+#	endif
 #endif
 
 #ifndef DEBUG

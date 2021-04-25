@@ -33,7 +33,7 @@ namespace engine
         return true;
     }
 
-    void UnixPlatform::CreateWindow()
+    void UnixPlatform::CreatePlatformWindow()
     {
         if (m_App->IsHeadless())
         {
