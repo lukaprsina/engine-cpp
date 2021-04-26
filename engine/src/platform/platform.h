@@ -24,6 +24,7 @@ namespace engine
         virtual ~Platform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app);
+        virtual bool Prepare();
         virtual void MainLoop();
         virtual void Terminate(ExitCode code);
         virtual void Close() const;

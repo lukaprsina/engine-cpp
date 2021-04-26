@@ -1,5 +1,5 @@
 #include "platform/platform.h"
-#include "common/base.h"
+#include "common/base_common.h"
 
 namespace engine
 {
@@ -12,6 +12,11 @@ namespace engine
         ENG_ASSERT(app && "Application isn't valid!");
         m_App = std::move(app);
         CreatePlatformWindow();
+        return true;
+    }
+
+    bool Platform::Prepare()
+    {
         return true;
     }
 

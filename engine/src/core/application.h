@@ -1,17 +1,26 @@
 #pragma once
 
+#include "core/options.h"
+
 namespace engine
 {
     class Application
     {
     public:
         Application();
-        ~Application();
+        ~Application() = default;
+
+        void SetName(const std::string &name) { m_Name = name; }
+        void SetUsage(const std::string &usage) { m_Usage = usage; }
+
+        void ParseOptions(std::vector<std::string> &arguments);
 
         bool IsHeadless() { return m_Headless; };
 
     private:
-        static std::string m_Usage;
+        std::string m_Name;
+        std::string m_Usage;
+        Options m_Options;
         bool m_Headless;
     };
 }

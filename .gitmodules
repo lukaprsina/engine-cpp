@@ -13,3 +13,6 @@
 [submodule "engine/vendor/glfw"]
 	path = engine/vendor/glfw
 	url = https://github.com/glfw/glfw
+[submodule "engine/vendor/spdlog"]
+	path = engine/vendor/spdlog
+	url = https://github.com/gabime/spdlog

@@ -10,7 +10,7 @@
       "request": "launch",
       // Resolved by CMake Tools:
       "program": "${command:cmake.launchTargetPath}",
-      "args": ["hello"],
+      "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [
@@ -30,7 +30,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "CMake Build",
+      "preLaunchTask": "CMake Build"
     }
   ]
 }

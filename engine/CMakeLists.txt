@@ -1,12 +1,17 @@
 set(CORE_FILES
     # Header Files    
     src/core/application.h
+    src/core/options.h
+    src/core/log.h
     # Source Files    
-    src/core/application.cpp)
+    src/core/application.cpp
+    src/core/options.cpp
+    src/core/log.cpp)
 
 set(COMMON_FILES
     # Header Files
-    src/common/base.h
+    src/common/base_common.h
+    src/common/log_common.h
     src/common/vulkan_common.h)
 
 set(WINDOW_FILES

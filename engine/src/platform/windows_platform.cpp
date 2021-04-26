@@ -63,6 +63,7 @@ namespace engine
 
     WindowsPlatform::WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                                      PSTR lpCmdLine, INT nCmdShow)
+        : Platform()
     {
         if (!AllocConsole())
         {
