@@ -11,6 +11,9 @@ namespace engine
         ~Options() = default;
 
         void ParseOptions(std::string &usage, std::vector<std::string> &arguments);
+        bool Contains(const std::string &argument) const;
+
+        const int32_t GetInt(const std::string &argument) const;
 
     private:
         std::string m_Usage;

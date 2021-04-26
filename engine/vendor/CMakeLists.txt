@@ -11,7 +11,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/docopt)
 target_link_libraries(Engine PRIVATE docopt)
 
 #glfw
+option(GLFW_BUILD_DOCS OFF)
+option(GLFW_BUILD_TESTS OFF)
+option(GLFW_BUILD_EXAMPLES OFF)
+option(GLFW_BUILD_TESTS OFF)
+option(GLFW_INSTALL OFF)
+
 add_subdirectory(glfw)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/glfw/include)
+target_link_libraries(Engine PRIVATE glfw)
 
 #add_subdirectory(glm)
 

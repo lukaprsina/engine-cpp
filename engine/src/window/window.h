@@ -17,7 +17,7 @@ namespace engine
 
         virtual void ProcessEvents() {}
         virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
-        virtual bool ShouldClose() = 0;
+        virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
 
     protected:

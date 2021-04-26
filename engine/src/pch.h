@@ -7,4 +7,6 @@
 #include <map>
 #include <assert.h>
 
+#include "core/log.h"
+
 namespace fs = std::filesystem;

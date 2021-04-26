@@ -2,6 +2,8 @@
 
 #include "window/window.h"
 
+struct GLFWwindow;
+
 namespace engine
 {
     class GlfwWindow : public Window
@@ -14,7 +16,10 @@ namespace engine
         virtual ~GlfwWindow();
 
         virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
-        virtual bool ShouldClose() override;
+        virtual bool ShouldClose() const override;
         virtual void Close() override;
+
+    private:
+        GLFWwindow *m_Handle = nullptr;
     };
 }

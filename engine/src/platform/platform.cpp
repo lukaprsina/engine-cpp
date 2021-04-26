@@ -11,7 +11,17 @@ namespace engine
     {
         ENG_ASSERT(app && "Application isn't valid!");
         m_App = std::move(app);
+
+        bool isHeadless = m_App->GetOptions().Contains("--headless");
+        m_App->SetHeadless(isHeadless);
+
         CreatePlatformWindow();
+
+        if (!m_Window)
+            throw std::runtime_error("Can't create window!");
+        else
+            ENG_CORE_TRACE("Window created!");
+
         return true;
     }
 
@@ -22,6 +32,9 @@ namespace engine
 
     void Platform::MainLoop()
     {
+        while (true)
+        {
+        }
     }
 
     void Platform::Terminate(ExitCode)

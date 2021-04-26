@@ -18,7 +18,7 @@ namespace engine
     {
     }
 
-    bool HeadlessWindow::ShouldClose()
+    bool HeadlessWindow::ShouldClose() const
     {
     }
 

@@ -14,7 +14,7 @@ namespace engine
         virtual ~HeadlessWindow();
 
         virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
-        virtual bool ShouldClose() override;
+        virtual bool ShouldClose() const override;
         virtual void Close() override;
     };
 }

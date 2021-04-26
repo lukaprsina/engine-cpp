@@ -32,8 +32,7 @@ namespace engine
 
     bool UnixPlatform::Initialize(std::unique_ptr<Application> &&app)
     {
-        Platform::Initialize(std::move(app)) && Platform::Prepare();
-        return true;
+        return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
     void UnixPlatform::CreatePlatformWindow()

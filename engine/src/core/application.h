@@ -11,11 +11,14 @@ namespace engine
         ~Application() = default;
 
         void SetName(const std::string &name) { m_Name = name; }
+        std::string GetName() const { return m_Name; };
         void SetUsage(const std::string &usage) { m_Usage = usage; }
 
         void ParseOptions(std::vector<std::string> &arguments);
+        Options GetOptions() const { return m_Options; };
 
-        bool IsHeadless() { return m_Headless; };
+        void SetHeadless(bool headless) { m_Headless = headless; };
+        bool IsHeadless() const { return m_Headless; };
 
     private:
         std::string m_Name;

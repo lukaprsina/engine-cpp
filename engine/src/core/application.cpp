@@ -1,6 +1,4 @@
 #include "core/application.h"
-
-#include "common/log_common.h"
 #include "core/log.h"
 
 namespace engine
@@ -9,14 +7,13 @@ namespace engine
         : m_Headless(false)
     {
         Log::Init();
-        ENG_CORE_TRACE("Hello");
-        ENG_VULKAN_TRACE("Hello");
-        ENG_TRACE("Hello");
+
+        ENG_CORE_TRACE("Logger initialized.");
 
         SetUsage(
             R"(Engine
     Usage:
-        Engine
+        Engine [--headless]
         Engine --help
     Options:
         --help                    Show this screen.
