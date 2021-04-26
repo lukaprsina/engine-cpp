@@ -32,8 +32,11 @@ namespace engine
 
     void Platform::MainLoop()
     {
-        while (true)
+        while (!m_Window->ShouldClose())
         {
+            m_Window->ProcessEvents();
+            ENG_CORE_TRACE("Time!");
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
 

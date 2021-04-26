@@ -13,6 +13,13 @@ set(COMMON_FILES
     src/common/base_common.h    
     src/common/vulkan_common.h)
 
+set(EVENT_FILES
+    # Header Files
+    src/events/application_event.h    
+    src/events/event.h
+    src/events/key_event.h    
+    src/events/mouse_event.h)
+
 set(WINDOW_FILES
     # Header Files
     src/window/glfw_window.h
@@ -44,6 +51,7 @@ set(UNIX_FILES
 
 source_group("core\\" FILES ${CORE_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
+source_group("events\\" FILES ${EVENTS_FILES})
 source_group("window\\" FILES ${WINDOW_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
 source_group("platform\\windows" FILES ${WINDOWS_FILES})

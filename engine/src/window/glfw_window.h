@@ -15,6 +15,7 @@ namespace engine
 
         virtual ~GlfwWindow();
 
+        virtual void ProcessEvents() override;
         virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
         virtual bool ShouldClose() const override;
         virtual void Close() override;

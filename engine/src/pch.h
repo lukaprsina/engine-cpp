@@ -5,6 +5,8 @@
 #include <memory>
 #include <filesystem>
 #include <map>
+#include <chrono>
+#include <thread>
 #include <assert.h>
 
 #include "core/log.h"

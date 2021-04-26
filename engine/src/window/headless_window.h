@@ -16,5 +16,8 @@ namespace engine
         virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
         virtual bool ShouldClose() const override;
         virtual void Close() override;
+
+    private:
+        bool m_Closed;
     };
 }
