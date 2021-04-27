@@ -30,7 +30,7 @@ namespace engine
         virtual void Close() const;
 
         Window &GetWindow() { return *m_Window; };
-        Application &GetApplication() { return *m_App; };
+        Application &GetApp() { return *m_App; };
 
         static void SetArguments(const std::vector<std::string> &arguments) { m_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return m_Arguments; };

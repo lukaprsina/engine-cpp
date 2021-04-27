@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/options.h"
+#include "events/application_event.h"
 
 namespace engine
 {
@@ -9,6 +10,9 @@ namespace engine
     public:
         Application();
         ~Application() = default;
+
+        void OnEvent(Event &event);
+        bool OnWindowClose(WindowCloseEvent &event);
 
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; };

@@ -10,8 +10,7 @@ namespace engine
     {
     public:
         GlfwWindow(Platform &platform,
-                   uint32_t width = 1280,
-                   uint32_t height = 720);
+                   WindowSettings &settings);
 
         virtual ~GlfwWindow();
 

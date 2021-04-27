@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/base_common.h"
+
 namespace engine
 {
     enum class EventType
@@ -40,7 +42,7 @@ namespace engine
         friend class EventDispatcher;
 
     public:
-        bool Handled = false;
+        bool handled = false;
 
         virtual EventType GetEventType() const = 0;
         virtual const char *GetName() const = 0;
@@ -70,7 +72,7 @@ namespace engine
         {
             if (m_Event.GetEventType() == T::GetStaticType())
             {
-                m_Event.Handled = func(*(T *)&m_Event);
+                m_Event.handled = func(*(T *)&m_Event);
                 return true;
             }
             return false;
