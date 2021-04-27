@@ -5,10 +5,12 @@
 
 namespace engine
 {
+    class Platform;
+
     class Application
     {
     public:
-        Application();
+        Application(Platform *platform);
         ~Application() = default;
 
         void OnEvent(Event &event);
@@ -25,6 +27,7 @@ namespace engine
         bool IsHeadless() const { return m_Headless; };
 
     private:
+        Platform *m_Platform;
         std::string m_Name;
         std::string m_Usage;
         Options m_Options;

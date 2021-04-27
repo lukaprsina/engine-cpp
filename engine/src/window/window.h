@@ -15,7 +15,7 @@ namespace engine
         uint32_t height = 720;
         bool focused = true;
 
-        std::function<void(Event &)> eventCallback;
+        std::function<void(Event &)> eventCallback = nullptr;
     };
 
     class Window
@@ -30,12 +30,11 @@ namespace engine
         virtual void Close() = 0;
 
         void SetSettings(WindowSettings &settings) { m_Settings = settings; }
+        WindowSettings GetSettings() { return m_Settings; }
         void SetEventCallback(const std::function<void(Event &)> &eventCallback) { m_Settings.eventCallback = eventCallback; }
 
     protected:
         Platform &m_Platform;
-
-    private:
         WindowSettings m_Settings;
     };
 }

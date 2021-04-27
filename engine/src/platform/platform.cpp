@@ -1,5 +1,8 @@
 #include "platform/platform.h"
+
 #include "common/base_common.h"
+#include "events/event.h"
+#include "core/application.h"
 
 namespace engine
 {

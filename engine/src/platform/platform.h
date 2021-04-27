@@ -17,6 +17,8 @@ namespace engine
     {
     };
 
+    class Event;
+
     class Platform
     {
     public:

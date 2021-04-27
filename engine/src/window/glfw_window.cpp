@@ -67,7 +67,7 @@ namespace engine
         if (!m_Handle)
             throw std::runtime_error("Couldn't create GLFW window.");
 
-        glfwSetWindowUserPointer(m_Handle, &settings);
+        glfwSetWindowUserPointer(m_Handle, &m_Settings);
 
         glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
         glfwSetWindowSizeCallback(m_Handle, WindowSizeCallback);

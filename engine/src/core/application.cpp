@@ -2,12 +2,14 @@
 
 #include "core/log.h"
 #include "events/application_event.h"
+#include "platform/platform.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace engine
 {
-    Application::Application()
+    Application::Application(Platform *platform)
+        : m_Platform(platform)
     {
         Log::Init();
 
