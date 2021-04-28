@@ -22,7 +22,6 @@ namespace engine
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
             WindowCloseEvent event;
             data.eventCallback(event);
-            // glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
 
         void WindowSizeCallback(GLFWwindow *window, int width, int height)
@@ -32,6 +31,46 @@ namespace engine
             data.height = height;
 
             WindowResizeEvent event(width, height);
+            data.eventCallback(event);
+        }
+
+        void WindowFocusCallback(GLFWwindow *window, int focused)
+        {
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+
+            WindowFocusedEvent event(focused);
+            data.eventCallback(event);
+        }
+
+        void WindowPositionCallback(GLFWwindow *window, int xPos, int yPos)
+        {
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+
+            WindowMovedEvent event(xPos, yPos);
+            data.eventCallback(event);
+        }
+
+        void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+        {
+        }
+
+        void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+        {
+        }
+
+        void ScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
+        {
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+
+            MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
+            data.eventCallback(event);
+        }
+
+        void CursorPositionCallback(GLFWwindow *window, double xPos, double yPos)
+        {
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+
+            MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
             data.eventCallback(event);
         }
     }
@@ -71,6 +110,12 @@ namespace engine
 
         glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
         glfwSetWindowSizeCallback(m_Handle, WindowSizeCallback);
+        glfwSetWindowFocusCallback(m_Handle, WindowFocusCallback);
+        glfwSetWindowPosCallback(m_Handle, WindowPositionCallback);
+        // glfwSetKeyCallback(m_Handle, KeyCallback);
+        // glfwSetMouseButtonCallback(m_Handle, MouseButtonCallback);
+        glfwSetScrollCallback(m_Handle, ScrollCallback);
+        glfwSetCursorPosCallback(m_Handle, CursorPositionCallback);
     }
 
     GlfwWindow::~GlfwWindow()

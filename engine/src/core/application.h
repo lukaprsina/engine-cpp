@@ -15,10 +15,14 @@ namespace engine
 
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
+        bool Prepare();
+        void Finish();
 
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; };
+
         void SetUsage(const std::string &usage) { m_Usage = usage; }
+        std::string GetUsage() { return m_Usage; }
 
         void ParseOptions(std::vector<std::string> &arguments);
         Options GetOptions() const { return m_Options; };

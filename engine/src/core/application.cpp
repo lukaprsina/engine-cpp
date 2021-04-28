@@ -33,7 +33,19 @@ namespace engine
 
     bool Application::OnWindowClose(WindowCloseEvent &event)
     {
+        m_Platform->Close();
         return true;
+    }
+
+    bool Application::Prepare()
+    {
+        ENG_CORE_TRACE("{0}", m_Platform->GetSurfaceExtension());
+        return true;
+    }
+
+    void Application::Finish()
+    {
+        ENG_CORE_TRACE("Closing Application.");
     }
 
     void Application::OnEvent(Event &event)

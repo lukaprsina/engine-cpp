@@ -7,6 +7,14 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#ifndef VK_MVK_MACOS_SURFACE_EXTENSION_NAME
+#define VK_MVK_MACOS_SURFACE_EXTENSION_NAME "VK_MVK_macos_surface"
+#endif
+
+#ifndef VK_KHR_XCB_SURFACE_EXTENSION_NAME
+#define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
+#endif
+
 namespace engine
 {
     namespace
@@ -47,6 +55,18 @@ namespace engine
         else
         {
             m_Window = std::make_unique<GlfwWindow>(*this, settings);
+        }
+    }
+
+    const char *UnixPlatform::GetSurfaceExtension()
+    {
+        if (m_Type == UnixType::Mac)
+        {
+            return VK_MVK_MACOS_SURFACE_EXTENSION_NAME;
+        }
+        else
+        {
+            return VK_KHR_XCB_SURFACE_EXTENSION_NAME;
         }
     }
 }

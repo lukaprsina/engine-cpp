@@ -32,22 +32,38 @@ namespace engine
 
     bool Platform::Prepare()
     {
-        return true;
+        if (m_App)
+        {
+            return m_App->Prepare();
+        }
+
+        return false;
     }
 
     void Platform::MainLoop()
     {
         while (!m_Window->ShouldClose())
         {
-            m_Window->ProcessEvents();
+            Run();
         }
+    }
+
+    void Platform::Run()
+    {
+        m_Window->ProcessEvents();
     }
 
     void Platform::Terminate(ExitCode)
     {
+        if (m_App)
+            m_App->Finish();
+
+        m_App.reset();
+        m_Window.reset();
     }
 
     void Platform::Close() const
     {
+        m_Window->Close();
     }
 }

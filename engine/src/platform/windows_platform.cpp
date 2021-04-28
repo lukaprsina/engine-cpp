@@ -81,11 +81,15 @@ namespace engine
 
     bool WindowsPlatform::Initialize(std::unique_ptr<Application> &&app)
     {
-        std::cout << "Fuck win\n";
         return true;
     }
 
     void WindowsPlatform::CreatePlatformWindow()
     {
+    }
+
+    virtual const char *GetSurfaceExtension()
+    {
+        return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
     }
 }

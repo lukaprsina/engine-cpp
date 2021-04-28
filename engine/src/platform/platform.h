@@ -28,11 +28,13 @@ namespace engine
         virtual bool Initialize(std::unique_ptr<Application> &&app);
         virtual bool Prepare();
         virtual void MainLoop();
+        void Run();
         virtual void Terminate(ExitCode code);
         virtual void Close() const;
 
         Window &GetWindow() { return *m_Window; };
         Application &GetApp() { return *m_App; };
+        virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { m_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return m_Arguments; };

@@ -18,6 +18,7 @@ namespace engine
 
         virtual bool Initialize(std::unique_ptr<Application> &&app) override;
         virtual void CreatePlatformWindow() override;
+        virtual const char *GetSurfaceExtension() override;
 
     private:
         UnixType m_Type;
