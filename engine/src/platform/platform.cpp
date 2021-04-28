@@ -1,5 +1,8 @@
 #include "platform/platform.h"
+
 #include "common/base_common.h"
+#include "events/event.h"
+#include "core/application.h"
 
 namespace engine
 {
@@ -22,6 +25,8 @@ namespace engine
         else
             ENG_CORE_TRACE("Window created!");
 
+        m_Window->SetEventCallback(std::bind(&Application::OnEvent, GetApp(), std::placeholders::_1));
+
         return true;
     }
 
@@ -35,8 +40,6 @@ namespace engine
         while (!m_Window->ShouldClose())
         {
             m_Window->ProcessEvents();
-            ENG_CORE_TRACE("Time!");
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
 

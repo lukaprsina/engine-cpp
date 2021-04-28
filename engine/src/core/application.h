@@ -1,14 +1,20 @@
 #pragma once
 
 #include "core/options.h"
+#include "events/application_event.h"
 
 namespace engine
 {
+    class Platform;
+
     class Application
     {
     public:
-        Application();
+        Application(Platform *platform);
         ~Application() = default;
+
+        void OnEvent(Event &event);
+        bool OnWindowClose(WindowCloseEvent &event);
 
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; };
@@ -21,6 +27,7 @@ namespace engine
         bool IsHeadless() const { return m_Headless; };
 
     private:
+        Platform *m_Platform;
         std::string m_Name;
         std::string m_Usage;
         Options m_Options;

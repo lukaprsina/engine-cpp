@@ -4,9 +4,8 @@
 namespace engine
 {
     HeadlessWindow::HeadlessWindow(Platform &platform,
-                                   uint32_t width,
-                                   uint32_t height)
-        : Window(platform, width, height), m_Closed(false)
+                                   WindowSettings &settings)
+        : Window(platform, settings), m_Closed(false)
     {
     }
 

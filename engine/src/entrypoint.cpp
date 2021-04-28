@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     try
     {
 #endif
-        std::unique_ptr<engine::Application> app = std::make_unique<engine::Application>();
+        std::unique_ptr<engine::Application> app = std::make_unique<engine::Application>(&platform);
         app->SetName("Engine");
         app->ParseOptions(platform.GetArguments());
 

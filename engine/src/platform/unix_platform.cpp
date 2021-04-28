@@ -2,6 +2,7 @@
 
 #include "window/glfw_window.h"
 #include "window/headless_window.h"
+#include "events/event.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -37,13 +38,15 @@ namespace engine
 
     void UnixPlatform::CreatePlatformWindow()
     {
+        WindowSettings settings;
+
         if (m_App->IsHeadless())
         {
-            m_Window = std::make_unique<HeadlessWindow>(*this);
+            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
         }
         else
         {
-            m_Window = std::make_unique<GlfwWindow>(*this);
+            m_Window = std::make_unique<GlfwWindow>(*this, settings);
         }
     }
 }

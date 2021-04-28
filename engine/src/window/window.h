@@ -5,14 +5,23 @@
 namespace engine
 {
     class Platform;
-    class Instance
+    class Event;
+    class Instance;
+
+    struct WindowSettings
     {
+        std::string title = "";
+        uint32_t width = 1280;
+        uint32_t height = 720;
+        bool focused = true;
+
+        std::function<void(Event &)> eventCallback = nullptr;
     };
 
     class Window
     {
     public:
-        Window(Platform &platform, uint32_t width, uint32_t height);
+        Window(Platform &platform, WindowSettings &settings);
         virtual ~Window() = default;
 
         virtual void ProcessEvents() {}
@@ -20,11 +29,12 @@ namespace engine
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
 
+        void SetSettings(WindowSettings &settings) { m_Settings = settings; }
+        WindowSettings GetSettings() { return m_Settings; }
+        void SetEventCallback(const std::function<void(Event &)> &eventCallback) { m_Settings.eventCallback = eventCallback; }
+
     protected:
         Platform &m_Platform;
-
-    private:
-        uint32_t m_Width;
-        uint32_t m_Height;
+        WindowSettings m_Settings;
     };
 }

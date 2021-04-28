@@ -1,5 +1,9 @@
 #include "window/glfw_window.h"
+
 #include "platform/platform.h"
+#include "events/application_event.h"
+#include "events/key_event.h"
+#include "events/mouse_event.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -15,18 +19,26 @@ namespace engine
 
         void WindowCloseCallback(GLFWwindow *window)
         {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            WindowCloseEvent event;
+            data.eventCallback(event);
+            // glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
 
         void WindowSizeCallback(GLFWwindow *window, int width, int height)
         {
+            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            data.width = width;
+            data.height = height;
+
+            WindowResizeEvent event(width, height);
+            data.eventCallback(event);
         }
     }
 
     GlfwWindow::GlfwWindow(Platform &platform,
-                           uint32_t width,
-                           uint32_t height)
-        : Window(platform, width, height)
+                           WindowSettings &settings)
+        : Window(platform, settings)
     {
         if (!glfwInit())
             throw std::runtime_error("GLFW couldn't be initialized.");
@@ -35,28 +47,37 @@ namespace engine
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        const Options &options = platform.GetApplication().GetOptions();
+        const Options &options = platform.GetApp().GetOptions();
 
         if (options.Contains("--width"))
-            width = static_cast<uint32_t>(options.GetInt("--width"));
+            settings.width = static_cast<uint32_t>(options.GetInt("--width"));
 
         if (options.Contains("--height"))
-            width = static_cast<uint32_t>(options.GetInt("--height"));
+            settings.height = static_cast<uint32_t>(options.GetInt("--height"));
 
-        const char *name = platform.GetApplication().GetName().c_str();
+        if (settings.title.empty())
+            settings.title = platform.GetApp().GetName();
 
-        m_Handle = glfwCreateWindow(width, height, name, nullptr, nullptr);
+        Window::SetSettings(settings);
+
+        m_Handle = glfwCreateWindow(settings.width,
+                                    settings.height,
+                                    settings.title.c_str(), nullptr, nullptr);
 
         if (!m_Handle)
             throw std::runtime_error("Couldn't create GLFW window.");
 
-        glfwSetWindowUserPointer(m_Handle, this);
+        glfwSetWindowUserPointer(m_Handle, &m_Settings);
 
         glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
+        glfwSetWindowSizeCallback(m_Handle, WindowSizeCallback);
     }
 
     GlfwWindow::~GlfwWindow()
     {
+        if (m_Handle)
+            glfwDestroyWindow(m_Handle);
+
         glfwTerminate();
     }
 
