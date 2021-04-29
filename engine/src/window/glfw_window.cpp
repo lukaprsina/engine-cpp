@@ -307,10 +307,10 @@ namespace engine
         glfwPollEvents();
     }
 
-    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
+    /* VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
     {
         return nullptr;
-    }
+    } */
 
     bool GlfwWindow::ShouldClose() const
     {

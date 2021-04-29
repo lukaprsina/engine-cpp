@@ -11,7 +11,13 @@ set(CORE_FILES
 set(COMMON_FILES
     # Header Files
     src/common/base_common.h    
-    src/common/vulkan_common.h)
+    src/common/error_common.h
+    src/common/vulkan_common.h
+    src/common/strings_common.h
+    #Source files
+    src/common/error_common.cpp
+    src/common/strings_common.cpp
+    )
 
 set(EVENT_FILES
     # Header Files
@@ -49,6 +55,12 @@ set(UNIX_FILES
     # Source Files
     src/platform/unix_platform.cpp)
 
+set(VULKAN_API_FILES
+    #Header files
+    src/vulkan_api/instance/instance.h
+    #Source files
+    src/vulkan_api/instance/instance.cpp)
+
 source_group("core\\" FILES ${CORE_FILES})
 source_group("common\\" FILES ${COMMON_FILES})
 source_group("events\\" FILES ${EVENTS_FILES})
@@ -56,12 +68,14 @@ source_group("window\\" FILES ${WINDOW_FILES})
 source_group("platform\\" FILES ${PLATFORM_FILES})
 source_group("platform\\windows" FILES ${WINDOWS_FILES})
 source_group("platform\\unix" FILES ${UNIX_FILES})
+source_group("vulkan_api\\" FILES ${VULKAN_API_FILES})
 
 set(PROJECT_FILES
     ${CORE_FILES}
     ${COMMON_FILES}
     ${WINDOW_FILES}
     ${PLATFORM_FILES}
+    ${VULKAN_API_FILES}
     )
 
 if(ANDROID)

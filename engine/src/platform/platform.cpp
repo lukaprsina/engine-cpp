@@ -25,7 +25,7 @@ namespace engine
         else
             ENG_CORE_TRACE("Window created!");
 
-        m_Window->SetEventCallback(std::bind(&Application::OnEvent, GetApp(), std::placeholders::_1));
+        m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
         return true;
     }

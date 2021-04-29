@@ -1,15 +1,17 @@
 #include "core/application.h"
 
+#include "common/vulkan_common.h"
 #include "core/log.h"
 #include "events/application_event.h"
 #include "platform/platform.h"
+#include "vulkan_api/instance/instance.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace engine
 {
     Application::Application(Platform *platform)
-        : m_Platform(platform)
+        : m_Platform(platform), m_Instance(nullptr), m_ValidationLayers{}
     {
         Log::Init();
 
@@ -31,6 +33,10 @@ namespace engine
             "\n");
     }
 
+    Application::~Application()
+    {
+    }
+
     bool Application::OnWindowClose(WindowCloseEvent &event)
     {
         m_Platform->Close();
@@ -39,7 +45,13 @@ namespace engine
 
     bool Application::Prepare()
     {
-        ENG_CORE_TRACE("{0}", m_Platform->GetSurfaceExtension());
+        AddInstanceExtension(m_Platform->GetSurfaceExtension());
+        m_Instance = std::make_unique<Instance>(m_Name,
+                                                m_InstanceExtensions,
+                                                m_ValidationLayers,
+                                                m_Headless,
+                                                VK_API_VERSION_1_2);
+
         return true;
     }
 

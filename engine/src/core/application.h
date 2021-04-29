@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/options.h"
+#include "vulkan_api/instance/instance.h"
 
 namespace engine
 {
@@ -12,7 +13,12 @@ namespace engine
     {
     public:
         Application(Platform *platform);
-        ~Application() = default;
+        Application() = delete;
+        Application(const Application &) = default;
+        Application(Application &&) = delete;
+        ~Application();
+        Application &operator=(const Application &) = delete;
+        Application &operator=(Application &&) = delete;
 
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
@@ -31,11 +37,22 @@ namespace engine
         void SetHeadless(bool headless) { m_Headless = headless; };
         bool IsHeadless() const { return m_Headless; };
 
+        void AddInstanceExtension(const char *extension, bool optional = false) { m_InstanceExtensions[extension] = optional; }
+        const std::unordered_map<const char *, bool> GetInstanceExtensions() { return m_InstanceExtensions; }
+        void AddDeviceExtension(const char *extension, bool optional = false) { m_DeviceExtensions[extension] = optional; }
+        const std::unordered_map<const char *, bool> GetDeviceExtensions() { return m_DeviceExtensions; }
+
     private:
         Platform *m_Platform;
         std::string m_Name;
         std::string m_Usage;
         Options m_Options;
         bool m_Headless;
+
+        std::unique_ptr<Instance> m_Instance;
+
+        std::unordered_map<const char *, bool> m_DeviceExtensions;
+        std::unordered_map<const char *, bool> m_InstanceExtensions;
+        std::vector<const char *> m_ValidationLayers;
     };
 }

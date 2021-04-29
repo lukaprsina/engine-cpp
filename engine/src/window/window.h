@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common/vulkan_common.h"
+#include "vulkan_api/instance/instance.h"
 
 namespace engine
 {
     class Platform;
     class Event;
-    class Instance;
 
     struct WindowSettings
     {
@@ -25,7 +25,7 @@ namespace engine
         virtual ~Window() = default;
 
         virtual void ProcessEvents() {}
-        virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
+        // virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
 
