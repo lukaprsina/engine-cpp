@@ -52,6 +52,7 @@ namespace engine
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+        ENG_CORE_TRACE("{}", event.ToString());
     }
 
     void Application::ParseOptions(std::vector<std::string> &arguments)

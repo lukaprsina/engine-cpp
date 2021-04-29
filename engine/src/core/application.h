@@ -1,11 +1,12 @@
 #pragma once
 
 #include "core/options.h"
-#include "events/application_event.h"
 
 namespace engine
 {
     class Platform;
+    class WindowCloseEvent;
+    class Event;
 
     class Application
     {

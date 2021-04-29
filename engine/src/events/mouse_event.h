@@ -4,6 +4,16 @@
 
 namespace engine
 {
+	enum class MouseButton
+	{
+		Left,
+		Right,
+		Middle,
+		Back,
+		Forward,
+		Unknown
+	};
+
 	class MouseMovedEvent : public Event
 	{
 	public:

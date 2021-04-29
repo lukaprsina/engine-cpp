@@ -1,9 +1,4 @@
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-#include "platform/android/android_platform.h"
-void android_main(android_app *state)
-{
-    engine::AndroidPlatform platform{state};
-#elif defined(VK_USE_PLATFORM_WIN32_KHR)
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
 #include "platform/windows_platform.h"
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      PSTR lpCmdLine, INT nCmdShow)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "window/window.h"
+#include "events/key_event.h"
 
 struct GLFWwindow;
 
