@@ -98,6 +98,18 @@ target_include_directories(Engine
 
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
-target_compile_definitions(Engine PRIVATE ENG_PLATFORM)
+target_compile_definitions(Engine
+    PRIVATE ENG_PLATFORM
+    PRIVATE ENG_VALIDATION_LAYERS
+    PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED
+    )
+
+set(gcc_like_compile "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU>")
+set(msvc_compile "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+
+target_compile_options(Engine
+    PRIVATE "$<${gcc_like_compile}:$<BUILD_INTERFACE:-Wall;-Wextra;-pedantic>>"
+    PRIVATE "$<${msvc_compile}:$<BUILD_INTERFACE:-W3>>"
+    )
 
 add_subdirectory("vendor")

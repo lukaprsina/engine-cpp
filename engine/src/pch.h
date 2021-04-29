@@ -10,5 +10,6 @@
 #include <assert.h>
 
 #include "core/log.h"
+#include "common/base_common.h"
 
 namespace fs = std::filesystem;

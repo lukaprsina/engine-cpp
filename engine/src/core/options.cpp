@@ -32,7 +32,7 @@ namespace engine
         return false;
     }
 
-    const int32_t Options::GetInt(const std::string &argument) const
+    int32_t Options::GetInt(const std::string &argument) const
     {
         if (Contains(argument))
         {

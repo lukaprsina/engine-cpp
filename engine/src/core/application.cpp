@@ -37,7 +37,7 @@ namespace engine
     {
     }
 
-    bool Application::OnWindowClose(WindowCloseEvent &event)
+    bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
     {
         m_Platform->Close();
         return true;
@@ -46,9 +46,11 @@ namespace engine
     bool Application::Prepare()
     {
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
+        DebugUtilsSettings debug_utils_settings;
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
                                                 m_ValidationLayers,
+                                                debug_utils_settings,
                                                 m_Headless,
                                                 VK_API_VERSION_1_2);
 
@@ -64,7 +66,6 @@ namespace engine
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
-        ENG_CORE_TRACE("{}", event.ToString());
     }
 
     void Application::ParseOptions(std::vector<std::string> &arguments)
