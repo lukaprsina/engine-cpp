@@ -296,7 +296,7 @@ namespace engine
             debug_report_create_info.pfnCallback = DebugCallback;
 
             instance_info.pNext = &debug_report_create_info;
-        }
+        }        
 #endif
 
 #if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
@@ -304,14 +304,14 @@ namespace engine
 
         if (validation_features)
         {
-            const std::array<VkValidationFeatureEnableEXT, 2> enable_features = {
+            static const VkValidationFeatureEnableEXT enable_features[2] = {
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT,
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
             };
 
             validation_features_info.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-            validation_features_info.enabledValidationFeatureCount = enable_features.size();
-            validation_features_info.pEnabledValidationFeatures = enable_features.data();
+            validation_features_info.enabledValidationFeatureCount = 2;
+            validation_features_info.pEnabledValidationFeatures = enable_features;
             validation_features_info.pNext = instance_info.pNext;
 
             instance_info.pNext = &validation_features_info;

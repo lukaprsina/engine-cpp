@@ -1,5 +1,9 @@
 #include "platform/windows_platform.h"
 
+#include "window/glfw_window.h"
+#include "window/headless_window.h"
+#include "events/event.h"
+
 #include <stdio.h>
 #include <iostream>
 
@@ -71,9 +75,9 @@ namespace engine
         }
 
         FILE *fp;
-        /* freopen_s(&fp, "conin$", "r", stdin);
+        freopen_s(&fp, "conin$", "r", stdin);
         freopen_s(&fp, "conout$", "w", stdout);
-        freopen_s(&fp, "conout$", "w", stderr); */
+        freopen_s(&fp, "conout$", "w", stderr);
 
         Platform::SetArguments(get_args());
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
@@ -81,14 +85,24 @@ namespace engine
 
     bool WindowsPlatform::Initialize(std::unique_ptr<Application> &&app)
     {
-        return true;
+        return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
     void WindowsPlatform::CreatePlatformWindow()
     {
+        WindowSettings settings;
+
+        if (m_App->IsHeadless())
+        {
+            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
+        }
+        else
+        {
+            m_Window = std::make_unique<GlfwWindow>(*this, settings);
+        }
     }
 
-    virtual const char *GetSurfaceExtension()
+    const char *WindowsPlatform::GetSurfaceExtension()
     {
         return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
     }

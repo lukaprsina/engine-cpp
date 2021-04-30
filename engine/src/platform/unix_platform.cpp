@@ -4,9 +4,6 @@
 #include "window/headless_window.h"
 #include "events/event.h"
 
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
 #ifndef VK_MVK_MACOS_SURFACE_EXTENSION_NAME
 #define VK_MVK_MACOS_SURFACE_EXTENSION_NAME "VK_MVK_macos_surface"
 #endif

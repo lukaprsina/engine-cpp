@@ -19,8 +19,6 @@
     },
     {
       "label": "CMake Build",
-      //"command": "${command:cmake.build}",
-      //"type": "shell",
       "command": "build",
       "type": "cmake",
       "group": {
