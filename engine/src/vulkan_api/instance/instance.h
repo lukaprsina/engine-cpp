@@ -10,6 +10,8 @@ namespace engine
         uint32_t VulkanMessageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     };
 
+    class PhysicalDevice;
+
     class Instance
     {
     public:
@@ -22,14 +24,21 @@ namespace engine
         Instance() = delete;
         ~Instance();
 
+        VkInstance GetHandle() { return m_Handle; }
+        PhysicalDevice &GetBestGpu();
+
     private:
         std::vector<const char *> m_EnabledExtensions;
         DebugUtilsSettings m_DebugUtilsSettings;
 
 #if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
-        VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = nullptr;
-        VkDebugReportCallbackEXT m_DebugReportCallback = nullptr;
+        VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = VK_NULL_HANDLE;
+        VkDebugReportCallbackEXT m_DebugReportCallback = VK_NULL_HANDLE;
 #endif
+
+        void QueryGpus();
+
+        std::vector<std::unique_ptr<PhysicalDevice>> m_Gpus;
 
         VkInstance m_Handle = nullptr;
     };

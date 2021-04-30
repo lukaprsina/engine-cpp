@@ -54,6 +54,9 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_2);
 
+        m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
+        auto &gpu = m_Instance->GetBestGpu();
+
         return true;
     }
 

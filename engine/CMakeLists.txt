@@ -58,8 +58,10 @@ set(UNIX_FILES
 set(VULKAN_API_FILES
     #Header files
     src/vulkan_api/instance/instance.h
+    src/vulkan_api/instance/physical_device.h
     #Source files
-    src/vulkan_api/instance/instance.cpp)
+    src/vulkan_api/instance/instance.cpp
+    src/vulkan_api/instance/physical_device.cpp)
 
 source_group("core\\" FILES ${CORE_FILES})
 source_group("common\\" FILES ${COMMON_FILES})

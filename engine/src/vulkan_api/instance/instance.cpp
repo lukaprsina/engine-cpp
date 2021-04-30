@@ -2,6 +2,11 @@
 
 #include "common/base_common.h"
 #include "common/error_common.h"
+#include "vulkan_api/instance/physical_device.h"
+
+#if (defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED) && !defined(ENG_VALIDATION_LAYERS))
+#error Need validation layers when enabling GPU assisted validation layers
+#endif
 
 namespace
 {
@@ -199,7 +204,7 @@ namespace engine
         }
         else
         {
-            m_EnabledExtensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+            m_EnabledExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
         }
 
         bool extension_found = false;
@@ -209,7 +214,7 @@ namespace engine
             const char *extension_name = extension.first;
             bool is_optional = extension.second;
 
-            for (int i = 0; i < available_instance_extensions.size(); i++)
+            for (size_t i = 0; i < available_instance_extensions.size(); i++)
             {
                 if (strcmp(extension_name, available_instance_extensions[i].extensionName) == 0)
                 {
@@ -334,6 +339,8 @@ namespace engine
                 throw VulkanException(result, "Could not create debug report callback");
         }
 #endif
+
+        QueryGpus();
     }
 
     Instance::~Instance()
@@ -353,5 +360,65 @@ namespace engine
         {
             vkDestroyInstance(m_Handle, nullptr);
         }
+    }
+
+    void Instance::QueryGpus()
+    {
+        uint32_t physical_device_count = 0;
+        VK_CHECK(vkEnumeratePhysicalDevices(m_Handle, &physical_device_count, nullptr));
+
+        if (physical_device_count < 1)
+            throw std::runtime_error("Couldn't find a physical device that supports Vulkan.");
+
+        std::vector<VkPhysicalDevice> physical_devices;
+        physical_devices.resize(physical_device_count);
+
+        VK_CHECK(vkEnumeratePhysicalDevices(m_Handle, &physical_device_count, physical_devices.data()));
+
+        for (auto &physical_device : physical_devices)
+        {
+            m_Gpus.emplace_back(std::make_unique<PhysicalDevice>(*this, physical_device));
+        }
+    }
+
+    PhysicalDevice &Instance::GetBestGpu()
+    {
+        ENG_ASSERT(!m_Gpus.empty() && "No GPUS found.");
+        uint32_t score = 0;
+
+        std::multimap<uint32_t, PhysicalDevice> candidates;
+
+        for (auto &gpu : m_Gpus)
+        {
+            if (!gpu->GetFeatures().geometryShader)
+                continue;
+
+            score = 0;
+
+            if (gpu->GetProperties().deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+                score += 1000;
+            else if (gpu->GetProperties().deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+                score += 100;
+
+            auto heaps_pointer = gpu->GetMemoryProperties().memoryHeaps;
+            size_t heap_count = gpu->GetMemoryProperties().memoryHeapCount;
+
+            std::vector<VkMemoryHeap> heaps(heaps_pointer, heaps_pointer + heap_count);
+
+            for (const auto &heap : heaps)
+            {
+                if (heap.flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+                    score += heap.size * std::pow(10, -7);
+            }
+
+            score += gpu->GetProperties().limits.maxImageDimension2D * 0.02;
+
+            candidates.insert(std::make_pair(score, *gpu));
+        }
+
+        if (candidates.rbegin()->first == 0)
+            throw std::runtime_error("The only device capable of Vulkan rendering isn't suitable.");
+
+        return candidates.rbegin()->second;
     }
 }

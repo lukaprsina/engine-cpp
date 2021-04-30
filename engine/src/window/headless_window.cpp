@@ -13,10 +13,10 @@ namespace engine
     {
     }
 
-    /* VkSurfaceKHR HeadlessWindow::CreateSurface(Instance &instance)
+    VkSurfaceKHR HeadlessWindow::CreateSurface(Instance &instance)
     {
         return nullptr;
-    } */
+    }
 
     bool HeadlessWindow::ShouldClose() const
     {

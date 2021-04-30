@@ -307,10 +307,22 @@ namespace engine
         glfwPollEvents();
     }
 
-    /* VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
+    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
     {
-        return nullptr;
-    } */
+        ENG_ASSERT(instance.GetHandle() && "Create an instance before calling CreateSurface.");
+        ENG_ASSERT(m_Handle && "Create a window before calling CreateSurface.");
+
+        if (instance.GetHandle() == VK_NULL_HANDLE || !m_Handle)
+            return VK_NULL_HANDLE;
+
+        VkSurfaceKHR surface;
+        VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &surface);
+
+        if (result != VK_SUCCESS)
+            return VK_NULL_HANDLE;
+
+        return surface;
+    }
 
     bool GlfwWindow::ShouldClose() const
     {

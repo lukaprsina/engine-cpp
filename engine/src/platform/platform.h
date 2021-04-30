@@ -32,8 +32,8 @@ namespace engine
         virtual void Terminate(ExitCode code);
         virtual void Close() const;
 
-        const Window &GetWindow() const { return *m_Window; };
-        const Application &GetApp() const { return *m_App; };
+        Window &GetWindow() const { return *m_Window; };
+        Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { m_Arguments = arguments; };

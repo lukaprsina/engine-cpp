@@ -54,5 +54,7 @@ namespace engine
         std::unordered_map<const char *, bool> m_DeviceExtensions;
         std::unordered_map<const char *, bool> m_InstanceExtensions;
         std::vector<const char *> m_ValidationLayers;
+
+        VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
     };
 }
