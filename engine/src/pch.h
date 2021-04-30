@@ -8,6 +8,7 @@
 #include <chrono>
 #include <thread>
 #include <assert.h>
+#include <array>
 
 #include "core/log.h"
 #include "common/base_common.h"
