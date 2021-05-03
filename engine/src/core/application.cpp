@@ -5,6 +5,8 @@
 #include "events/application_event.h"
 #include "platform/platform.h"
 #include "vulkan_api/instance/instance.h"
+#include "vulkan_api/instance/physical_device.h"
+#include "vulkan_api/instance/device.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -35,6 +37,11 @@ namespace engine
 
     Application::~Application()
     {
+        if (m_Device)
+            m_Device->WaitIdle();
+
+        if (m_Surface != VK_NULL_HANDLE)
+            vkDestroySurfaceKHR(m_Instance->GetHandle(), m_Surface, nullptr);
     }
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
@@ -47,15 +54,24 @@ namespace engine
     {
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
+
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
                                                 m_ValidationLayers,
                                                 debug_utils_settings,
                                                 m_Headless,
-                                                VK_API_VERSION_1_2);
+                                                VK_API_VERSION_1_0);
 
         m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
-        auto &gpu = m_Instance->GetBestGpu();
+        PhysicalDevice gpu = m_Instance->GetBestGpu();
+
+        if (gpu.GetFeatures().textureCompressionASTC_LDR)
+            gpu.GetMutableRequestedFeatures().textureCompressionASTC_LDR = VK_TRUE;
+
+        if (!IsHeadless() || m_Instance->IsExtensionEnabled(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME))
+            AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+        m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
 
         return true;
     }

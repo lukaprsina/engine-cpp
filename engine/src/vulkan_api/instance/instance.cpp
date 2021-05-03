@@ -296,7 +296,7 @@ namespace engine
             debug_report_create_info.pfnCallback = DebugCallback;
 
             instance_info.pNext = &debug_report_create_info;
-        }        
+        }
 #endif
 
 #if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
@@ -381,7 +381,7 @@ namespace engine
         }
     }
 
-    PhysicalDevice &Instance::GetBestGpu()
+    PhysicalDevice Instance::GetBestGpu()
     {
         ENG_ASSERT(!m_Gpus.empty() && "No GPUS found.");
         uint32_t score = 0;
@@ -416,9 +416,20 @@ namespace engine
             candidates.insert(std::make_pair(score, *gpu));
         }
 
-        if (candidates.rbegin()->first == 0)
+        if (candidates.empty() || candidates.rbegin()->first == 0)
             throw std::runtime_error("The only device capable of Vulkan rendering isn't suitable.");
 
         return candidates.rbegin()->second;
+    }
+
+    bool Instance::IsExtensionEnabled(const char *extension) const
+    {
+        auto it = std::find_if(m_EnabledExtensions.begin(),
+                               m_EnabledExtensions.end(),
+                               [extension](const char *enabled_extension) {
+                                   return (std::strcmp(enabled_extension, extension) == 0);
+                               });
+
+        return it != m_EnabledExtensions.end();
     }
 }
