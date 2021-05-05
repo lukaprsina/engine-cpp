@@ -1,7 +1,5 @@
 #pragma once
 
-#include "common/vulkan_common.h"
-
 namespace engine
 {
     struct DebugUtilsSettings
@@ -33,15 +31,18 @@ namespace engine
         std::vector<const char *> m_EnabledExtensions;
         DebugUtilsSettings m_DebugUtilsSettings;
 
+        bool EnableDebugCallback(std::vector<VkExtensionProperties> &available_instance_extensions);
+        bool EnableValidationFeatures();
+        void AddSwapchainExtension(std::vector<VkExtensionProperties> &available_instance_extensions, bool headless);
+        void ValidateExtensions(std::unordered_map<const char *, bool> &required_extensions, std::vector<VkExtensionProperties> &available_instance_extensions);
+
 #if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
         VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = VK_NULL_HANDLE;
         VkDebugReportCallbackEXT m_DebugReportCallback = VK_NULL_HANDLE;
 #endif
 
         void QueryGpus();
-
         std::vector<std::unique_ptr<PhysicalDevice>> m_Gpus;
-
         VkInstance m_Handle = nullptr;
     };
 }

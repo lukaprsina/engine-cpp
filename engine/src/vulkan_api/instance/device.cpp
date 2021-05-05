@@ -1,6 +1,13 @@
 #include "vulkan_api/instance/device.h"
 
-#include "common/error_common.h"
+#include "vulkan_api/instance/instance.h"
+#include "vulkan_api/instance/command_pool.h"
+#include "vulkan_api/instance/fence_pool.h"
+
+ENG_DISABLE_WARNINGS()
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {
@@ -9,13 +16,15 @@ namespace engine
                    std::unordered_map<const char *, bool> requested_extensions)
         : m_Gpu(gpu), m_ResourceCache(*this)
     {
-        ENG_CORE_TRACE("Selected GPU: {}", gpu.GetProperties().deviceName);
+        ENG_CORE_INFO("Selected GPU: {}", gpu.GetProperties().deviceName);
 
         std::vector<VkQueueFamilyProperties> queue_family_properties = gpu.GetQueueFamilyProperties();
         uint32_t queue_family_properties_count = to_u32(queue_family_properties.size());
 
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos(queue_family_properties_count);
         std::vector<std::vector<float>> queue_priorities(queue_family_properties_count);
+
+        m_Queues.resize(queue_family_properties_count);
 
         for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties_count; ++queue_family_index)
         {
@@ -49,7 +58,7 @@ namespace engine
             m_EnabledExtensions.push_back("VK_KHR_get_memory_requirements2");
             m_EnabledExtensions.push_back("VK_KHR_dedicated_allocation");
 
-            ENG_CORE_TRACE("Dedicated Allocation enabled");
+            ENG_CORE_INFO("Dedicated Allocation enabled");
         }
 
         std::vector<const char *> unsupported_extensions;
@@ -63,10 +72,10 @@ namespace engine
 
         if (m_EnabledExtensions.size() > 0)
         {
-            ENG_CORE_TRACE("Device supports the following requested extensions:");
+            ENG_CORE_INFO("Enabled extensions:");
             for (auto &extension : m_EnabledExtensions)
             {
-                ENG_CORE_TRACE("  \t{}", extension);
+                ENG_CORE_INFO("  \t{}", extension);
             }
         }
 
@@ -97,10 +106,76 @@ namespace engine
 
         if (result != VK_SUCCESS)
             throw VulkanException(result, "Cannot create device");
+
+        for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties_count; ++queue_family_index)
+        {
+            const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
+            VkBool32 present_supported = gpu.IsPresentSupported(surface, queue_family_index);
+
+            for (uint32_t queue_index = 0; queue_index < queue_family_property.queueCount; ++queue_index)
+                m_Queues[queue_family_index].emplace_back(*this, queue_family_index, queue_family_property, present_supported, queue_index);
+        }
+
+        VmaVulkanFunctions vma_vulkan_func{};
+        vma_vulkan_func.vkAllocateMemory = vkAllocateMemory;
+        vma_vulkan_func.vkBindBufferMemory = vkBindBufferMemory;
+        vma_vulkan_func.vkBindImageMemory = vkBindImageMemory;
+        vma_vulkan_func.vkCreateBuffer = vkCreateBuffer;
+        vma_vulkan_func.vkCreateImage = vkCreateImage;
+        vma_vulkan_func.vkDestroyBuffer = vkDestroyBuffer;
+        vma_vulkan_func.vkDestroyImage = vkDestroyImage;
+        vma_vulkan_func.vkFlushMappedMemoryRanges = vkFlushMappedMemoryRanges;
+        vma_vulkan_func.vkFreeMemory = vkFreeMemory;
+        vma_vulkan_func.vkGetBufferMemoryRequirements = vkGetBufferMemoryRequirements;
+        vma_vulkan_func.vkGetImageMemoryRequirements = vkGetImageMemoryRequirements;
+        vma_vulkan_func.vkGetPhysicalDeviceMemoryProperties = vkGetPhysicalDeviceMemoryProperties;
+        vma_vulkan_func.vkGetPhysicalDeviceProperties = vkGetPhysicalDeviceProperties;
+        vma_vulkan_func.vkInvalidateMappedMemoryRanges = vkInvalidateMappedMemoryRanges;
+        vma_vulkan_func.vkMapMemory = vkMapMemory;
+        vma_vulkan_func.vkUnmapMemory = vkUnmapMemory;
+        vma_vulkan_func.vkCmdCopyBuffer = vkCmdCopyBuffer;
+
+        VmaAllocatorCreateInfo allocator_info{};
+        allocator_info.physicalDevice = gpu.GetHandle();
+        allocator_info.device = m_Handle;
+        allocator_info.instance = gpu.GetInstance().GetHandle();
+
+        if (IsExtensionSupported("VK_KHR_get_memory_requirements2") &&
+            IsExtensionSupported("VK_KHR_dedicated_allocation"))
+        {
+            allocator_info.flags |= VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT;
+            vma_vulkan_func.vkGetBufferMemoryRequirements2KHR = vkGetBufferMemoryRequirements2KHR;
+            vma_vulkan_func.vkGetImageMemoryRequirements2KHR = vkGetImageMemoryRequirements2KHR;
+        }
+
+        if (IsExtensionSupported(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) && IsExtensionSupported(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME))
+        {
+            allocator_info.flags |= VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+        }
+
+        allocator_info.pVulkanFunctions = &vma_vulkan_func;
+
+        result = vmaCreateAllocator(&allocator_info, &m_MemoryAllocator);
+
+        if (result != VK_SUCCESS)
+            throw VulkanException{result, "Cannot create allocator"};
+
+        uint32_t family_index = GetQueueByFlags(VK_QUEUE_GRAPHICS_BIT, VK_QUEUE_COMPUTE_BIT).GetFamilyIndex();
+
+        m_CommandPool = std::make_unique<CommandPool>(*this, family_index);
+        m_FencePool = std::make_unique<FencePool>(*this);
     }
 
     Device::~Device()
     {
+        m_CommandPool.reset();
+        m_FencePool.reset();
+
+        if (m_MemoryAllocator != VK_NULL_HANDLE)
+            vmaDestroyAllocator(m_MemoryAllocator);
+
+        if (m_Handle != VK_NULL_HANDLE)
+            vkDestroyDevice(m_Handle, nullptr);
     }
 
     VkResult Device::WaitIdle()
@@ -117,5 +192,21 @@ namespace engine
                                });
 
         return it != m_DeviceExtensions.end();
+    }
+
+    const Queue &Device::GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index)
+    {
+        for (uint32_t queue_family_index = 0U; queue_family_index < m_Queues.size(); ++queue_family_index)
+        {
+            Queue &first_queue = m_Queues[queue_family_index][0];
+
+            VkQueueFlags queue_flags = first_queue.GetProperties().queueFlags;
+            uint32_t queue_count = first_queue.GetProperties().queueCount;
+
+            if (((queue_flags & required_queue_flags) == required_queue_flags) && queue_index < queue_count)
+            {
+                return m_Queues[queue_family_index][queue_index];
+            }
+        }
     }
 }

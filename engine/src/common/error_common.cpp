@@ -3,7 +3,7 @@
 namespace engine
 {
     VulkanException::VulkanException(const VkResult result, const std::string &message)
-        : result{result}, std::runtime_error{message}
+        : std::runtime_error(message), result(result)
     {
         error_message = std::string(std::runtime_error::what());
     }

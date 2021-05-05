@@ -2,7 +2,6 @@
 
 #include "core/application.h"
 #include "window/window.h"
-#include "common/vulkan_common.h"
 
 namespace engine
 {

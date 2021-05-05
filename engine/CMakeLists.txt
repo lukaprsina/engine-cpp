@@ -62,12 +62,16 @@ set(VULKAN_API_FILES
     src/vulkan_api/instance/device.h
     src/vulkan_api/instance/resource_cache.h
     src/vulkan_api/instance/queue.h
+    src/vulkan_api/instance/command_pool.h
+    src/vulkan_api/instance/fence_pool.h
     #Source files
     src/vulkan_api/instance/instance.cpp
     src/vulkan_api/instance/physical_device.cpp
     src/vulkan_api/instance/device.cpp
     src/vulkan_api/instance/resource_cache.cpp
-    src/vulkan_api/instance/queue.cpp)
+    src/vulkan_api/instance/queue.cpp
+    src/vulkan_api/instance/command_pool.cpp
+    src/vulkan_api/instance/fence_pool.cpp)
 
 set(PROJECT_FILES
     ${CORE_FILES}
@@ -100,7 +104,7 @@ target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 target_compile_definitions(Engine
     PRIVATE ENG_PLATFORM
     PRIVATE ENG_VALIDATION_LAYERS
-    #PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED
+    PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED
     )
 
 set(gcc_like_compile "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU>")

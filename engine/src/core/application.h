@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/options.h"
-#include "common/vulkan_common.h"
 
 namespace engine
 {

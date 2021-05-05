@@ -17,11 +17,14 @@ namespace engine
         VkPhysicalDeviceMemoryProperties GetMemoryProperties() const { return m_MemoryProperties; }
 
         const std::vector<VkQueueFamilyProperties> &GetQueueFamilyProperties() const { return m_QueueFamilyProperties; }
-        VkPhysicalDevice GetHandle() const { return m_PhysicalDevice; };
+        VkPhysicalDevice GetHandle() const { return m_Handle; };
+        Instance &GetInstance() const { return m_Instance; };
+
+        VkBool32 IsPresentSupported(VkSurfaceKHR surface, uint32_t queue_family_index);
 
     private:
         Instance &m_Instance;
-        VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+        VkPhysicalDevice m_Handle = VK_NULL_HANDLE;
         VkPhysicalDeviceFeatures m_Features{};
         VkPhysicalDeviceFeatures m_RequestedFeatures{};
         VkPhysicalDeviceProperties m_Properties{};

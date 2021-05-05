@@ -16,3 +16,6 @@
 [submodule "engine/vendor/spdlog"]
 	path = engine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "engine/vendor/vma"]
+	path = engine/vendor/vma
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator

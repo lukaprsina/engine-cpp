@@ -1,7 +1,5 @@
 #pragma once
 
-#include "common/base_common.h"
-
 namespace engine
 {
     enum class EventType

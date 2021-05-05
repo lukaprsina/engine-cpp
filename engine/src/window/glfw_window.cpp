@@ -144,7 +144,7 @@ namespace engine
     {
         void ErrorCallback(int error, const char *description)
         {
-            ENG_CORE_TRACE("GLFW Error (code {}): {}", error, description);
+            ENG_CORE_INFO("GLFW Error (code {}): {}", error, description);
         }
 
         void WindowCloseCallback(GLFWwindow *window)

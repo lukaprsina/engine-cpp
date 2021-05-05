@@ -3,10 +3,12 @@
 #include "vulkan_api/instance/physical_device.h"
 #include "vulkan_api/instance/resource_cache.h"
 #include "vulkan_api/instance/queue.h"
-#include "common/vulkan_common.h"
 
 namespace engine
 {
+    class CommandPool;
+    class FencePool;
+
     class Device
     {
     public:
@@ -15,6 +17,8 @@ namespace engine
 
         VkResult WaitIdle();
         bool IsExtensionSupported(const char *requested_extension) const;
+        VkDevice GetHandle() const { return m_Handle; }
+        const Queue &GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index);
 
     private:
         PhysicalDevice &m_Gpu;
@@ -24,7 +28,10 @@ namespace engine
         std::vector<const char *> m_EnabledExtensions;
 
         VkDevice m_Handle = VK_NULL_HANDLE;
-
         std::vector<std::vector<Queue>> m_Queues;
+        VmaAllocator m_MemoryAllocator;
+
+        std::unique_ptr<CommandPool> m_CommandPool;
+        std::unique_ptr<FencePool> m_FencePool;
     };
 }

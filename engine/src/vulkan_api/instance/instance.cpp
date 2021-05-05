@@ -1,7 +1,5 @@
 #include "vulkan_api/instance/instance.h"
 
-#include "common/base_common.h"
-#include "common/error_common.h"
 #include "vulkan_api/instance/physical_device.h"
 
 #if (defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED) && !defined(ENG_VALIDATION_LAYERS))
@@ -68,12 +66,13 @@ namespace
     bool ValidateLayers(const std::vector<const char *> &required,
                         const std::vector<VkLayerProperties> &available)
     {
-        for (auto layer : required)
+        bool found = false;
+        for (auto &layer : required)
         {
-            bool found = false;
+            found = false;
             for (auto &available_layer : available)
             {
-                if (strcmp(available_layer.layerName, layer) == 0)
+                if (std::strcmp(available_layer.layerName, layer) == 0)
                 {
                     found = true;
                     break;
@@ -146,95 +145,10 @@ namespace engine
         std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
         VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
 
-#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
-        bool debug_utils = false;
-        for (auto &available_extension : available_instance_extensions)
-        {
-            if (strcmp(available_extension.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0)
-            {
-                m_EnabledExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-                debug_utils = true;
-                ENG_CORE_TRACE("{} is available, enabling it", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-            }
-        }
-
-        if (!debug_utils)
-        {
-            m_EnabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-        }
-#endif
-
-#if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
-        bool validation_features = false;
-        {
-            uint32_t layer_instance_extension_count;
-            VK_CHECK(vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_validation", &layer_instance_extension_count, nullptr));
-
-            std::vector<VkExtensionProperties> available_layer_instance_extensions(layer_instance_extension_count);
-            VK_CHECK(vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_validation", &layer_instance_extension_count, available_layer_instance_extensions.data()));
-
-            for (auto &available_extension : available_layer_instance_extensions)
-            {
-                if (strcmp(available_extension.extensionName, VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME) == 0)
-                {
-                    m_EnabledExtensions.push_back(VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME);
-                    validation_features = true;
-                    ENG_CORE_TRACE("{} is available, enabling it", VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME);
-                }
-            }
-        }
-#endif
-
-        if (headless)
-        {
-            bool headless_extension = false;
-            for (auto &available_extension : available_instance_extensions)
-            {
-                if (strcmp(available_extension.extensionName, VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME) == 0)
-                {
-                    m_EnabledExtensions.push_back(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
-                    headless_extension = true;
-                    ENG_CORE_TRACE("{} is available, enabling it", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
-                }
-            }
-            if (!headless_extension)
-            {
-                ENG_CORE_TRACE("{} is not available, disabling swapchain creation", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
-            }
-        }
-        else
-        {
-            m_EnabledExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
-        }
-
-        bool extension_found = false;
-        for (auto &extension : required_extensions)
-        {
-            extension_found = false;
-            const char *extension_name = extension.first;
-            bool is_optional = extension.second;
-
-            for (size_t i = 0; i < available_instance_extensions.size(); i++)
-            {
-                if (strcmp(extension_name, available_instance_extensions[i].extensionName) == 0)
-                {
-                    extension_found = true;
-                    m_EnabledExtensions.emplace_back(extension_name);
-                    break;
-                }
-            }
-
-            if (!extension_found)
-            {
-                if (is_optional)
-                    ENG_CORE_ERROR("Optional instance extension {} not available, some features may be disabled.", extension_name);
-                else
-                {
-                    ENG_CORE_CRITICAL("Required instance extension {} not available, cannot run.", extension_name);
-                    throw std::runtime_error("Required instance extensions are missing.\n");
-                }
-            }
-        }
+        bool debug_utils = EnableDebugCallback(available_instance_extensions);
+        bool validation_features = EnableValidationFeatures();
+        AddSwapchainExtension(available_instance_extensions, headless);
+        ValidateExtensions(required_extensions, available_instance_extensions);
 
         uint32_t validation_layer_count;
         VK_CHECK(vkEnumerateInstanceLayerProperties(&validation_layer_count, nullptr));
@@ -250,9 +164,9 @@ namespace engine
 
         if (ValidateLayers(requested_validation_layers, supported_validation_layers))
         {
-            ENG_CORE_TRACE("Enabled Validation Layers:");
+            ENG_CORE_INFO("Enabled Validation Layers:");
             for (const auto &layer : requested_validation_layers)
-                ENG_CORE_TRACE("	\t{}", layer);
+                ENG_CORE_INFO("	\t{}", layer);
         }
         else
             throw std::runtime_error("Required validation layers are missing.");
@@ -431,5 +345,106 @@ namespace engine
                                });
 
         return it != m_EnabledExtensions.end();
+    }
+
+    bool Instance::EnableDebugCallback(std::vector<VkExtensionProperties> &available_instance_extensions)
+    {
+        bool debug_utils = false;
+#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
+        for (auto &available_extension : available_instance_extensions)
+        {
+            if (strcmp(available_extension.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0)
+            {
+                m_EnabledExtensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+                debug_utils = true;
+                ENG_CORE_INFO("{} is available, enabling it", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            }
+        }
+
+        if (!debug_utils)
+        {
+            m_EnabledExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+        }
+#endif
+        return debug_utils;
+    }
+
+    bool Instance::EnableValidationFeatures()
+    {
+        bool validation_features = false;
+#if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
+        {
+            uint32_t layer_instance_extension_count;
+            VK_CHECK(vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_validation", &layer_instance_extension_count, nullptr));
+
+            std::vector<VkExtensionProperties> available_layer_instance_extensions(layer_instance_extension_count);
+            VK_CHECK(vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_validation", &layer_instance_extension_count, available_layer_instance_extensions.data()));
+
+            for (auto &available_extension : available_layer_instance_extensions)
+            {
+                if (strcmp(available_extension.extensionName, VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME) == 0)
+                {
+                    m_EnabledExtensions.push_back(VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME);
+                    validation_features = true;
+                    ENG_CORE_INFO("{} is available, enabling it", VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME);
+                }
+            }
+        }
+#endif
+        return validation_features;
+    }
+
+    void Instance::AddSwapchainExtension(std::vector<VkExtensionProperties> &available_instance_extensions, bool headless)
+    {
+        if (headless)
+        {
+            bool headless_extension = false;
+            for (auto &available_extension : available_instance_extensions)
+            {
+                if (strcmp(available_extension.extensionName, VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME) == 0)
+                {
+                    m_EnabledExtensions.push_back(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
+                    headless_extension = true;
+                    ENG_CORE_INFO("{} is available, enabling it", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
+                }
+            }
+            if (!headless_extension)
+            {
+                ENG_CORE_WARN("{} is not available, disabling swapchain creation", VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
+            }
+        }
+        m_EnabledExtensions.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
+    }
+
+    void Instance::ValidateExtensions(std::unordered_map<const char *, bool> &required_extensions, std::vector<VkExtensionProperties> &available_instance_extensions)
+    {
+        bool extension_found = false;
+        for (auto &extension : required_extensions)
+        {
+            extension_found = false;
+            const char *extension_name = extension.first;
+            bool is_optional = extension.second;
+
+            for (size_t i = 0; i < available_instance_extensions.size(); i++)
+            {
+                if (strcmp(extension_name, available_instance_extensions[i].extensionName) == 0)
+                {
+                    extension_found = true;
+                    m_EnabledExtensions.emplace_back(extension_name);
+                    break;
+                }
+            }
+
+            if (!extension_found)
+            {
+                if (is_optional)
+                    ENG_CORE_ERROR("Optional instance extension {} not available, some features may be disabled.", extension_name);
+                else
+                {
+                    ENG_CORE_CRITICAL("Required instance extension {} not available, cannot run.", extension_name);
+                    throw std::runtime_error("Required instance extensions are missing.\n");
+                }
+            }
+        }
     }
 }

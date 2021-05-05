@@ -1,6 +1,5 @@
 #include "core/application.h"
 
-#include "common/vulkan_common.h"
 #include "core/log.h"
 #include "events/application_event.h"
 #include "platform/platform.h"
@@ -17,7 +16,7 @@ namespace engine
     {
         Log::Init();
 
-        ENG_CORE_TRACE("Logger initialized.");
+        ENG_CORE_INFO("Logger initialized.");
 
         SetUsage(
             R"(Engine
@@ -78,7 +77,7 @@ namespace engine
 
     void Application::Finish()
     {
-        ENG_CORE_TRACE("Closing Application.");
+        ENG_CORE_INFO("Closing Application.");
     }
 
     void Application::OnEvent(Event &event)
