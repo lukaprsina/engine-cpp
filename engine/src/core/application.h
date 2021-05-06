@@ -1,13 +1,14 @@
 #pragma once
 
 #include "core/options.h"
-#include "vulkan_api/instance/instance.h"
 
 namespace engine
 {
     class Platform;
     class WindowCloseEvent;
     class Event;
+    class Instance;
+    class Device;
 
     class Application
     {
@@ -50,6 +51,7 @@ namespace engine
         bool m_Headless;
 
         std::unique_ptr<Instance> m_Instance;
+        std::unique_ptr<Device> m_Device;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions;
         std::unordered_map<const char *, bool> m_InstanceExtensions;

@@ -59,18 +59,19 @@ set(VULKAN_API_FILES
     #Header files
     src/vulkan_api/instance/instance.h
     src/vulkan_api/instance/physical_device.h
+    src/vulkan_api/instance/device.h
+    src/vulkan_api/instance/resource_cache.h
+    src/vulkan_api/instance/queue.h
+    src/vulkan_api/instance/command_pool.h
+    src/vulkan_api/instance/fence_pool.h
     #Source files
     src/vulkan_api/instance/instance.cpp
-    src/vulkan_api/instance/physical_device.cpp)
-
-source_group("core\\" FILES ${CORE_FILES})
-source_group("common\\" FILES ${COMMON_FILES})
-source_group("events\\" FILES ${EVENTS_FILES})
-source_group("window\\" FILES ${WINDOW_FILES})
-source_group("platform\\" FILES ${PLATFORM_FILES})
-source_group("platform\\windows" FILES ${WINDOWS_FILES})
-source_group("platform\\unix" FILES ${UNIX_FILES})
-source_group("vulkan_api\\" FILES ${VULKAN_API_FILES})
+    src/vulkan_api/instance/physical_device.cpp
+    src/vulkan_api/instance/device.cpp
+    src/vulkan_api/instance/resource_cache.cpp
+    src/vulkan_api/instance/queue.cpp
+    src/vulkan_api/instance/command_pool.cpp
+    src/vulkan_api/instance/fence_pool.cpp)
 
 set(PROJECT_FILES
     ${CORE_FILES}

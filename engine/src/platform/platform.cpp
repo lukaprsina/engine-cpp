@@ -1,6 +1,5 @@
 #include "platform/platform.h"
 
-#include "common/base_common.h"
 #include "events/event.h"
 #include "core/application.h"
 
@@ -23,7 +22,7 @@ namespace engine
         if (!m_Window)
             throw std::runtime_error("Can't create window!");
         else
-            ENG_CORE_TRACE("Window created!");
+            ENG_CORE_INFO("Window created!");
 
         m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
