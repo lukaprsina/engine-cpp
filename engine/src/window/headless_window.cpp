@@ -15,7 +15,7 @@ namespace engine
 
     VkSurfaceKHR HeadlessWindow::CreateSurface(Instance &instance)
     {
-        return nullptr;
+        return VK_NULL_HANDLE;
     }
 
     bool HeadlessWindow::ShouldClose() const
