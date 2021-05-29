@@ -1,7 +1,6 @@
 #pragma once
 
 #include "platform/platform.h"
-#include <windows.h>
 
 namespace engine
 {
