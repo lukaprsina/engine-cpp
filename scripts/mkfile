@@ -1,0 +1,92 @@
+#!/bin/bash
+
+project_path="/home/luka/dev/c++/engine/engine"
+source_folder="src"
+
+read_filename()
+{
+    echo -en "\nPath:\n"
+    read path
+
+    full_path="${project_path}/${source_folder}/${path}" 
+
+    if [ -d "$full_path" ]; then
+        valid_path=true
+    else
+        echo "Directory ${path} not found!"
+    fi    
+}
+
+
+echo Create file:
+read filename
+
+valid_path=false
+read_filename
+
+while [ "$valid_path" = false ]; do
+   read_filename
+done
+
+fullpath_filename="${full_path}/${filename}"
+
+if [ \( -f "${fullpath_filename}.h" \) -o \( -f "${fullpath_filename}.cpp" \) ]; then
+    echo -en "\nFile already present.\n"
+    exit
+fi
+
+path_filename="${path}/${filename}"
+
+u_filename="$(tr '[:lower:]' '[:upper:]' <<< ${filename:0:1})${filename:1}"
+
+cat <<EOT >> "${fullpath_filename}.h"
+#pragma once
+
+namespace engine
+{
+    class $u_filename
+    {
+    public:
+        $u_filename();
+        ~$u_filename();
+    };
+}
+EOT
+
+cat <<EOT >> "${fullpath_filename}.cpp"
+#include "${source_folder}/${path_filename}.h"
+
+namespace engine
+{
+    $u_filename::$u_filename()
+    {
+    }
+
+    $u_filename::~$u_filename()
+    {
+    }
+}
+
+EOT
+
+echo -en "\n"
+
+chrlen=${#path_filename}
+
+for i in $(seq $chrlen)
+do
+    echo -en "#"
+done
+
+echo -en "\n\nsrc/${path_filename}\n"
+
+for i in $(seq $chrlen)
+do
+    echo -en "#"
+done
+
+echo -en "\n"
+
+code "${fullpath_filename}.cpp"
+code "${fullpath_filename}.h"
+code "${project_path}/CMakeLists.txt"

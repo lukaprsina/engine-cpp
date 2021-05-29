@@ -1,4 +1,5 @@
 #include "vulkan_api/instance/render_context.h"
+
 #include "vulkan_api/instance/device.h"
 
 namespace engine
@@ -14,6 +15,8 @@ namespace engine
           m_SurfaceFormatPriority(surface_format_priority),
           m_Extent({width, height})
     {
+        if (surface != VK_NULL_HANDLE)
+            m_Swapchain = std::make_unique<Swapchain>();
     }
 
     RenderContext::~RenderContext()

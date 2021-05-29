@@ -65,6 +65,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/instance/command_pool.h
     src/vulkan_api/instance/fence_pool.h
     src/vulkan_api/instance/render_context.h
+    src/vulkan_api/instance/swapchain.h
     #Source files
     src/vulkan_api/instance/instance.cpp
     src/vulkan_api/instance/physical_device.cpp
@@ -73,7 +74,8 @@ set(VULKAN_API_FILES
     src/vulkan_api/instance/queue.cpp
     src/vulkan_api/instance/command_pool.cpp
     src/vulkan_api/instance/fence_pool.cpp
-    src/vulkan_api/instance/render_context.cpp)
+    src/vulkan_api/instance/render_context.cpp
+    src/vulkan_api/instance/swapchain.cpp)
 
 set(PROJECT_FILES
     ${CORE_FILES}

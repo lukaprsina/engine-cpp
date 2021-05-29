@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan_api/instance/swapchain.h"
+
 namespace engine
 {
     class Device;
@@ -16,8 +18,11 @@ namespace engine
 
     private:
         Device &m_Device;
+
         std::vector<VkPresentModeKHR> m_PresentModePriority;
         std::vector<VkSurfaceFormatKHR> m_SurfaceFormatPriority;
         VkExtent2D m_Extent;
+
+        std::unique_ptr<Swapchain> m_Swapchain;
     };
 }
