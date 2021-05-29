@@ -24,8 +24,6 @@ namespace engine
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos(queue_family_properties_count);
         std::vector<std::vector<float>> queue_priorities(queue_family_properties_count);
 
-        m_Queues.resize(queue_family_properties_count);
-
         for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties_count; ++queue_family_index)
         {
             const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
@@ -112,8 +110,7 @@ namespace engine
             const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
             VkBool32 present_supported = gpu.IsPresentSupported(surface, queue_family_index);
 
-            for (uint32_t queue_index = 0; queue_index < queue_family_property.queueCount; ++queue_index)
-                m_Queues[queue_family_index].emplace_back(*this, queue_family_index, queue_family_property, present_supported, queue_index);
+            m_QueueFamilies.emplace_back(*this, queue_family_index, queue_family_property, present_supported);
         }
 
         VmaVulkanFunctions vma_vulkan_func{};
@@ -187,26 +184,30 @@ namespace engine
     {
         auto it = std::find_if(m_DeviceExtensions.begin(),
                                m_DeviceExtensions.end(),
-                               [requested_extension](auto &enabled_extension) {
+                               [requested_extension](auto &enabled_extension)
+                               {
                                    return (std::strcmp(enabled_extension.extensionName, requested_extension) == 0);
                                });
 
         return it != m_DeviceExtensions.end();
     }
 
-    const Queue &Device::GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index)
+    QueueFamily &Device::GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index)
     {
-        for (uint32_t queue_family_index = 0U; queue_family_index < m_Queues.size(); ++queue_family_index)
+        size_t queue_family_index = 0;
+        for (auto &queue_family : m_QueueFamilies)
         {
-            Queue &first_queue = m_Queues[queue_family_index][0];
-
-            VkQueueFlags queue_flags = first_queue.GetProperties().queueFlags;
-            uint32_t queue_count = first_queue.GetProperties().queueCount;
+            VkQueueFlags queue_flags = queue_family.GetProperties().queueFlags;
+            uint32_t queue_count = queue_family.GetProperties().queueCount;
 
             if (((queue_flags & required_queue_flags) == required_queue_flags) && queue_index < queue_count)
             {
-                return m_Queues[queue_family_index][queue_index];
+                return m_QueueFamilies[queue_family_index];
             }
+
+            queue_family_index++;
         }
+
+        throw std::runtime_error("Queue not found");
     }
 }

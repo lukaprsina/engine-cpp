@@ -6,6 +6,7 @@
 #include "vulkan_api/instance/instance.h"
 #include "vulkan_api/instance/physical_device.h"
 #include "vulkan_api/instance/device.h"
+#include "vulkan_api/instance/render_context.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -71,6 +72,21 @@ namespace engine
             AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
+
+        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
+                                                             VK_PRESENT_MODE_MAILBOX_KHR});
+
+        std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+
+        m_RenderContext = std::make_unique<RenderContext>(*m_Device,
+                                                          m_Surface,
+                                                          present_mode_priority,
+                                                          surface_format_priority,
+                                                          m_Platform->GetWindow().GetSettings().width,
+                                                          m_Platform->GetWindow().GetSettings().height);
 
         return true;
     }

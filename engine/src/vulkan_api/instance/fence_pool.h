@@ -8,5 +8,8 @@ namespace engine
     public:
         FencePool(Device &device);
         ~FencePool();
+
+    private:
+        Device &m_Device;
     };
 }

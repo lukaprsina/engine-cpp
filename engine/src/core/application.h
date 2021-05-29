@@ -9,6 +9,7 @@ namespace engine
     class Event;
     class Instance;
     class Device;
+    class RenderContext;
 
     class Application
     {
@@ -52,6 +53,7 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance;
         std::unique_ptr<Device> m_Device;
+        std::unique_ptr<RenderContext> m_RenderContext;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions;
         std::unordered_map<const char *, bool> m_InstanceExtensions;

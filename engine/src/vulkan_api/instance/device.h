@@ -18,7 +18,7 @@ namespace engine
         VkResult WaitIdle();
         bool IsExtensionSupported(const char *requested_extension) const;
         VkDevice GetHandle() const { return m_Handle; }
-        const Queue &GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index);
+        QueueFamily &GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index);
 
     private:
         PhysicalDevice &m_Gpu;
@@ -28,7 +28,7 @@ namespace engine
         std::vector<const char *> m_EnabledExtensions;
 
         VkDevice m_Handle = VK_NULL_HANDLE;
-        std::vector<std::vector<Queue>> m_Queues;
+        std::vector<QueueFamily> m_QueueFamilies;
         VmaAllocator m_MemoryAllocator;
 
         std::unique_ptr<CommandPool> m_CommandPool;

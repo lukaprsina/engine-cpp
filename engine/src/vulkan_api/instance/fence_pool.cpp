@@ -5,6 +5,7 @@
 namespace engine
 {
     FencePool::FencePool(Device &device)
+        : m_Device(device)
     {
     }
 
