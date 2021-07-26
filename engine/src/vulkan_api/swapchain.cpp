@@ -25,7 +25,7 @@ namespace engine
             uint32_t max_image_array_layers)
         {
             request_image_array_layers = std::min(request_image_array_layers, max_image_array_layers);
-            request_image_array_layers = std::max(request_image_array_layers, 1u);
+            request_image_array_layers = std::max(request_image_array_layers, 1U);
 
             return request_image_array_layers;
         }
@@ -57,88 +57,61 @@ namespace engine
         }
 
         inline VkPresentModeKHR ChoosePresentMode(
-            VkPresentModeKHR request_present_mode,
             const std::vector<VkPresentModeKHR> &available_present_modes,
             const std::vector<VkPresentModeKHR> &present_mode_priority_list)
+
         {
-            auto present_mode_it = std::find(available_present_modes.begin(), available_present_modes.end(), request_present_mode);
+            VkPresentModeKHR chosen_present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
-            if (present_mode_it == available_present_modes.end())
+            for (auto &present_mode : present_mode_priority_list)
             {
-                // If nothing found, always default to FIFO
-                VkPresentModeKHR chosen_present_mode = VK_PRESENT_MODE_FIFO_KHR;
-
-                for (auto &present_mode : present_mode_priority_list)
+                if (std::find(available_present_modes.begin(), available_present_modes.end(), present_mode) != available_present_modes.end())
                 {
-                    if (std::find(available_present_modes.begin(), available_present_modes.end(), present_mode) != available_present_modes.end())
-                    {
-                        chosen_present_mode = present_mode;
-                    }
+                    chosen_present_mode = present_mode;
+                    ENG_CORE_INFO("(Swapchain) Present mode selected: {}", ToString(chosen_present_mode));
+                    break;
                 }
+                else
+                {
+                    ENG_CORE_WARN("(Swapchain) No present modes from the priority list found. Selecting ({}).", ToString(chosen_present_mode));
+                }
+            }
 
-                ENG_CORE_WARN("(Swapchain) Present mode '{}' not supported. Selecting '{}'.", ToString(request_present_mode), ToString(chosen_present_mode));
-                return chosen_present_mode;
-            }
-            else
-            {
-                ENG_CORE_INFO("(Swapchain) Present mode selected: {}", ToString(request_present_mode));
-                return *present_mode_it;
-            }
+            return chosen_present_mode;
         }
 
         inline VkSurfaceFormatKHR ChooseSurfaceFormat(
-            const VkSurfaceFormatKHR requested_surface_format,
             const std::vector<VkSurfaceFormatKHR> &available_surface_formats,
             const std::vector<VkSurfaceFormatKHR> &surface_format_priority_list)
         {
-            // Try to find the requested surface format in the supported surface formats
-            auto surface_format_it = std::find_if(
-                available_surface_formats.begin(),
-                available_surface_formats.end(),
-                [&requested_surface_format](const VkSurfaceFormatKHR &surface)
-                {
-                    if (surface.format == requested_surface_format.format &&
-                        surface.colorSpace == requested_surface_format.colorSpace)
-                    {
-                        return true;
-                    }
+            auto surface_format_it = available_surface_formats.begin();
 
-                    return false;
-                });
-
-            // If the requested surface format isn't found, then try to request a format from the priority list
-            if (surface_format_it == available_surface_formats.end())
+            for (auto &surface_format : surface_format_priority_list)
             {
-                for (auto &surface_format : surface_format_priority_list)
-                {
-                    surface_format_it = std::find_if(
-                        available_surface_formats.begin(),
-                        available_surface_formats.end(),
-                        [&surface_format](const VkSurfaceFormatKHR &surface)
+                surface_format_it = std::find_if(
+                    available_surface_formats.begin(),
+                    available_surface_formats.end(),
+                    [&surface_format](const VkSurfaceFormatKHR &surface)
+                    {
+                        if (surface.format == surface_format.format &&
+                            surface.colorSpace == surface_format.colorSpace)
                         {
-                            if (surface.format == surface_format.format &&
-                                surface.colorSpace == surface_format.colorSpace)
-                            {
-                                return true;
-                            }
+                            return true;
+                        }
 
-                            return false;
-                        });
-                    if (surface_format_it != available_surface_formats.end())
-                    {
-                        ENG_CORE_WARN("(Swapchain) Surface format ({}) not supported. Selecting ({}).", ToString(requested_surface_format), ToString(*surface_format_it));
-                        return *surface_format_it;
-                    }
+                        return false;
+                    });
+
+                if (surface_format_it != available_surface_formats.end())
+                {
+                    ENG_CORE_INFO("(Swapchain) Surface format selected: {}", ToString(*surface_format_it));
+                    return *surface_format_it;
                 }
+            }
 
-                // If nothing found, default the first supporte surface format
-                surface_format_it = available_surface_formats.begin();
-                ENG_CORE_WARN("(Swapchain) Surface format ({}) not supported. Selecting ({}).", ToString(requested_surface_format), ToString(*surface_format_it));
-            }
-            else
-            {
-                ENG_CORE_INFO("(Swapchain) Surface format selected: {}", ToString(requested_surface_format));
-            }
+            // If nothing found, default the first supported surface format
+            surface_format_it = available_surface_formats.begin();
+            ENG_CORE_WARN("(Swapchain) No surface formats from the priority list found. Selecting ({}).", ToString(*surface_format_it));
 
             return *surface_format_it;
         }
@@ -342,11 +315,43 @@ namespace engine
 
     Swapchain::~Swapchain()
     {
+        if (m_Handle != VK_NULL_HANDLE)
+        {
+            vkDestroySwapchainKHR(m_Device.GetHandle(), m_Handle, nullptr);
+        }
     }
 
     void Swapchain::Create()
     {
-        m_Properties.present_mode = ChoosePresentMode(m_Properties.present_mode, m_PresentModes, m_PresentModePriorityList);
-        m_Properties.surface_format = ChooseSurfaceFormat(m_Properties.surface_format, m_SurfaceFormats, m_SurfaceFormatPriorityList);
+        m_Properties.present_mode = ChoosePresentMode(m_PresentModes, m_PresentModePriorityList);
+        m_Properties.surface_format = ChooseSurfaceFormat(m_SurfaceFormats, m_SurfaceFormatPriorityList);
+
+        VkSwapchainCreateInfoKHR create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        create_info.minImageCount = m_Properties.image_count;
+        create_info.imageExtent = m_Properties.extent;
+        create_info.presentMode = m_Properties.present_mode;
+        create_info.imageFormat = m_Properties.surface_format.format;
+        create_info.imageColorSpace = m_Properties.surface_format.colorSpace;
+        create_info.imageArrayLayers = m_Properties.array_layers;
+        create_info.imageUsage = m_Properties.image_usage;
+        create_info.preTransform = m_Properties.pre_transform;
+        create_info.compositeAlpha = m_Properties.composite_alpha;
+        create_info.oldSwapchain = m_Properties.old_swapchain;
+        create_info.surface = m_Surface;
+
+        VkResult result = vkCreateSwapchainKHR(m_Device.GetHandle(), &create_info, nullptr, &m_Handle);
+
+        if (result != VK_SUCCESS)
+        {
+            throw VulkanException{result, "Cannot create Swapchain"};
+        }
+
+        uint32_t image_available{0u};
+        VK_CHECK(vkGetSwapchainImagesKHR(m_Device.GetHandle(), m_Handle, &image_available, nullptr));
+
+        m_Images.resize(image_available);
+
+        VK_CHECK(vkGetSwapchainImagesKHR(m_Device.GetHandle(), m_Handle, &image_available, m_Images.data()));
     }
 }

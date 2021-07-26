@@ -64,6 +64,7 @@ namespace engine
         Device &m_Device;
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
         VkSwapchainKHR m_Handle{VK_NULL_HANDLE};
+        std::vector<VkImage> m_Images;
 
         std::vector<VkPresentModeKHR> m_PresentModes;
         std::vector<VkSurfaceFormatKHR> m_SurfaceFormats;

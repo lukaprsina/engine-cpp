@@ -40,8 +40,13 @@ namespace engine
         if (m_Device)
             m_Device->WaitIdle();
 
+        m_RenderContext.reset();
+        m_Device.reset();
+
         if (m_Surface != VK_NULL_HANDLE)
             vkDestroySurfaceKHR(m_Instance->GetHandle(), m_Surface, nullptr);
+
+        m_Instance.reset();
     }
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
@@ -88,8 +93,8 @@ namespace engine
                                                           m_Platform->GetWindow().GetSettings().width,
                                                           m_Platform->GetWindow().GetSettings().height);
 
-        m_RenderContext->SetPresentModePriority({VK_PRESENT_MODE_IMMEDIATE_KHR});
-        m_RenderContext->SetSurfaceFormatPriority({{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+        /* m_RenderContext->SetPresentModePriority({VK_PRESENT_MODE_IMMEDIATE_KHR});
+        m_RenderContext->SetSurfaceFormatPriority({{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}}); */
 
         m_RenderContext->Prepare();
 
