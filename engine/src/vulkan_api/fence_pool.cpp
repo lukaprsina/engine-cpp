@@ -1,6 +1,6 @@
-#include "vulkan_api/instance/fence_pool.h"
+#include "vulkan_api/fence_pool.h"
 
-#include "vulkan_api/instance/device.h"
+#include "vulkan_api/device.h"
 
 namespace engine
 {

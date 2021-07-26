@@ -185,7 +185,8 @@ namespace engine
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
             static uint32_t repeat_count = 0;
 
-            KeyCode key_code = TranslateKeyCode(key);
+            // TODO
+            // KeyCode key_code = TranslateKeyCode(key);
             switch (action)
             {
             case GLFW_PRESS:

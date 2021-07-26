@@ -58,12 +58,9 @@ namespace engine
     const char *UnixPlatform::GetSurfaceExtension()
     {
         if (m_Type == UnixType::Mac)
-        {
             return VK_MVK_MACOS_SURFACE_EXTENSION_NAME;
-        }
+
         else
-        {
             return VK_KHR_XCB_SURFACE_EXTENSION_NAME;
-        }
     }
 }

@@ -11,9 +11,9 @@
 #include <array>
 
 #include "core/log.h"
-#include "common/base_common.h"
-#include "common/error_common.h"
-#include "common/strings_common.h"
-#include "common/vulkan_common.h"
+#include "common/base.h"
+#include "common/error.h"
+#include "common/strings.h"
+#include "common/vulkan.h"
 
 namespace fs = std::filesystem;

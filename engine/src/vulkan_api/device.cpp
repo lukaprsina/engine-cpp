@@ -1,8 +1,8 @@
-#include "vulkan_api/instance/device.h"
+#include "vulkan_api/device.h"
 
-#include "vulkan_api/instance/instance.h"
-#include "vulkan_api/instance/command_pool.h"
-#include "vulkan_api/instance/fence_pool.h"
+#include "vulkan_api/instance.h"
+#include "vulkan_api/command_pool.h"
+#include "vulkan_api/fence_pool.h"
 
 ENG_DISABLE_WARNINGS()
 #define VMA_IMPLEMENTATION
@@ -157,7 +157,7 @@ namespace engine
         if (result != VK_SUCCESS)
             throw VulkanException{result, "Cannot create allocator"};
 
-        uint32_t family_index = GetQueueByFlags(VK_QUEUE_GRAPHICS_BIT, VK_QUEUE_COMPUTE_BIT).GetFamilyIndex();
+        uint32_t family_index = GetQueueByFlags(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT).GetFamilyIndex();
 
         m_CommandPool = std::make_unique<CommandPool>(*this, family_index);
         m_FencePool = std::make_unique<FencePool>(*this);
@@ -192,18 +192,15 @@ namespace engine
         return it != m_DeviceExtensions.end();
     }
 
-    QueueFamily &Device::GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index)
+    QueueFamily &Device::GetQueueByFlags(VkQueueFlags required_queue_flags)
     {
         size_t queue_family_index = 0;
         for (auto &queue_family : m_QueueFamilies)
         {
             VkQueueFlags queue_flags = queue_family.GetProperties().queueFlags;
-            uint32_t queue_count = queue_family.GetProperties().queueCount;
 
-            if (((queue_flags & required_queue_flags) == required_queue_flags) && queue_index < queue_count)
-            {
+            if ((queue_flags & required_queue_flags) == required_queue_flags)
                 return m_QueueFamilies[queue_family_index];
-            }
 
             queue_family_index++;
         }

@@ -1,6 +1,6 @@
-#include "vulkan_api/instance/command_pool.h"
+#include "vulkan_api/command_pool.h"
 
-#include "vulkan_api/instance/device.h"
+#include "vulkan_api/device.h"
 
 namespace engine
 {

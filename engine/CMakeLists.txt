@@ -10,13 +10,13 @@ set(CORE_FILES
 
 set(COMMON_FILES
     # Header Files
-    src/common/base_common.h    
-    src/common/error_common.h
-    src/common/vulkan_common.h
-    src/common/strings_common.h
+    src/common/base.h    
+    src/common/error.h
+    src/common/vulkan.h
+    src/common/strings.h
     #Source files
-    src/common/error_common.cpp
-    src/common/strings_common.cpp
+    src/common/error.cpp
+    src/common/strings.cpp
     )
 
 set(EVENT_FILES
@@ -57,25 +57,25 @@ set(UNIX_FILES
 
 set(VULKAN_API_FILES
     #Header files
-    src/vulkan_api/instance/instance.h
-    src/vulkan_api/instance/physical_device.h
-    src/vulkan_api/instance/device.h
-    src/vulkan_api/instance/resource_cache.h
-    src/vulkan_api/instance/queue.h
-    src/vulkan_api/instance/command_pool.h
-    src/vulkan_api/instance/fence_pool.h
-    src/vulkan_api/instance/render_context.h
-    src/vulkan_api/instance/swapchain.h
+    src/vulkan_api/instance.h
+    src/vulkan_api/physical_device.h
+    src/vulkan_api/device.h
+    src/vulkan_api/resource_cache.h
+    src/vulkan_api/queue.h
+    src/vulkan_api/command_pool.h
+    src/vulkan_api/fence_pool.h
+    src/vulkan_api/render_context.h
+    src/vulkan_api/swapchain.h
     #Source files
-    src/vulkan_api/instance/instance.cpp
-    src/vulkan_api/instance/physical_device.cpp
-    src/vulkan_api/instance/device.cpp
-    src/vulkan_api/instance/resource_cache.cpp
-    src/vulkan_api/instance/queue.cpp
-    src/vulkan_api/instance/command_pool.cpp
-    src/vulkan_api/instance/fence_pool.cpp
-    src/vulkan_api/instance/render_context.cpp
-    src/vulkan_api/instance/swapchain.cpp)
+    src/vulkan_api/instance.cpp
+    src/vulkan_api/physical_device.cpp
+    src/vulkan_api/device.cpp
+    src/vulkan_api/resource_cache.cpp
+    src/vulkan_api/queue.cpp
+    src/vulkan_api/command_pool.cpp
+    src/vulkan_api/fence_pool.cpp
+    src/vulkan_api/render_context.cpp
+    src/vulkan_api/swapchain.cpp)
 
 set(PROJECT_FILES
     ${CORE_FILES}
@@ -111,12 +111,10 @@ target_compile_definitions(Engine
     PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED
     )
 
-set(gcc_like_compile "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU>")
-set(msvc_compile "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-
-target_compile_options(Engine
-    PRIVATE "$<${gcc_like_compile}:$<BUILD_INTERFACE:-Wall;-Wextra;-pedantic>>"
-    PRIVATE "$<${msvc_compile}:$<BUILD_INTERFACE:-W3>>"
-    )
+if(MSVC)
+  target_compile_options(Engine PRIVATE /W3 /WX)
+else()
+  target_compile_options(Engine PRIVATE -Wall)
+endif()
 
 add_subdirectory("vendor")

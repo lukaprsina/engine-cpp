@@ -14,8 +14,8 @@ namespace engine
         ENG_ASSERT(app && "Application isn't valid!");
         m_App = std::move(app);
 
-        bool isHeadless = m_App->GetOptions().Contains("--headless");
-        m_App->SetHeadless(isHeadless);
+        bool is_headless = m_App->GetOptions().Contains("--headless");
+        m_App->SetHeadless(is_headless);
 
         CreatePlatformWindow();
 

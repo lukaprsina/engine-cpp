@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/vulkan_common.h"
+#include "common/vulkan.h"
 
 namespace engine
 {

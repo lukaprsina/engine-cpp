@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vulkan_api/instance/physical_device.h"
-#include "vulkan_api/instance/resource_cache.h"
-#include "vulkan_api/instance/queue.h"
+#include "vulkan_api/physical_device.h"
+#include "vulkan_api/resource_cache.h"
+#include "vulkan_api/queue.h"
 
 namespace engine
 {
@@ -18,7 +18,8 @@ namespace engine
         VkResult WaitIdle();
         bool IsExtensionSupported(const char *requested_extension) const;
         VkDevice GetHandle() const { return m_Handle; }
-        QueueFamily &GetQueueByFlags(VkQueueFlags required_queue_flags, uint32_t queue_index);
+        PhysicalDevice GetGPU() const { return m_Gpu; }
+        QueueFamily &GetQueueByFlags(VkQueueFlags required_queue_flags);
 
     private:
         PhysicalDevice &m_Gpu;

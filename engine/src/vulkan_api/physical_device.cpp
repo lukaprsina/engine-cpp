@@ -1,6 +1,6 @@
-#include "vulkan_api/instance/physical_device.h"
+#include "vulkan_api/physical_device.h"
 
-#include "vulkan_api/instance/instance.h"
+#include "vulkan_api/instance.h"
 
 namespace engine
 {

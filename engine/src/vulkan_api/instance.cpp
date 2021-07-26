@@ -1,6 +1,6 @@
-#include "vulkan_api/instance/instance.h"
+#include "vulkan_api/instance.h"
 
-#include "vulkan_api/instance/physical_device.h"
+#include "vulkan_api/physical_device.h"
 
 #if (defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED) && !defined(ENG_VALIDATION_LAYERS))
 #error Need validation layers when enabling GPU assisted validation layers
@@ -340,7 +340,8 @@ namespace engine
     {
         auto it = std::find_if(m_EnabledExtensions.begin(),
                                m_EnabledExtensions.end(),
-                               [extension](const char *enabled_extension) {
+                               [extension](const char *enabled_extension)
+                               {
                                    return (std::strcmp(enabled_extension, extension) == 0);
                                });
 

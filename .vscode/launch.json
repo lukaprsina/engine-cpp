@@ -21,8 +21,6 @@
           "value": "$PATH:${command:cmake.getLaunchTargetDirectory}"
         }
       ],
-      "externalConsole": false,
-      "MIMode": "gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

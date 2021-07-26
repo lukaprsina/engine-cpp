@@ -3,10 +3,10 @@
 #include "core/log.h"
 #include "events/application_event.h"
 #include "platform/platform.h"
-#include "vulkan_api/instance/instance.h"
-#include "vulkan_api/instance/physical_device.h"
-#include "vulkan_api/instance/device.h"
-#include "vulkan_api/instance/render_context.h"
+#include "vulkan_api/instance.h"
+#include "vulkan_api/physical_device.h"
+#include "vulkan_api/device.h"
+#include "vulkan_api/render_context.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -87,6 +87,11 @@ namespace engine
                                                           surface_format_priority,
                                                           m_Platform->GetWindow().GetSettings().width,
                                                           m_Platform->GetWindow().GetSettings().height);
+
+        m_RenderContext->SetPresentModePriority({VK_PRESENT_MODE_IMMEDIATE_KHR});
+        m_RenderContext->SetSurfaceFormatPriority({{VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+
+        m_RenderContext->Prepare();
 
         return true;
     }

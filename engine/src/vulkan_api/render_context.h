@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vulkan_api/instance/swapchain.h"
+#include "vulkan_api/swapchain.h"
 
 namespace engine
 {
@@ -16,11 +16,22 @@ namespace engine
                       uint32_t height);
         ~RenderContext();
 
+        void Prepare();
+
+        void SetPresentModePriority(const std::vector<VkPresentModeKHR> &new_present_mode_priority_list)
+        {
+            if (m_Swapchain)
+                m_Swapchain->SetPresentModePriority(new_present_mode_priority_list);
+        }
+
+        void SetSurfaceFormatPriority(const std::vector<VkSurfaceFormatKHR> &new_surface_format_priority_list)
+        {
+            if (m_Swapchain)
+                m_Swapchain->SetSurfaceFormatPriority(new_surface_format_priority_list);
+        }
+
     private:
         Device &m_Device;
-
-        std::vector<VkPresentModeKHR> m_PresentModePriority;
-        std::vector<VkSurfaceFormatKHR> m_SurfaceFormatPriority;
         VkExtent2D m_Extent;
 
         std::unique_ptr<Swapchain> m_Swapchain;

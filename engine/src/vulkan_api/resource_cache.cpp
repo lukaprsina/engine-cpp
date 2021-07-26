@@ -1,6 +1,6 @@
-#include "vulkan_api/instance/resource_cache.h"
+#include "vulkan_api/resource_cache.h"
 
-#include "vulkan_api/instance/device.h"
+#include "vulkan_api/device.h"
 
 namespace engine
 {

@@ -1,5 +1,5 @@
-#include "vulkan_api/instance/queue.h"
-#include "vulkan_api/instance/device.h"
+#include "vulkan_api/queue.h"
+#include "vulkan_api/device.h"
 
 namespace engine
 {
