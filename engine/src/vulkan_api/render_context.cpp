@@ -24,9 +24,6 @@ namespace engine
         else
             m_Swapchain = std::make_unique<Swapchain>(device, surface, present_mode_priority,
                                                       surface_format_priority);
-
-        m_Swapchain->SetPresentModePriority(present_mode_priority);
-        m_Swapchain->SetSurfaceFormatPriority(surface_format_priority);
     }
 
     RenderContext::~RenderContext()

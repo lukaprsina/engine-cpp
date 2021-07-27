@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/options.h"
+#include "core/timer.h"
 
 namespace engine
 {
@@ -25,6 +26,7 @@ namespace engine
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
         bool Prepare();
+        void Step();
         void Finish();
 
         void SetName(const std::string &name) { m_Name = name; }
@@ -50,6 +52,7 @@ namespace engine
         std::string m_Usage;
         Options m_Options;
         bool m_Headless;
+        Timer m_Timer;
 
         std::unique_ptr<Instance> m_Instance;
         std::unique_ptr<Device> m_Device;

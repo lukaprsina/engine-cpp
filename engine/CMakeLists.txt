@@ -3,10 +3,12 @@ set(CORE_FILES
     src/core/application.h
     src/core/options.h
     src/core/log.h
+    src/core/timer.h
     # Source Files    
     src/core/application.cpp
     src/core/options.cpp
-    src/core/log.cpp)
+    src/core/log.cpp
+    src/core/timer.cpp)
 
 set(COMMON_FILES
     # Header Files

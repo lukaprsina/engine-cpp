@@ -41,15 +41,17 @@ namespace engine
 
     void Platform::MainLoop()
     {
+        ENG_CORE_INFO("Starting the main loop.");
         while (!m_Window->ShouldClose())
         {
             Run();
+            m_Window->ProcessEvents();
         }
     }
 
     void Platform::Run()
     {
-        m_Window->ProcessEvents();
+        m_App->Step();
     }
 
     void Platform::Terminate(ExitCode)

@@ -238,11 +238,9 @@ namespace engine
                          const VkExtent2D &extent,
                          const uint32_t image_count,
                          const VkSurfaceTransformFlagBitsKHR transform,
-                         const VkPresentModeKHR present_mode,
-                         const VkSurfaceFormatKHR surface_format,
                          const std::set<VkImageUsageFlagBits> &image_usage_flags)
         : Swapchain(*this, device, surface, present_mode_priority, surface_format_priority,
-                    extent, image_count, transform, present_mode, surface_format, image_usage_flags)
+                    extent, image_count, transform, image_usage_flags)
     {
     }
 
@@ -254,8 +252,6 @@ namespace engine
                          const VkExtent2D &extent,
                          const uint32_t image_count,
                          const VkSurfaceTransformFlagBitsKHR transform,
-                         const VkPresentModeKHR present_mode,
-                         const VkSurfaceFormatKHR surface_format,
                          const std::set<VkImageUsageFlagBits> &image_usage_flags)
         : m_Device(device),
           m_Surface(surface)
@@ -300,6 +296,7 @@ namespace engine
         m_Properties.image_count = ChooseImageCount(image_count, surface_capabilities.minImageCount, surface_capabilities.maxImageCount);
         m_Properties.extent = ChooseExtent(extent, surface_capabilities.minImageExtent, surface_capabilities.maxImageExtent, surface_capabilities.currentExtent);
         m_Properties.array_layers = ChooseImageArrayLayers(1, surface_capabilities.maxImageArrayLayers);
+        m_Properties.surface_format = ChooseSurfaceFormat(m_SurfaceFormats, m_SurfaceFormatPriorityList);
 
         VkFormatProperties format_properties;
         vkGetPhysicalDeviceFormatProperties(m_Device.GetGPU().GetHandle(), m_Properties.surface_format.format, &format_properties);
@@ -308,9 +305,6 @@ namespace engine
 
         m_Properties.pre_transform = ChooseTransform(transform, surface_capabilities.supportedTransforms, surface_capabilities.currentTransform);
         m_Properties.composite_alpha = ChooseCompositeAlpha(VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR, surface_capabilities.supportedCompositeAlpha);
-
-        m_Properties.surface_format = surface_format;
-        m_Properties.present_mode = present_mode;
     }
 
     Swapchain::~Swapchain()
@@ -347,7 +341,7 @@ namespace engine
             throw VulkanException{result, "Cannot create Swapchain"};
         }
 
-        uint32_t image_available{0u};
+        uint32_t image_available;
         VK_CHECK(vkGetSwapchainImagesKHR(m_Device.GetHandle(), m_Handle, &image_available, nullptr));
 
         m_Images.resize(image_available);
