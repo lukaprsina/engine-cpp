@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/application.h"
+#include "core/timer.h"
 #include "window/window.h"
 
 namespace engine
@@ -10,10 +11,6 @@ namespace engine
         Success = 0,     /* App prepare succeeded, it ran correctly and exited properly with no errors */
         UnableToRun = 1, /* App prepare failed, could not run */
         FatalError = 2   /* App encountered an unexpected error */
-    };
-
-    class Timer
-    {
     };
 
     class Event;

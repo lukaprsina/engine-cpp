@@ -27,6 +27,8 @@ namespace engine
         bool OnWindowClose(WindowCloseEvent &event);
         bool Prepare();
         void Step();
+        void Update(float delta_time);
+        void UpdateScene(float delta_time);
         void Finish();
 
         void SetName(const std::string &name) { m_Name = name; }
@@ -52,6 +54,7 @@ namespace engine
         std::string m_Usage;
         Options m_Options;
         bool m_Headless;
+        uint32_t m_FrameCount;
         Timer m_Timer;
 
         std::unique_ptr<Instance> m_Instance;

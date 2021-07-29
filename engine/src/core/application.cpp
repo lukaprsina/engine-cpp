@@ -100,7 +100,22 @@ namespace engine
 
     void Application::Step()
     {
-        m_Timer
+        auto delta_time = static_cast<float>(m_Timer.Tick());
+
+        if (m_FrameCount == 0)
+            delta_time = 0.01667f;
+
+        Update(delta_time);
+    }
+
+    void Application::Update(float delta_time)
+    {
+        UpdateScene(delta_time);
+        auto &command_buffer = m_RenderContext->Begin();
+    }
+
+    void Application::UpdateScene(float delta_time)
+    {
     }
 
     void Application::Finish()

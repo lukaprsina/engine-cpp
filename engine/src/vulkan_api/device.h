@@ -12,13 +12,15 @@ namespace engine
     class Device
     {
     public:
-        Device(PhysicalDevice &gpu, VkSurfaceKHR surface, std::unordered_map<const char *, bool> requested_extensions = {});
+        Device(PhysicalDevice &gpu, VkSurfaceKHR surface,
+               std::unordered_map<const char *, bool> requested_extensions = {});
         ~Device();
 
         VkResult WaitIdle();
         bool IsExtensionSupported(const char *requested_extension) const;
         VkDevice GetHandle() const { return m_Handle; }
         PhysicalDevice GetGPU() const { return m_Gpu; }
+        VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
         QueueFamily &GetQueueByFlags(VkQueueFlags required_queue_flags);
 
     private:

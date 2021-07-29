@@ -44,6 +44,14 @@ namespace engine
 
         VkSwapchainKHR GetHandle() const { return m_Handle; }
 
+        const VkExtent2D &GetExtent() const { return m_Properties.extent; }
+
+        const std::vector<VkImage> &GetImages() const { return m_Images; }
+
+        VkFormat GetFormat() const { return m_Properties.surface_format.format; }
+
+        VkImageUsageFlags GetUsage() const { return m_Properties.image_usage; }
+
         void SetPresentModePriority(const std::vector<VkPresentModeKHR> &new_present_mode_priority_list)
         {
             m_PresentModePriorityList = new_present_mode_priority_list;

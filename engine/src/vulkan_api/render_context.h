@@ -1,6 +1,9 @@
 #pragma once
 
 #include "vulkan_api/swapchain.h"
+#include "vulkan_api/command_buffer.h"
+#include "vulkan_api/render_target.h"
+#include "vulkan_api/render_frame.h"
 
 namespace engine
 {
@@ -16,7 +19,10 @@ namespace engine
                       uint32_t height);
         ~RenderContext();
 
-        void Prepare();
+        void Prepare(size_t thread_count = 1,
+                     RenderTarget::CreateFunc create_render_target_function = RenderTarget::s_DefaultCreateFunction);
+
+        CommandBuffer &Begin(CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool);
 
         void SetPresentModePriority(const std::vector<VkPresentModeKHR> &new_present_mode_priority_list)
         {
@@ -32,8 +38,10 @@ namespace engine
 
     private:
         Device &m_Device;
-        VkExtent2D m_Extent;
-
+        VkExtent2D m_SurfaceExtent;
+        bool m_Prepared;
         std::unique_ptr<Swapchain> m_Swapchain;
+
+        std::vector<std::unique_ptr<RenderFrame>> m_Frames;
     };
 }

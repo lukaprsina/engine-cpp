@@ -18,6 +18,7 @@ set(COMMON_FILES
     src/common/strings.h
     #Source files
     src/common/error.cpp
+    src/common/vulkan.cpp
     src/common/strings.cpp
     )
 
@@ -68,6 +69,12 @@ set(VULKAN_API_FILES
     src/vulkan_api/fence_pool.h
     src/vulkan_api/render_context.h
     src/vulkan_api/swapchain.h
+    src/vulkan_api/command_buffer.h
+    src/vulkan_api/core/image.h
+    src/vulkan_api/core/image_view.h
+    src/vulkan_api/render_target.h
+    src/vulkan_api/render_frame.h
+    src/vulkan_api/semaphore_pool.h
     #Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -77,7 +84,14 @@ set(VULKAN_API_FILES
     src/vulkan_api/command_pool.cpp
     src/vulkan_api/fence_pool.cpp
     src/vulkan_api/render_context.cpp
-    src/vulkan_api/swapchain.cpp)
+    src/vulkan_api/swapchain.cpp
+    src/vulkan_api/command_buffer.cpp    
+    src/vulkan_api/core/image.cpp
+    src/vulkan_api/core/image_view.cpp
+    src/vulkan_api/render_target.cpp
+    src/vulkan_api/render_frame.cpp
+    src/vulkan_api/semaphore_pool.cpp
+)
 
 set(PROJECT_FILES
     ${CORE_FILES}

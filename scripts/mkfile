@@ -54,7 +54,7 @@ namespace engine
 EOT
 
 cat <<EOT >> "${fullpath_filename}.cpp"
-#include "${source_folder}/${path_filename}.h"
+#include "${path_filename}.h"
 
 namespace engine
 {
