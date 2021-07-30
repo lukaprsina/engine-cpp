@@ -307,6 +307,21 @@ namespace engine
         m_Properties.composite_alpha = ChooseCompositeAlpha(VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR, surface_capabilities.supportedCompositeAlpha);
     }
 
+    Swapchain::Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent)
+        : Swapchain(old_swapchain, old_swapchain.m_Device,
+                    old_swapchain.m_Surface,
+                    old_swapchain.m_PresentModePriorityList,
+                    old_swapchain.m_SurfaceFormatPriorityList,
+                    extent,
+                    old_swapchain.m_Properties.image_count,
+                    old_swapchain.m_Properties.pre_transform,
+                    old_swapchain.m_ImageUsageFlags)
+    {
+        m_PresentModePriorityList = old_swapchain.m_PresentModePriorityList;
+        m_SurfaceFormatPriorityList = old_swapchain.m_SurfaceFormatPriorityList;
+        Create();
+    }
+
     Swapchain::~Swapchain()
     {
         if (m_Handle != VK_NULL_HANDLE)

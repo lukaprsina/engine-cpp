@@ -31,6 +31,29 @@ namespace engine
     {
     }
 
+    void RenderContext::UpdateSwapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform)
+    {
+        if (!m_Swapchain)
+        {
+            ENG_CORE_WARN("Can't update the swapchains extent and surface transform in headless mode, skipping.");
+            return;
+        }
+
+        // TODO
+        m_Device.GetResourceCache();
+
+        auto width = extent.width;
+        auto height = extent.height;
+        // Pre-rotation: always use native orientation i.e. if rotated, use width and height of identity transform
+        if (transform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR || transform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
+            std::swap(width, height);
+
+        m_Swapchain = std::make_unique<Swapchain>(*m_Swapchain, VkExtent2D(width, height), transform);
+        m_PreTransform = transform;
+
+        Recreate();
+    }
+
     void RenderContext::Prepare(size_t thread_count,
                                 RenderTarget::CreateFunc create_render_target_function)
     {
@@ -54,13 +77,90 @@ namespace engine
                 m_Frames.emplace_back(std::make_unique<RenderFrame>(m_Device, std::move(render_target),
                                                                     thread_count));
             }
-
-            m_Prepared = true;
         }
+
+        m_CreateRenderTargetFunction = create_render_target_function;
+        m_ThreadCount = thread_count;
+        m_Prepared = true;
     }
 
     CommandBuffer &RenderContext::Begin(CommandBuffer::ResetMode reset_mode)
     {
-        assert(m_Prepared);
+        assert(m_Prepared && "RenderContext not prepared for rendering, call prepare()");
+
+        if (!m_FrameActive)
+            BeginFrame();
+
+        if (m_AcquiredSemaphore == VK_NULL_HANDLE)
+            throw std::runtime_error("Couldn't begin frame!");
     }
+
+    void RenderContext::BeginFrame()
+    {
+        if (m_Swapchain)
+            HandleSurfaceChanges();
+
+        assert(!m_FrameActive && "Frame is still active, please call end_frame");
+
+        auto &prev_frame = *m_Frames.at(m_ActiveFrameIndex);
+    }
+
+    void RenderContext::HandleSurfaceChanges()
+    {
+        if (m_Swapchain)
+        {
+            ENG_CORE_WARN("Can't handle surface changes in headless mode, skipping.");
+            return;
+        }
+        VkSurfaceCapabilitiesKHR surface_properties;
+        VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_Device.GetGPU().GetHandle(),
+                                                           m_Swapchain->GetSurface(),
+                                                           &surface_properties));
+
+        if (surface_properties.currentExtent.width == 0xFFFFFFFF)
+            return;
+
+        if (surface_properties.currentExtent.width != m_SurfaceExtent.width ||
+            surface_properties.currentExtent.height != m_SurfaceExtent.height)
+        {
+            m_Device.WaitIdle();
+            UpdateSwapchain(surface_properties.currentExtent, m_PreTransform);
+        }
+    }
+
+    void RenderContext::Recreate()
+    {
+        ENG_CORE_INFO("Recreating swapchain");
+
+        VkExtent2D swapchain_extent = m_Swapchain->GetExtent();
+        VkExtent3D extent{swapchain_extent.width, swapchain_extent.height, 1};
+
+        auto frame_it = m_Frames.begin();
+
+        for (auto &image_handle : m_Swapchain->GetImages())
+        {
+            core::Image swapchain_image{m_Device, image_handle,
+                                        extent,
+                                        m_Swapchain->GetFormat(),
+                                        m_Swapchain->GetUsage()};
+
+            auto render_target = m_CreateRenderTargetFunction(std::move(swapchain_image));
+
+            if (frame_it != m_Frames.end())
+            {
+                (*frame_it)->UpdateRenderTarget(std::move(render_target));
+            }
+            else
+            {
+                // Create a new frame if the new swapchain has more images than current frames
+                m_Frames.emplace_back(std::make_unique<RenderFrame>(m_Device, std::move(render_target), m_ThreadCount));
+            }
+
+            ++frame_it;
+        }
+
+        //TODO
+        m_Device.GetResourceCache();
+    }
+
 }

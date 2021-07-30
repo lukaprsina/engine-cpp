@@ -15,6 +15,16 @@ namespace engine
                     size_t thread_count = 1);
         ~RenderFrame();
 
+        void UpdateRenderTarget(std::unique_ptr<RenderTarget> &&render_target)
+        {
+            m_SwapchainRenderTarget = std::move(render_target);
+        }
+
+        VkSemaphore RenderFrame::RequestSemaphoreWithOwnership()
+        {
+            return m_SemaphorePool.RequestSemaphoreWithOwnership();
+        }
+
     private:
         Device &m_Device;
         FencePool m_FencePool;

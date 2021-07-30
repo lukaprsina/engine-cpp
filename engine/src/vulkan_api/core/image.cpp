@@ -65,7 +65,7 @@ namespace engine
               m_Type(FindImageType(extent)),
               m_Extent(extent),
               m_Format(format),
-              m_Sample_count(sample_count),
+              m_SampleCount(sample_count),
               m_Usage(image_usage),
               m_ArrayLayerCount(array_layers),
               m_Tiling(tiling)
@@ -123,7 +123,7 @@ namespace engine
               m_Extent(extent),
               m_Format(format),
               m_Usage(image_usage),
-              m_Sample_count(sample_count)
+              m_SampleCount(sample_count)
 
         {
             m_Subresource.mipLevel = 1;

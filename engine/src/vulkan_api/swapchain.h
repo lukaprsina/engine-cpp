@@ -40,7 +40,11 @@ namespace engine
                   const VkSurfaceTransformFlagBitsKHR transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
                   const std::set<VkImageUsageFlagBits> &image_usage_flags = {VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT});
 
+        Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent);
+
         ~Swapchain();
+
+        VkSurfaceKHR GetSurface() const { return m_Surface; }
 
         VkSwapchainKHR GetHandle() const { return m_Handle; }
 

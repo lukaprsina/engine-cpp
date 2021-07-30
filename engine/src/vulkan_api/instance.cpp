@@ -197,8 +197,8 @@ namespace engine
         if (debug_utils)
         {
             debug_utils_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            debug_utils_create_info.messageSeverity = m_DebugUtilsSettings.VulkanMessageSeverity;
-            debug_utils_create_info.messageType = m_DebugUtilsSettings.VulkanMessageType;
+            debug_utils_create_info.messageSeverity = m_DebugUtilsSettings.vulkan_message_severity;
+            debug_utils_create_info.messageType = m_DebugUtilsSettings.vulkan_message_type;
             debug_utils_create_info.pfnUserCallback = DebugUtilsMessengerCallback;
 
             instance_info.pNext = &debug_utils_create_info;

@@ -5,10 +5,10 @@
 namespace engine
 {
     class Device;
-    class ImageView;
 
     namespace core
     {
+        class ImageView;
         class Image
         {
         public:
@@ -35,8 +35,14 @@ namespace engine
             ~Image();
 
             Device &GetDevice() { return m_Device; }
+            VkImage &GetHandle() { return m_Handle; }
             const VkExtent3D &GetExtent() const { return m_Extent; }
             VkImageType GetType() const { return m_Type; }
+            VkFormat GetFormat() const { return m_Format; }
+            VkImageUsageFlags GetUsage() const { return m_Usage; }
+            VkSampleCountFlagBits GetSampleCount() const { return m_SampleCount; }
+            VkImageSubresource GetSubresource() const { return m_Subresource; }
+            std::unordered_set<ImageView *> &GetViews() { return m_ImageViews; }
 
         private:
             Device &m_Device;
@@ -46,14 +52,14 @@ namespace engine
             VkExtent3D m_Extent;
             VkFormat m_Format;
             VkImageUsageFlags m_Usage;
-            VkSampleCountFlagBits m_Sample_count;
+            VkSampleCountFlagBits m_SampleCount;
             VkImageTiling m_Tiling;
             VkImageSubresource m_Subresource;
             uint32_t m_ArrayLayerCount;
 
             /// Image views referring to this image
-            std::unordered_set<ImageView *> views;
-            uint8_t *mapped_data{nullptr};
+            std::unordered_set<ImageView *> m_ImageViews;
+            uint8_t *m_MappedData{nullptr};
 
             /// Whether it was mapped with vmaMapMemory
             bool mapped{false};

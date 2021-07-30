@@ -19,6 +19,8 @@ namespace engine
                       uint32_t height);
         ~RenderContext();
 
+        void UpdateSwapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform);
+
         void Prepare(size_t thread_count = 1,
                      RenderTarget::CreateFunc create_render_target_function = RenderTarget::s_DefaultCreateFunction);
 
@@ -36,11 +38,25 @@ namespace engine
                 m_Swapchain->SetSurfaceFormatPriority(new_surface_format_priority_list);
         }
 
+        void BeginFrame();
+
+        void Recreate();
+
+        void HandleSurfaceChanges();
+
     private:
         Device &m_Device;
         VkExtent2D m_SurfaceExtent;
         bool m_Prepared;
         std::unique_ptr<Swapchain> m_Swapchain;
+        RenderTarget::CreateFunc m_CreateRenderTargetFunction = RenderTarget::s_DefaultCreateFunction;
+        VkSurfaceTransformFlagBitsKHR m_PreTransform{VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR};
+        size_t m_ThreadCount = 1;
+
+        VkSemaphore m_AcquiredSemaphore;
+        bool m_Prepared = false;
+        uint32_t m_ActiveFrameIndex = 0;
+        bool m_FrameActive = false;
 
         std::vector<std::unique_ptr<RenderFrame>> m_Frames;
     };

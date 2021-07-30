@@ -8,48 +8,16 @@ namespace engine
 {
     namespace
     {
-        struct CompareExtent2D
+        auto CompareExtend2D = [](const VkExtent2D &lhs, const VkExtent2D &rhs)
         {
-            bool operator()(const VkExtent2D &lhs, const VkExtent2D &rhs) const
-            {
-                return !(lhs.width == rhs.width && lhs.height == rhs.height) && (lhs.width < rhs.width && lhs.height < rhs.height);
-            }
+            return !(lhs.width == rhs.width && lhs.height == rhs.height) &&
+                   (lhs.width < rhs.width && lhs.height < rhs.height);
         };
     }
 
-    RenderTarget::RenderTarget(std::vector<core::Image> &&images)
-        : m_Device(images.back().GetDevice()),
-          m_Images(std::move(images))
-    {
-        assert(!m_Images.empty() && "Render target should have at least one image");
-        std::set<VkExtent2D, CompareExtent2D> unique_extent;
-
-        auto get_image_extent = [](const core::Image &image)
-        { return VkExtent2D{image.GetExtent().width, image.GetExtent().height}; };
-
-        std::transform(m_Images.begin(), m_Images.end(), std::inserter(unique_extent, unique_extent.end()), get_image_extent);
-
-        if (unique_extent.size() != 1)
-        {
-            throw VulkanException{VK_ERROR_INITIALIZATION_FAILED, "Extent size is not unique"};
-        }
-
-        m_Extent = *unique_extent.begin();
-
-        for (auto &image : m_Images)
-        {
-            if (image.GetType() != VK_IMAGE_TYPE_2D)
-            {
-                throw VulkanException{VK_ERROR_INITIALIZATION_FAILED, "Image type is not 2D"};
-            }
-
-            views.emplace_back(image, VK_IMAGE_VIEW_TYPE_2D);
-
-            attachments.emplace_back(Attachment{image.get_format(), image.get_sample_count(), image.get_usage()});
-        }
-    }
-
-    RenderTarget::~RenderTarget()
+    Attachment::Attachment(VkFormat format, VkSampleCountFlagBits samples,
+                           VkImageUsageFlags usage)
+        : format(format), samples(samples), usage(usage)
     {
     }
 
@@ -68,4 +36,49 @@ namespace engine
 
         return std::make_unique<RenderTarget>(std::move(images));
     };
+
+    RenderTarget::RenderTarget(std::vector<core::Image> &&images)
+        : m_Device(images.back().GetDevice()),
+          m_Images(std::move(images))
+    {
+        assert(!m_Images.empty() && "Render target should have at least one image");
+
+        auto CompareExtend2D = [](const VkExtent2D &lhs, const VkExtent2D &rhs)
+        {
+            return !(lhs.width == rhs.width && lhs.height == rhs.height) &&
+                   (lhs.width < rhs.width && lhs.height < rhs.height);
+        };
+        std::set<VkExtent2D, decltype(CompareExtend2D)> unique_extent(CompareExtend2D);
+
+        auto get_image_extent = [](const core::Image &image)
+        {
+            return VkExtent2D{image.GetExtent().width, image.GetExtent().height};
+        };
+        std::transform(m_Images.begin(), m_Images.end(), std::inserter(unique_extent, unique_extent.end()), get_image_extent);
+
+        if (unique_extent.size() != 1)
+        {
+            throw VulkanException{VK_ERROR_INITIALIZATION_FAILED, "Extent size is not unique"};
+        }
+
+        m_Extent = *unique_extent.begin();
+
+        for (auto &image : m_Images)
+        {
+            if (image.GetType() != VK_IMAGE_TYPE_2D)
+            {
+                throw VulkanException{VK_ERROR_INITIALIZATION_FAILED, "Image type is not 2D"};
+            }
+
+            m_ImageViews.emplace_back(image, VK_IMAGE_VIEW_TYPE_2D);
+
+            m_Attachments.emplace_back(Attachment(image.GetFormat(),
+                                                  image.GetSampleCount(),
+                                                  image.GetUsage()));
+        }
+    }
+
+    RenderTarget::~RenderTarget()
+    {
+    }
 }
