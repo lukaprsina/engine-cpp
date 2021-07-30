@@ -10,4 +10,8 @@ namespace engine
     SemaphorePool::~SemaphorePool()
     {
     }
+
+    VkSemaphore RequestSemaphoreWithOwnership()
+    {
+        }
 }
