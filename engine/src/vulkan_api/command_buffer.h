@@ -2,10 +2,11 @@
 
 namespace engine
 {
+    class CommandPool;
     class CommandBuffer
     {
     public:
-        CommandBuffer();
+        CommandBuffer(CommandPool &command_pool, VkCommandBufferLevel level);
         ~CommandBuffer();
 
         enum class ResetMode
@@ -22,5 +23,15 @@ namespace engine
             Recording,
             Executable,
         };
+
+        VkResult Reset(ResetMode reset_mode);
+
+        const VkCommandBufferLevel m_Level;
+
+    private:
+        State m_State = State::Initial;
+        CommandPool &m_CommandPool;
+        VkCommandBuffer m_Handle;
+        uint32_t m_MaxPushConstantsSize;
     };
 }

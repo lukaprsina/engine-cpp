@@ -23,7 +23,7 @@ namespace engine
         VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
         ResourceCache &GetResourceCache() { return m_ResourceCache; }
 
-        QueueFamily &GetQueueByFlags(VkQueueFlags required_queue_flags);
+        QueueFamily &GetQueueFamilyByFlags(VkQueueFlags required_queue_flags);
 
     private:
         PhysicalDevice &m_Gpu;

@@ -39,3 +39,8 @@ set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
 add_subdirectory(volk)
 target_link_libraries(Engine PRIVATE volk)
 install(TARGETS volk)
+
+#entt
+add_subdirectory(entt)
+target_link_libraries(Engine PRIVATE EnTT::EnTT)
+install(TARGETS EnTT)

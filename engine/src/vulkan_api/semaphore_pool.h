@@ -12,7 +12,12 @@ namespace engine
 
         VkSemaphore RequestSemaphoreWithOwnership();
 
+        void Reset();
+
     private:
         Device &m_Device;
+        std::vector<VkSemaphore> m_Semaphores;
+        std::vector<VkSemaphore> m_ReleasedSemaphores;
+        uint32_t m_ActiveSemaphoreCount;
     };
 }

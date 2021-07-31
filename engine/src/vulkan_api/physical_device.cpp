@@ -19,6 +19,10 @@ namespace engine
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_properties_count, m_QueueFamilyProperties.data());
     }
 
+    PhysicalDevice::~PhysicalDevice()
+    {
+    }
+
     VkBool32 PhysicalDevice::IsPresentSupported(VkSurfaceKHR surface, uint32_t queue_family_index)
     {
         VkBool32 present_supported = VK_FALSE;

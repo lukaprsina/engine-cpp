@@ -40,9 +40,13 @@ namespace engine
                   const VkSurfaceTransformFlagBitsKHR transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
                   const std::set<VkImageUsageFlagBits> &image_usage_flags = {VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT});
 
-        Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent);
+        Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform);
 
         ~Swapchain();
+
+        void Create();
+
+        VkResult AcquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence);
 
         VkSurfaceKHR GetSurface() const { return m_Surface; }
 
@@ -65,8 +69,6 @@ namespace engine
         {
             m_SurfaceFormatPriorityList = new_surface_format_priority_list;
         }
-
-        void Create();
 
     private:
         Device &m_Device;

@@ -93,6 +93,9 @@ namespace engine
 
         if (m_AcquiredSemaphore == VK_NULL_HANDLE)
             throw std::runtime_error("Couldn't begin frame!");
+
+        const auto &queue = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+        return GetActiveFrame().RequestCommandBuffer(queue, reset_mode);
     }
 
     void RenderContext::BeginFrame()
@@ -101,18 +104,52 @@ namespace engine
             HandleSurfaceChanges();
 
         assert(!m_FrameActive && "Frame is still active, please call end_frame");
-
         auto &prev_frame = *m_Frames.at(m_ActiveFrameIndex);
+        m_AcquiredSemaphore = prev_frame.GetSemaphorePool().RequestSemaphoreWithOwnership();
+
+        if (m_Swapchain)
+        {
+            auto result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
+
+            if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
+            {
+                HandleSurfaceChanges();
+
+                result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
+            }
+
+            if (result != VK_SUCCESS)
+            {
+                prev_frame.Reset();
+                return;
+            }
+        }
+
+        m_FrameActive = true;
+        WaitFrame();
+    }
+
+    void RenderContext::WaitFrame()
+    {
+        RenderFrame &frame = GetActiveFrame();
+        frame.Reset();
+    }
+
+    RenderFrame &RenderContext::GetActiveFrame()
+    {
+        assert(m_FrameActive && "Frame is not active, please call begin_frame");
+        return *m_Frames.at(m_ActiveFrameIndex);
     }
 
     void RenderContext::HandleSurfaceChanges()
     {
-        if (m_Swapchain)
+        if (!m_Swapchain)
         {
             ENG_CORE_WARN("Can't handle surface changes in headless mode, skipping.");
             return;
         }
         VkSurfaceCapabilitiesKHR surface_properties;
+        m_Device.GetGPU();
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_Device.GetGPU().GetHandle(),
                                                            m_Swapchain->GetSurface(),
                                                            &surface_properties));

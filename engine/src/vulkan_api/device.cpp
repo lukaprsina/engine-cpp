@@ -157,7 +157,7 @@ namespace engine
         if (result != VK_SUCCESS)
             throw VulkanException{result, "Cannot create allocator"};
 
-        uint32_t family_index = GetQueueByFlags(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT).GetFamilyIndex();
+        uint32_t family_index = GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT).GetFamilyIndex();
 
         m_CommandPool = std::make_unique<CommandPool>(*this, family_index);
         m_FencePool = std::make_unique<FencePool>(*this);
@@ -192,7 +192,7 @@ namespace engine
         return it != m_DeviceExtensions.end();
     }
 
-    QueueFamily &Device::GetQueueByFlags(VkQueueFlags required_queue_flags)
+    QueueFamily &Device::GetQueueFamilyByFlags(VkQueueFlags required_queue_flags)
     {
         size_t queue_family_index = 0;
         for (auto &queue_family : m_QueueFamilies)

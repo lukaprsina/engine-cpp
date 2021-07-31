@@ -307,14 +307,14 @@ namespace engine
         m_Properties.composite_alpha = ChooseCompositeAlpha(VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR, surface_capabilities.supportedCompositeAlpha);
     }
 
-    Swapchain::Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent)
+    Swapchain::Swapchain(Swapchain &old_swapchain, const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform)
         : Swapchain(old_swapchain, old_swapchain.m_Device,
                     old_swapchain.m_Surface,
                     old_swapchain.m_PresentModePriorityList,
                     old_swapchain.m_SurfaceFormatPriorityList,
                     extent,
                     old_swapchain.m_Properties.image_count,
-                    old_swapchain.m_Properties.pre_transform,
+                    transform,
                     old_swapchain.m_ImageUsageFlags)
     {
         m_PresentModePriorityList = old_swapchain.m_PresentModePriorityList;
@@ -362,5 +362,13 @@ namespace engine
         m_Images.resize(image_available);
 
         VK_CHECK(vkGetSwapchainImagesKHR(m_Device.GetHandle(), m_Handle, &image_available, m_Images.data()));
+    }
+
+    VkResult Swapchain::AcquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence)
+    {
+        return vkAcquireNextImageKHR(m_Device.GetHandle(), m_Handle,
+                                     std::numeric_limits<uint64_t>::max(),
+                                     image_acquired_semaphore, fence,
+                                     &image_index);
     }
 }

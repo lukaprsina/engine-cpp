@@ -8,7 +8,7 @@ namespace engine
     {
     public:
         PhysicalDevice(Instance &instance, VkPhysicalDevice physical_device);
-        ~PhysicalDevice() = default;
+        ~PhysicalDevice();
 
         VkPhysicalDeviceFeatures GetFeatures() const { return m_Features; }
         VkPhysicalDeviceFeatures GetRequestedFeatures() const { return m_RequestedFeatures; }

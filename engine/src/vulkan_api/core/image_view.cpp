@@ -50,8 +50,8 @@ namespace engine
         ImageView::ImageView(ImageView &&other)
             : m_Device(other.m_Device),
               m_Image(other.m_Image),
-              m_Handle(other.m_Handle),
               m_Format(other.m_Format),
+              m_Handle(other.m_Handle),
               m_SubresourceRange(other.m_SubresourceRange)
         {
             auto &views = m_Image->GetViews();

@@ -65,10 +65,10 @@ namespace engine
               m_Type(FindImageType(extent)),
               m_Extent(extent),
               m_Format(format),
-              m_SampleCount(sample_count),
               m_Usage(image_usage),
-              m_ArrayLayerCount(array_layers),
-              m_Tiling(tiling)
+              m_SampleCount(sample_count),
+              m_Tiling(tiling),
+              m_ArrayLayerCount(array_layers)
         {
             assert(mip_levels > 0 && "Image should have at least one level");
             assert(array_layers > 0 && "Image should have at least one layer");
