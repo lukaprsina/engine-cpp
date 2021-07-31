@@ -41,7 +41,7 @@ namespace engine
 
     void Platform::MainLoop()
     {
-        // ENG_CORE_INFO("Starting the main loop.");
+        ENG_CORE_INFO("Starting the main loop.");
         while (!m_Window->ShouldClose())
         {
             Run();

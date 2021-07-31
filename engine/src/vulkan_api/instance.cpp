@@ -295,12 +295,12 @@ namespace engine
         }
     }
 
-    PhysicalDevice Instance::GetBestGpu()
+    PhysicalDevice &Instance::GetBestGpu()
     {
         ENG_ASSERT(!m_Gpus.empty() && "No GPUS found.");
         uint32_t score = 0;
 
-        std::multimap<uint32_t, PhysicalDevice> candidates;
+        std::multimap<uint32_t, PhysicalDevice *> candidates;
 
         for (auto &gpu : m_Gpus)
         {
@@ -326,14 +326,14 @@ namespace engine
             }
 
             score += gpu->GetProperties().limits.maxImageDimension2D * 0.02;
-
-            candidates.insert(std::make_pair(score, *gpu));
+            auto test = std::make_pair(score, gpu.get());
+            candidates.insert(test);
         }
 
         if (candidates.empty() || candidates.rbegin()->first == 0)
             throw std::runtime_error("The only device capable of Vulkan rendering isn't suitable.");
 
-        return candidates.rbegin()->second;
+        return *candidates.rbegin()->second;
     }
 
     bool Instance::IsExtensionEnabled(const char *extension) const

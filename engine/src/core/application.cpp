@@ -68,7 +68,7 @@ namespace engine
                                                 VK_API_VERSION_1_0);
 
         m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
-        PhysicalDevice gpu = m_Instance->GetBestGpu();
+        PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
             gpu.GetMutableRequestedFeatures().textureCompressionASTC_LDR = VK_TRUE;

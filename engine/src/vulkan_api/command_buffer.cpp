@@ -6,8 +6,8 @@
 namespace engine
 {
     CommandBuffer::CommandBuffer(CommandPool &command_pool, VkCommandBufferLevel level)
-        : m_CommandPool{command_pool},
-          m_Level{level},
+        : m_Level{level},
+          m_CommandPool{command_pool},
           m_MaxPushConstantsSize{command_pool.GetDevice().GetGPU().GetProperties().limits.maxPushConstantsSize}
     {
         VkCommandBufferAllocateInfo allocate_info{VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};

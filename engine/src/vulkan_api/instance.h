@@ -23,7 +23,7 @@ namespace engine
         ~Instance();
 
         VkInstance GetHandle() { return m_Handle; }
-        PhysicalDevice GetBestGpu();
+        PhysicalDevice &GetBestGpu();
 
         bool IsExtensionEnabled(const char *extension) const;
 
