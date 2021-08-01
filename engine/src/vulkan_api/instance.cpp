@@ -2,6 +2,8 @@
 
 #include "vulkan_api/physical_device.h"
 
+#include <array>
+
 #if (defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED) && !defined(ENG_VALIDATION_LAYERS))
 #error Need validation layers when enabling GPU assisted validation layers
 #endif
@@ -221,10 +223,10 @@ namespace engine
             static const std::array<VkValidationFeatureEnableEXT, 2> enable_features = {
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT,
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
-            };
+            };            
 
             validation_features_info.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-            validation_features_info.enabledValidationFeatureCount = enable_features.size();
+            validation_features_info.enabledValidationFeatureCount = static_cast<uint32_t>(enable_features.size());
             validation_features_info.pEnabledValidationFeatures = enable_features.data();
             validation_features_info.pNext = instance_info.pNext;
 
@@ -317,10 +319,10 @@ namespace engine
             for (const auto &heap : heaps)
             {
                 if (heap.flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
-                    score += heap.size * std::pow(10, -7);
+                    score += static_cast<uint32_t>(heap.size) * static_cast<uint32_t>(std::pow(10, -7));
             }
 
-            score += gpu->GetProperties().limits.maxImageDimension2D * 0.02;
+            score += static_cast<uint32_t>(std::floor(gpu->GetProperties().limits.maxImageDimension2D * 0.02));
             auto test = std::make_pair(score, gpu.get());
             candidates.insert(test);
         }
