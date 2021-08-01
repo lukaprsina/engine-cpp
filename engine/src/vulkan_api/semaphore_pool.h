@@ -16,8 +16,8 @@ namespace engine
 
     private:
         Device &m_Device;
-        std::vector<VkSemaphore> m_Semaphores;
-        std::vector<VkSemaphore> m_ReleasedSemaphores;
-        uint32_t m_ActiveSemaphoreCount;
+        std::vector<VkSemaphore> m_Semaphores{};
+        std::vector<VkSemaphore> m_ReleasedSemaphores{};
+        uint32_t m_ActiveSemaphoreCount{0};
     };
 }

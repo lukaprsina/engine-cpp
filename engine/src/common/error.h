@@ -34,7 +34,7 @@ namespace engine
         VkResult result;
 
     private:
-        std::string error_message;
+        std::string error_message{};
     };
 }
 

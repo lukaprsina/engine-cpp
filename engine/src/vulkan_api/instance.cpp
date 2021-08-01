@@ -140,7 +140,7 @@ namespace engine
         if (result)
             throw VulkanException(result, "Failed to initialize volk.");
 
-        uint32_t instance_extension_count;
+        uint32_t instance_extension_count = 0;
         VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, nullptr));
         std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
         VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
@@ -261,19 +261,14 @@ namespace engine
     {
 #if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
         if (m_DebugUtilsMessenger != VK_NULL_HANDLE)
-        {
             vkDestroyDebugUtilsMessengerEXT(m_Handle, m_DebugUtilsMessenger, nullptr);
-        }
+
         if (m_DebugReportCallback != VK_NULL_HANDLE)
-        {
             vkDestroyDebugReportCallbackEXT(m_Handle, m_DebugReportCallback, nullptr);
-        }
 #endif
 
         if (m_Handle != VK_NULL_HANDLE)
-        {
             vkDestroyInstance(m_Handle, nullptr);
-        }
     }
 
     void Instance::QueryGpus()

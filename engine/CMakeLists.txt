@@ -130,7 +130,7 @@ target_compile_definitions(Engine
 if(MSVC)
   target_compile_options(Engine PRIVATE /W3 /WX)
 else()
-  target_compile_options(Engine PRIVATE -Wall)
+  target_compile_options(Engine PRIVATE -Wall -Weffc++)
 endif()
 
 add_subdirectory("vendor")

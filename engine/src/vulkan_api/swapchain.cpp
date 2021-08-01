@@ -325,9 +325,7 @@ namespace engine
     Swapchain::~Swapchain()
     {
         if (m_Handle != VK_NULL_HANDLE)
-        {
             vkDestroySwapchainKHR(m_Device.GetHandle(), m_Handle, nullptr);
-        }
     }
 
     void Swapchain::Create()

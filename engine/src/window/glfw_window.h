@@ -21,6 +21,6 @@ namespace engine
         virtual void Close() override;
 
     private:
-        GLFWwindow *m_Handle = nullptr;
+        GLFWwindow *m_Handle{nullptr};
     };
 }

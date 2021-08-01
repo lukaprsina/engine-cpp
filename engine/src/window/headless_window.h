@@ -17,6 +17,6 @@ namespace engine
         virtual void Close() override;
 
     private:
-        bool m_Closed;
+        bool m_Closed{false};
     };
 }

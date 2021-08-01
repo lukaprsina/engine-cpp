@@ -11,6 +11,13 @@ namespace engine
 
     FencePool::~FencePool()
     {
+        Wait();
+        Reset();
+
+        for (VkFence fence : m_Fences)
+            vkDestroyFence(m_Device.GetHandle(), fence, nullptr);
+
+        m_Fences.clear();
     }
 
     VkResult FencePool::Wait(uint32_t timeout) const

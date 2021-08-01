@@ -5,7 +5,7 @@ namespace engine
 {
     HeadlessWindow::HeadlessWindow(Platform &platform,
                                    WindowSettings &settings)
-        : Window(platform, settings), m_Closed(false)
+        : Window(platform, settings)
     {
     }
 

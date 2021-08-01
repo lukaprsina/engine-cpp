@@ -28,7 +28,7 @@ namespace engine
         bool IsExtensionEnabled(const char *extension) const;
 
     private:
-        std::vector<const char *> m_EnabledExtensions;
+        std::vector<const char *> m_EnabledExtensions{};
         DebugUtilsSettings m_DebugUtilsSettings;
 
         bool EnableDebugCallback(std::vector<VkExtensionProperties> &available_instance_extensions);
@@ -37,12 +37,12 @@ namespace engine
         void ValidateExtensions(std::unordered_map<const char *, bool> &required_extensions, std::vector<VkExtensionProperties> &available_instance_extensions);
 
 #if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
-        VkDebugUtilsMessengerEXT m_DebugUtilsMessenger = VK_NULL_HANDLE;
-        VkDebugReportCallbackEXT m_DebugReportCallback = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT m_DebugUtilsMessenger{VK_NULL_HANDLE};
+        VkDebugReportCallbackEXT m_DebugReportCallback{VK_NULL_HANDLE};
 #endif
 
         void QueryGpus();
-        std::vector<std::unique_ptr<PhysicalDevice>> m_Gpus;
-        VkInstance m_Handle = nullptr;
+        std::vector<std::unique_ptr<PhysicalDevice>> m_Gpus{};
+        VkInstance m_Handle{VK_NULL_HANDLE};
     };
 }

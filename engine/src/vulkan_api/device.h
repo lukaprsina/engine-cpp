@@ -29,14 +29,14 @@ namespace engine
         PhysicalDevice &m_Gpu;
         ResourceCache m_ResourceCache;
 
-        std::vector<VkExtensionProperties> m_DeviceExtensions;
-        std::vector<const char *> m_EnabledExtensions;
+        std::vector<VkExtensionProperties> m_DeviceExtensions{};
+        std::vector<const char *> m_EnabledExtensions{};
 
-        VkDevice m_Handle = VK_NULL_HANDLE;
-        std::vector<QueueFamily> m_QueueFamilies;
-        VmaAllocator m_MemoryAllocator;
+        VkDevice m_Handle{VK_NULL_HANDLE};
+        std::vector<QueueFamily> m_QueueFamilies{};
+        VmaAllocator m_MemoryAllocator{};
 
-        std::unique_ptr<CommandPool> m_CommandPool;
-        std::unique_ptr<FencePool> m_FencePool;
+        std::unique_ptr<CommandPool> m_CommandPool{};
+        std::unique_ptr<FencePool> m_FencePool{};
     };
 }

@@ -32,7 +32,11 @@ namespace engine
                   uint32_t num_queue_families = 0,
                   const uint32_t *queue_families = nullptr);
 
+            Image(Image &&other);
+
             ~Image();
+
+            void Unmap();
 
             Device &GetDevice() { return m_Device; }
             VkImage &GetHandle() { return m_Handle; }
@@ -46,23 +50,23 @@ namespace engine
 
         private:
             Device &m_Device;
-            VkImage m_Handle;
-            VmaAllocation m_Memory;
-            VkImageType m_Type;
-            VkExtent3D m_Extent;
-            VkFormat m_Format;
-            VkImageUsageFlags m_Usage;
-            VkSampleCountFlagBits m_SampleCount;
-            VkImageTiling m_Tiling;
-            VkImageSubresource m_Subresource;
-            uint32_t m_ArrayLayerCount;
+            VkImage m_Handle{VK_NULL_HANDLE};
+            VmaAllocation m_Memory{VK_NULL_HANDLE};
+            VkImageType m_Type{};
+            VkExtent3D m_Extent{};
+            VkFormat m_Format{};
+            VkImageUsageFlags m_Usage{};
+            VkSampleCountFlagBits m_SampleCount{};
+            VkImageTiling m_Tiling{};
+            VkImageSubresource m_Subresource{};
+            uint32_t m_ArrayLayerCount{0};
 
             /// Image views referring to this image
-            std::unordered_set<ImageView *> m_ImageViews;
+            std::unordered_set<ImageView *> m_ImageViews{};
             uint8_t *m_MappedData{nullptr};
 
             /// Whether it was mapped with vmaMapMemory
-            bool mapped{false};
+            bool m_Mapped{false};
         };
     }
 }

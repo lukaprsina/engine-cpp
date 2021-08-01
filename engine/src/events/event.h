@@ -37,9 +37,9 @@ namespace engine
 
     class Event
     {
-        friend class EventDispatcher;
-
     public:
+        Event() = default;
+        virtual ~Event() = default;
         bool handled = false;
 
         virtual EventType GetEventType() const = 0;
@@ -52,6 +52,9 @@ namespace engine
         {
             return GetCategoryFlags() & category;
         }
+
+    private:
+        friend class EventDispatcher;
     };
 
     class EventDispatcher

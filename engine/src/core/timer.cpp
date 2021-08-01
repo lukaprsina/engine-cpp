@@ -3,8 +3,7 @@
 namespace engine
 {
     Timer::Timer()
-        : m_Running(false), m_Lapping(false),
-          m_StartTime(Clock::now()), m_LapTime(Clock::now()),
+        : m_StartTime(Clock::now()), m_LapTime(Clock::now()),
           m_PreviousTick(Clock::now())
     {
     }

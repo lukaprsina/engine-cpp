@@ -14,7 +14,7 @@ namespace engine
 
     private:
         Device &m_Device;
-        std::vector<VkFence> m_Fences;
-        uint32_t m_ActiveFenceCount;
+        std::vector<VkFence> m_Fences{};
+        uint32_t m_ActiveFenceCount{0};
     };
 }

@@ -16,9 +16,9 @@ namespace engine
 
     private:
         Device &m_Device;
-        uint32_t m_FamilyIndex;
-        uint32_t m_Index;
-        VkQueue m_Handle;
+        uint32_t m_FamilyIndex{0};
+        uint32_t m_Index{0};
+        VkQueue m_Handle{VK_NULL_HANDLE};
     };
 
     class QueueFamily
@@ -36,9 +36,9 @@ namespace engine
 
     private:
         Device &m_Device;
-        std::vector<Queue> m_Queues;
-        uint32_t m_FamilyIndex;
-        VkBool32 m_CanPresent;
-        VkQueueFamilyProperties m_Properties;
+        std::vector<Queue> m_Queues{};
+        uint32_t m_FamilyIndex{0};
+        VkBool32 m_CanPresent{false};
+        VkQueueFamilyProperties m_Properties{};
     };
 }

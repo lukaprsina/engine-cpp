@@ -9,6 +9,12 @@ namespace engine
 
     SemaphorePool::~SemaphorePool()
     {
+        Reset();
+
+        for (VkSemaphore semaphore : m_Semaphores)
+            vkDestroySemaphore(m_Device.GetHandle(), semaphore, nullptr);
+
+        m_Semaphores.clear();
     }
 
     VkSemaphore SemaphorePool::RequestSemaphoreWithOwnership()
@@ -20,7 +26,7 @@ namespace engine
             return semaphore;
         }
 
-        VkSemaphore semaphore;
+        VkSemaphore semaphore = VK_NULL_HANDLE;
         VkSemaphoreCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 

@@ -24,12 +24,12 @@ namespace engine
 
     private:
         Instance &m_Instance;
-        VkPhysicalDevice m_Handle = VK_NULL_HANDLE;
+        VkPhysicalDevice m_Handle{VK_NULL_HANDLE};
         VkPhysicalDeviceFeatures m_Features{};
         VkPhysicalDeviceFeatures m_RequestedFeatures{};
         VkPhysicalDeviceProperties m_Properties{};
         VkPhysicalDeviceMemoryProperties m_MemoryProperties{};
 
-        std::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
+        std::vector<VkQueueFamilyProperties> m_QueueFamilyProperties{};
     };
 }

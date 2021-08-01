@@ -32,25 +32,25 @@ namespace engine
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
-        static void SetArguments(const std::vector<std::string> &arguments) { m_Arguments = arguments; };
-        std::vector<std::string> &GetArguments() { return m_Arguments; };
+        static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
+        std::vector<std::string> &GetArguments() { return s_Arguments; };
 
-        static void SetExternalStorageDirectory(const std::string &directory) { m_ExternalStorageDirectory = directory; };
-        std::string &GetExternalStorageDirectory() { return m_ExternalStorageDirectory; };
+        static void SetExternalStorageDirectory(const std::string &directory) { s_ExternalStorageDirectory = directory; };
+        std::string &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
 
-        static void SetTempDirectory(const std::string &directory) { m_TempDirectory = directory; };
-        std::string &GetTempDirectory() { return m_TempDirectory; };
+        static void SetTempDirectory(const std::string &directory) { s_TempDirectory = directory; };
+        std::string &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
-        std::unique_ptr<Window> m_Window;
-        std::unique_ptr<Application> m_App;
-        Timer m_Timer;
+        std::unique_ptr<Window> m_Window{};
+        std::unique_ptr<Application> m_App{};
+        Timer m_Timer{};
 
         virtual void CreatePlatformWindow() = 0;
 
     private:
-        static std::vector<std::string> m_Arguments;
-        static std::string m_ExternalStorageDirectory;
-        static std::string m_TempDirectory;
+        static std::vector<std::string> s_Arguments;
+        static std::string s_ExternalStorageDirectory;
+        static std::string s_TempDirectory;
     };
 }

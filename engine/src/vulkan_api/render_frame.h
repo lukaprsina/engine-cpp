@@ -23,6 +23,11 @@ namespace engine
 
         void Reset();
 
+        VkSemaphore RequestSemaphoreWithOwnership()
+        {
+            return m_SemaphorePool.RequestSemaphoreWithOwnership();
+        }
+
         CommandBuffer &RequestCommandBuffer(const QueueFamily &queue_family,
                                             CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool,
                                             VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -35,11 +40,11 @@ namespace engine
 
         std::vector<std::unique_ptr<CommandPool>> &GetCommandPools(const QueueFamily &queue_family, CommandBuffer::ResetMode reset_mode);
 
-        std::map<uint32_t, std::vector<std::unique_ptr<CommandPool>>> m_CommandPools;
+        std::map<uint32_t, std::vector<std::unique_ptr<CommandPool>>> m_CommandPools{};
         FencePool m_FencePool;
         SemaphorePool m_SemaphorePool;
         std::unique_ptr<RenderTarget> m_SwapchainRenderTarget;
-        size_t m_ThreadCount;
+        size_t m_ThreadCount{1};
         // std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> buffer_pools;
     };
 }

@@ -63,6 +63,8 @@ namespace engine
 
         ImageView::~ImageView()
         {
+            if (m_Handle != VK_NULL_HANDLE)
+                vkDestroyImageView(m_Device.GetHandle(), m_Handle, nullptr);
         }
     }
 }

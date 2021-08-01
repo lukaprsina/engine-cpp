@@ -69,8 +69,8 @@ namespace engine
         bool IsRunning() const { return m_Running; }
 
     private:
-        bool m_Running;
-        bool m_Lapping;
+        bool m_Running{false};
+        bool m_Lapping{false};
 
         Clock::time_point m_StartTime;
         Clock::time_point m_LapTime;

@@ -14,21 +14,19 @@ namespace engine
                       uint32_t n_mip_levels = 0, uint32_t n_array_layers = 0);
 
             ImageView(ImageView &) = delete;
-
             ImageView(ImageView &&other);
-
             ~ImageView();
-
             ImageView &operator=(const ImageView &) = delete;
-
             ImageView &operator=(ImageView &&) = delete;
+
+            void SetImage(Image &image) { m_Image = &image; }
 
         private:
             Device &m_Device;
             Image *m_Image;
-            VkFormat m_Format;
-            VkImageView m_Handle;
-            VkImageSubresourceRange m_SubresourceRange;
+            VkFormat m_Format{};
+            VkImageView m_Handle{VK_NULL_HANDLE};
+            VkImageSubresourceRange m_SubresourceRange{};
         };
     }
 }

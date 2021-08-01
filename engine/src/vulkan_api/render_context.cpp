@@ -11,8 +11,7 @@ namespace engine
                                  std::vector<VkSurfaceFormatKHR> surface_format_priority,
                                  uint32_t width,
                                  uint32_t height)
-        : m_Device(device), m_SurfaceExtent({width, height}),
-          m_Prepared(false)
+        : m_Device(device), m_SurfaceExtent({width, height})
     {
         VkSurfaceCapabilitiesKHR surface_properties;
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.GetGPU().GetHandle(),
@@ -105,7 +104,7 @@ namespace engine
 
         assert(!m_FrameActive && "Frame is still active, please call end_frame");
         auto &prev_frame = *m_Frames.at(m_ActiveFrameIndex);
-        m_AcquiredSemaphore = prev_frame.GetSemaphorePool().RequestSemaphoreWithOwnership();
+        m_AcquiredSemaphore = prev_frame.RequestSemaphoreWithOwnership();
 
         if (m_Swapchain)
         {

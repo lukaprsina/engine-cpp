@@ -26,6 +26,11 @@ namespace engine
 
     CommandBuffer::~CommandBuffer()
     {
+        if (m_Handle != VK_NULL_HANDLE)
+        {
+            vkFreeCommandBuffers(m_CommandPool.GetDevice().GetHandle(),
+                                 m_CommandPool.GetHandle(), 1, &m_Handle);
+        }
     }
 
     VkResult CommandBuffer::Reset(ResetMode reset_mode)

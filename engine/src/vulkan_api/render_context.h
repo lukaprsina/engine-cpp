@@ -46,17 +46,17 @@ namespace engine
 
     private:
         Device &m_Device;
-        VkExtent2D m_SurfaceExtent;
-        bool m_Prepared = false;
-        std::unique_ptr<Swapchain> m_Swapchain;
-        RenderTarget::CreateFunc m_CreateRenderTargetFunction = RenderTarget::s_DefaultCreateFunction;
+        VkExtent2D m_SurfaceExtent{};
+        bool m_Prepared{false};
+        std::unique_ptr<Swapchain> m_Swapchain{};
+        RenderTarget::CreateFunc m_CreateRenderTargetFunction{RenderTarget::s_DefaultCreateFunction};
         VkSurfaceTransformFlagBitsKHR m_PreTransform{VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR};
-        size_t m_ThreadCount = 1;
+        size_t m_ThreadCount{1};
 
-        VkSemaphore m_AcquiredSemaphore;
-        uint32_t m_ActiveFrameIndex = 0;
-        bool m_FrameActive = false;
+        VkSemaphore m_AcquiredSemaphore{VK_NULL_HANDLE};
+        uint32_t m_ActiveFrameIndex{0};
+        bool m_FrameActive{false};
 
-        std::vector<std::unique_ptr<RenderFrame>> m_Frames;
+        std::vector<std::unique_ptr<RenderFrame>> m_Frames{};
     };
 }

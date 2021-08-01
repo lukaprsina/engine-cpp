@@ -1,6 +1,7 @@
 #include "vulkan_api/core/image.h"
 
 #include "vulkan_api/device.h"
+#include "vulkan_api/core/image_view.h"
 
 namespace engine
 {
@@ -76,7 +77,8 @@ namespace engine
             m_Subresource.mipLevel = mip_levels;
             m_Subresource.arrayLayer = array_layers;
 
-            VkImageCreateInfo image_info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+            VkImageCreateInfo image_info{};
+            image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
             image_info.flags = flags;
             image_info.imageType = m_Type;
             image_info.format = format;
@@ -111,6 +113,33 @@ namespace engine
             {
                 throw VulkanException{result, "Cannot create Image"};
             }
+            ENG_CORE_TRACE("{}", (void *)m_Handle);
+        }
+
+        Image::Image(Image &&other)
+            : m_Device{other.m_Device},
+              m_Handle{other.m_Handle},
+              m_Memory{other.m_Memory},
+              m_Type{other.m_Type},
+              m_Extent{other.m_Extent},
+              m_Format{other.m_Format},
+              m_SampleCount{other.m_SampleCount},
+              m_Usage{other.m_Usage},
+              m_Tiling{other.m_Tiling},
+              m_Subresource{other.m_Subresource},
+              m_MappedData{other.m_MappedData},
+              m_Mapped{other.m_Mapped}
+        {
+            other.m_Handle = VK_NULL_HANDLE;
+            other.m_Memory = VK_NULL_HANDLE;
+            other.m_MappedData = nullptr;
+            other.m_Mapped = false;
+
+            // Update image views references to this image to avoid dangling pointers
+            for (auto &view : m_ImageViews)
+            {
+                view->SetImage(*this);
+            }
         }
 
         Image::Image(Device &device, VkImage handle,
@@ -132,6 +161,21 @@ namespace engine
 
         Image::~Image()
         {
+            if (m_Handle != VK_NULL_HANDLE && m_Memory != VK_NULL_HANDLE)
+            {
+                Unmap();
+                vmaDestroyImage(m_Device.GetMemoryAllocator(), m_Handle, m_Memory);
+            }
+        }
+
+        void Image::Unmap()
+        {
+            if (m_Mapped)
+            {
+                vmaUnmapMemory(m_Device.GetMemoryAllocator(), m_Memory);
+                m_MappedData = nullptr;
+                m_Mapped = false;
+            }
         }
     }
 }

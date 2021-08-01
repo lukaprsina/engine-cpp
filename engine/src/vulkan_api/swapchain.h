@@ -74,25 +74,25 @@ namespace engine
         Device &m_Device;
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
         VkSwapchainKHR m_Handle{VK_NULL_HANDLE};
-        std::vector<VkImage> m_Images;
+        std::vector<VkImage> m_Images{};
 
-        std::vector<VkPresentModeKHR> m_PresentModes;
-        std::vector<VkSurfaceFormatKHR> m_SurfaceFormats;
+        std::vector<VkPresentModeKHR> m_PresentModes{};
+        std::vector<VkSurfaceFormatKHR> m_SurfaceFormats{};
 
-        SwapchainProperties m_Properties;
+        SwapchainProperties m_Properties{};
 
         // A list of present modes in order of priority (vector[0] has high priority, vector[size-1] has low priority)
-        std::vector<VkPresentModeKHR> m_PresentModePriorityList = {
+        std::vector<VkPresentModeKHR> m_PresentModePriorityList{
             VK_PRESENT_MODE_FIFO_KHR,
             VK_PRESENT_MODE_MAILBOX_KHR};
 
         // A list of surface formats in order of priority (vector[0] has high priority, vector[size-1] has low priority)
-        std::vector<VkSurfaceFormatKHR> m_SurfaceFormatPriorityList = {
+        std::vector<VkSurfaceFormatKHR> m_SurfaceFormatPriorityList{
             {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
             {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
             {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
             {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}};
 
-        std::set<VkImageUsageFlagBits> m_ImageUsageFlags;
+        std::set<VkImageUsageFlagBits> m_ImageUsageFlags{};
     };
 }

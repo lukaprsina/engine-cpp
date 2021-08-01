@@ -50,21 +50,21 @@ namespace engine
 
     private:
         Platform *m_Platform;
-        std::string m_Name;
-        std::string m_Usage;
-        Options m_Options;
-        bool m_Headless;
-        uint32_t m_FrameCount;
-        Timer m_Timer;
+        std::string m_Name{};
+        std::string m_Usage{};
+        Options m_Options{};
+        bool m_Headless{false};
+        uint32_t m_FrameCount{0};
+        Timer m_Timer{};
 
-        std::unique_ptr<Instance> m_Instance;
-        std::unique_ptr<Device> m_Device;
-        std::unique_ptr<RenderContext> m_RenderContext;
+        std::unique_ptr<Instance> m_Instance{};
+        std::unique_ptr<Device> m_Device{};
+        std::unique_ptr<RenderContext> m_RenderContext{};
 
-        std::unordered_map<const char *, bool> m_DeviceExtensions;
-        std::unordered_map<const char *, bool> m_InstanceExtensions;
-        std::vector<const char *> m_ValidationLayers;
+        std::unordered_map<const char *, bool> m_DeviceExtensions{};
+        std::unordered_map<const char *, bool> m_InstanceExtensions{};
+        std::vector<const char *> m_ValidationLayers{};
 
-        VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
+        VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
     };
 }

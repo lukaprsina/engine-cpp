@@ -31,9 +31,9 @@ namespace engine
 
     private:
         Device &m_Device;
-        VkExtent2D m_Extent;
-        std::vector<core::Image> m_Images;
-        std::vector<core::ImageView> m_ImageViews;
-        std::vector<Attachment> m_Attachments;
+        VkExtent2D m_Extent{};
+        std::vector<core::Image> m_Images{};
+        std::vector<core::ImageView> m_ImageViews{};
+        std::vector<Attachment> m_Attachments{};
     };
 }

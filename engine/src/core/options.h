@@ -16,7 +16,7 @@ namespace engine
         int32_t GetInt(const std::string &argument) const;
 
     private:
-        std::string m_Usage;
-        std::map<std::string, docopt::value> m_ParseResult;
+        std::string m_Usage{};
+        std::map<std::string, docopt::value> m_ParseResult{};
     };
 }

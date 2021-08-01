@@ -316,7 +316,7 @@ namespace engine
         if (instance.GetHandle() == VK_NULL_HANDLE || !m_Handle)
             return VK_NULL_HANDLE;
 
-        VkSurfaceKHR surface;
+        VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &surface);
 
         if (result != VK_SUCCESS)

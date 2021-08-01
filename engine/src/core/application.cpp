@@ -13,7 +13,7 @@
 namespace engine
 {
     Application::Application(Platform *platform)
-        : m_Platform(platform), m_Instance(nullptr), m_ValidationLayers{}
+        : m_Platform(platform)
     {
         Log::Init();
 
@@ -111,7 +111,7 @@ namespace engine
     void Application::Update(float delta_time)
     {
         UpdateScene(delta_time);
-        auto &command_buffer = m_RenderContext->Begin();
+        /* auto &command_buffer = */ m_RenderContext->Begin();
     }
 
     void Application::UpdateScene(float delta_time)

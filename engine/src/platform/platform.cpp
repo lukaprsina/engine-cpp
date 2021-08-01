@@ -5,9 +5,9 @@
 
 namespace engine
 {
-    std::vector<std::string> Platform::m_Arguments = {};
-    std::string Platform::m_ExternalStorageDirectory = "";
-    std::string Platform::m_TempDirectory = "";
+    std::vector<std::string> Platform::s_Arguments = {};
+    std::string Platform::s_ExternalStorageDirectory = "";
+    std::string Platform::s_TempDirectory = "";
 
     bool Platform::Initialize(std::unique_ptr<Application> &&app)
     {

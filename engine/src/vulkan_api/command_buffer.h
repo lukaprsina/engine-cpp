@@ -29,9 +29,9 @@ namespace engine
         const VkCommandBufferLevel m_Level;
 
     private:
-        State m_State = State::Initial;
+        State m_State{State::Initial};
         CommandPool &m_CommandPool;
-        VkCommandBuffer m_Handle;
+        VkCommandBuffer m_Handle{VK_NULL_HANDLE};
         uint32_t m_MaxPushConstantsSize;
     };
 }

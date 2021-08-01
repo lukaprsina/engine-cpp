@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-project(vendor)
-
 #docopt
 add_subdirectory(docopt)
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/docopt)

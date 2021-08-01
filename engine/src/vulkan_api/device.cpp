@@ -169,7 +169,13 @@ namespace engine
         m_FencePool.reset();
 
         if (m_MemoryAllocator != VK_NULL_HANDLE)
+        {
+            VmaStats stats;
+            vmaCalculateStats(m_MemoryAllocator, &stats);
+
+            ENG_CORE_INFO("Total device memory leaked: {} bytes.", stats.total.usedBytes);
             vmaDestroyAllocator(m_MemoryAllocator);
+        }
 
         if (m_Handle != VK_NULL_HANDLE)
             vkDestroyDevice(m_Handle, nullptr);
