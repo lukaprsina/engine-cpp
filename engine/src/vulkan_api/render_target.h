@@ -29,6 +29,8 @@ namespace engine
 
         static const CreateFunc s_DefaultCreateFunction;
 
+        const std::vector<core::ImageView> &GetViews() const { return m_ImageViews; }
+
     private:
         Device &m_Device;
         VkExtent2D m_Extent{};

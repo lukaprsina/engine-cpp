@@ -17,6 +17,32 @@ namespace engine
         m_Semaphores.clear();
     }
 
+    VkSemaphore SemaphorePool::RequestSemaphore()
+    {
+        // Check if there is an available semaphore
+        if (m_ActiveSemaphoreCount < m_Semaphores.size())
+        {
+            return m_Semaphores.at(m_ActiveSemaphoreCount++);
+        }
+
+        VkSemaphore semaphore{VK_NULL_HANDLE};
+
+        VkSemaphoreCreateInfo create_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+
+        VkResult result = vkCreateSemaphore(m_Device.GetHandle(), &create_info, nullptr, &semaphore);
+
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("Failed to create semaphore.");
+        }
+
+        m_Semaphores.push_back(semaphore);
+
+        m_ActiveSemaphoreCount++;
+
+        return semaphore;
+    }
+
     VkSemaphore SemaphorePool::RequestSemaphoreWithOwnership()
     {
         if (m_ActiveSemaphoreCount < m_Semaphores.size())
@@ -36,6 +62,12 @@ namespace engine
             throw std::runtime_error("Failed to create semaphore.");
 
         return semaphore;
+    }
+
+    void SemaphorePool::ReleaseOwnedSemaphore(VkSemaphore semaphore)
+    {
+        // We cannot reuse this semaphore until ::reset().
+        m_ReleasedSemaphores.push_back(semaphore);
     }
 
     void SemaphorePool::Reset()

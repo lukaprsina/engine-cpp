@@ -21,11 +21,28 @@ namespace engine
             m_SwapchainRenderTarget = std::move(render_target);
         }
 
+        RenderTarget &GetRenderTarget() { return *m_SwapchainRenderTarget; }
+
         void Reset();
+
+        VkFence RequestFence()
+        {
+            return m_FencePool.RequestFence();
+        }
+
+        VkSemaphore RequestSemaphore()
+        {
+            return m_SemaphorePool.RequestSemaphore();
+        }
 
         VkSemaphore RequestSemaphoreWithOwnership()
         {
             return m_SemaphorePool.RequestSemaphoreWithOwnership();
+        }
+
+        void ReleaseOwnedSemaphore(VkSemaphore semaphore)
+        {
+            m_SemaphorePool.ReleaseOwnedSemaphore(semaphore);
         }
 
         CommandBuffer &RequestCommandBuffer(const QueueFamily &queue_family,

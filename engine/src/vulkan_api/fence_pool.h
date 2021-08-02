@@ -9,6 +9,8 @@ namespace engine
         FencePool(Device &device);
         ~FencePool();
 
+        VkFence RequestFence();
+
         VkResult Wait(uint32_t timeout = std::numeric_limits<uint32_t>::max()) const;
         VkResult Reset();
 

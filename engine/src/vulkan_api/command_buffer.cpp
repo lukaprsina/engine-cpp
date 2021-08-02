@@ -33,6 +33,71 @@ namespace engine
         }
     }
 
+    CommandBuffer::CommandBuffer(CommandBuffer &&other)
+        : m_Level{other.m_Level},
+          m_State{other.m_State},
+          m_CommandPool{other.m_CommandPool},
+          m_Handle{other.m_Handle},
+          m_UpdateAfterBind{other.m_UpdateAfterBind}
+    {
+        other.m_Handle = VK_NULL_HANDLE;
+        other.m_State = State::Invalid;
+    }
+
+    VkResult CommandBuffer::Begin(VkCommandBufferUsageFlags flags, CommandBuffer *primary_cmd_buf)
+    {
+        assert(!IsRecording() && "Command buffer is already recording, please call end before beginning again");
+
+        if (IsRecording())
+        {
+            return VK_NOT_READY;
+        }
+
+        m_State = State::Recording;
+
+        // Reset state
+        /* m_PipelineState.reset();
+        m_ResourceBindingState.reset();
+        m_DescriptorSetLayoutBindingState.clear();
+        m_StoredPushConstants.clear(); */
+
+        VkCommandBufferBeginInfo begin_info{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+        VkCommandBufferInheritanceInfo inheritance = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO};
+        begin_info.flags = flags;
+
+        if (m_Level == VK_COMMAND_BUFFER_LEVEL_SECONDARY)
+        {
+            /* assert((m_RenderPass && m_Framebuffer) && "Render pass and framebuffer must be provided when calling begin from a secondary one");
+
+            m_CurrentRenderPass.render_pass = m_RenderPass;
+            m_CurrentRenderPass.framebuffer = m_Framebuffer;
+
+            inheritance.renderPass = m_CurrentRenderPass.render_pass->get_handle();
+            inheritance.framebuffer = m_CurrentRenderPass.framebuffer->get_handle();
+            inheritance.subpass = m_SubpassIndex; */
+
+            begin_info.pInheritanceInfo = &inheritance;
+        }
+
+        return vkBeginCommandBuffer(GetHandle(), &begin_info);
+    }
+
+    VkResult CommandBuffer::End()
+    {
+        assert(IsRecording() && "Command buffer is not recording, please call begin before end");
+
+        if (!IsRecording())
+        {
+            return VK_NOT_READY;
+        }
+
+        vkEndCommandBuffer(m_Handle);
+
+        m_State = State::Executable;
+
+        return VK_SUCCESS;
+    }
+
     VkResult CommandBuffer::Reset(ResetMode reset_mode)
     {
         VkResult result = VK_SUCCESS;

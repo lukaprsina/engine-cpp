@@ -34,6 +34,9 @@ namespace engine
     {
         Platform::SetArguments({argv + 1, argv + argc});
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
+
+        auto external_storage_directory = std::fs::current_path().append("build/");
+        Platform::SetExternalStorageDirectory(external_storage_directory.c_str());
     }
 
     bool UnixPlatform::Initialize(std::unique_ptr<Application> &&app)

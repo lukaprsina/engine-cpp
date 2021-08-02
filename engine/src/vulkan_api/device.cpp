@@ -198,6 +198,18 @@ namespace engine
         return it != m_DeviceExtensions.end();
     }
 
+    const QueueFamily &Device::GetSuitableGraphicsQueueFamily()
+    {
+        for (auto &queue_family : m_QueueFamilies)
+        {
+            if (queue_family.CanPresent() &&
+                queue_family.GetQueues().size() > 0)
+                return queue_family;
+        }
+
+        return GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+    }
+
     QueueFamily &Device::GetQueueFamilyByFlags(VkQueueFlags required_queue_flags)
     {
         size_t queue_family_index = 0;

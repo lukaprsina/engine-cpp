@@ -75,6 +75,11 @@ set(VULKAN_API_FILES
     src/vulkan_api/render_target.h
     src/vulkan_api/render_frame.h
     src/vulkan_api/semaphore_pool.h
+    src/vulkan_api/queue_family.h
+    src/vulkan_api/rendering/render_pipeline.h
+    src/vulkan_api/subpasses/subpass.h
+    src/vulkan_api/shaders/shader.h
+    src/platform/filesystem.h
     #Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -91,6 +96,11 @@ set(VULKAN_API_FILES
     src/vulkan_api/render_target.cpp
     src/vulkan_api/render_frame.cpp
     src/vulkan_api/semaphore_pool.cpp
+    src/vulkan_api/queue_family.cpp
+    src/vulkan_api/rendering/render_pipeline.cpp
+    src/vulkan_api/subpasses/subpass.cpp
+    src/vulkan_api/shaders/shader.cpp
+    src/platform/filesystem.cpp
 )
 
 set(PROJECT_FILES
@@ -130,7 +140,7 @@ target_compile_definitions(Engine
 if(MSVC)
   target_compile_options(Engine PRIVATE /W3 /WX)
 else()
-  target_compile_options(Engine PRIVATE -Wall -Weffc++)
+  target_compile_options(Engine PRIVATE -Wall)# -Weffc++)
 endif()
 
 add_subdirectory("vendor")

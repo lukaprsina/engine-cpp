@@ -2,11 +2,15 @@
 
 #include "core/log.h"
 #include "events/application_event.h"
-#include "platform/platform.h"
-#include "vulkan_api/instance.h"
-#include "vulkan_api/physical_device.h"
+#include "vulkan_api/command_buffer.h"
 #include "vulkan_api/device.h"
+#include "vulkan_api/instance.h"
+#include "platform/platform.h"
+#include "vulkan_api/physical_device.h"
 #include "vulkan_api/render_context.h"
+#include "vulkan_api/render_target.h"
+#include "vulkan_api/rendering/render_pipeline.h"
+#include "vulkan_api/shaders/shader.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -95,6 +99,18 @@ namespace engine
 
         m_RenderContext->Prepare();
 
+        Shader vert_shader("base.vert");
+        Shader frag_shader("base.frag");
+        /* auto scene_subpass = std::make_unique<ForwardSubpass>(m_RenderContext,
+                                                              std::move(vert_shader),
+                                                              std::move(frag_shader),
+                                                              *scene, *camera);
+
+        auto render_pipeline = RenderPipeline();
+        render_pipeline.AddSubpass(std::move(scene_subpass));
+
+        m_RenderPipeline = std::make_unique<RenderPipeline>(std::move(render_pipeline)); */
+
         return true;
     }
 
@@ -111,11 +127,25 @@ namespace engine
     void Application::Update(float delta_time)
     {
         UpdateScene(delta_time);
-        /* auto &command_buffer = */ m_RenderContext->Begin();
+        auto &command_buffer = m_RenderContext->Begin();
+        command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        Draw(command_buffer);
+        command_buffer.End();
+        m_RenderContext->Submit(command_buffer);
     }
 
     void Application::UpdateScene(float delta_time)
     {
+    }
+
+    void Application::Draw(CommandBuffer &command_buffer)
+    {
+        // auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
+        // TODO memory barrier
+
+        if (m_RenderPipeline)
+            m_RenderPipeline->Draw(command_buffer,
+                                   m_RenderContext->GetActiveFrame().GetRenderTarget());
     }
 
     void Application::Finish()

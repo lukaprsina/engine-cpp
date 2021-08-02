@@ -39,3 +39,10 @@ install(TARGETS volk)
 add_subdirectory(entt)
 target_link_libraries(Engine PRIVATE EnTT::EnTT)
 install(TARGETS EnTT)
+
+#shaderc
+option(SHADERC_SKIP_TESTS ON)
+option(SHADERC_SKIP_EXAMPLES ON)
+add_subdirectory(shaderc)
+target_link_libraries(Engine PRIVATE shaderc)
+install(TARGETS shaderc)

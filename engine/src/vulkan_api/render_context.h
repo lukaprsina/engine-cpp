@@ -2,6 +2,8 @@
 
 #include "vulkan_api/swapchain.h"
 #include "vulkan_api/command_buffer.h"
+#include "vulkan_api/queue.h"
+#include "vulkan_api/queue_family.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/render_frame.h"
 
@@ -26,6 +28,17 @@ namespace engine
 
         CommandBuffer &Begin(CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool);
 
+        void Submit(CommandBuffer &command_buffer);
+        void Submit(const std::vector<CommandBuffer *> &command_buffers);
+
+        VkSemaphore Submit(const Queue &queue,
+                           const std::vector<CommandBuffer *> &command_buffers,
+                           VkSemaphore wait_semaphore,
+                           VkPipelineStageFlags wait_pipeline_stage);
+
+        void Submit(const Queue &queue,
+                    const std::vector<CommandBuffer *> &command_buffers);
+
         void SetPresentModePriority(const std::vector<VkPresentModeKHR> &new_present_mode_priority_list)
         {
             if (m_Swapchain)
@@ -38,14 +51,19 @@ namespace engine
                 m_Swapchain->SetSurfaceFormatPriority(new_surface_format_priority_list);
         }
 
-        void BeginFrame();
-        void WaitFrame();
-        void Recreate();
         void HandleSurfaceChanges();
         RenderFrame &GetActiveFrame();
 
+        void BeginFrame();
+        void WaitFrame();
+        void EndFrame(VkSemaphore semaphore);
+        void Recreate();
+
+        void ReleaseOwnedSemaphore(VkSemaphore semaphore);
+
     private:
         Device &m_Device;
+        const QueueFamily &m_QueueFamily;
         VkExtent2D m_SurfaceExtent{};
         bool m_Prepared{false};
         std::unique_ptr<Swapchain> m_Swapchain{};

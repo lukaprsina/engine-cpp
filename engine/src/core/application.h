@@ -11,6 +11,9 @@ namespace engine
     class Instance;
     class Device;
     class RenderContext;
+    class RenderTarget;
+    class RenderPipeline;
+    class CommandBuffer;
 
     class Application
     {
@@ -29,6 +32,7 @@ namespace engine
         void Step();
         void Update(float delta_time);
         void UpdateScene(float delta_time);
+        void Draw(CommandBuffer &command_buffer);
         void Finish();
 
         void SetName(const std::string &name) { m_Name = name; }
@@ -60,6 +64,7 @@ namespace engine
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
         std::unique_ptr<RenderContext> m_RenderContext{};
+        std::unique_ptr<RenderPipeline> m_RenderPipeline{};
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};

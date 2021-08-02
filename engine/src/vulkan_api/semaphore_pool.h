@@ -10,7 +10,9 @@ namespace engine
         SemaphorePool(Device &device);
         ~SemaphorePool();
 
+        VkSemaphore RequestSemaphore();
         VkSemaphore RequestSemaphoreWithOwnership();
+        void ReleaseOwnedSemaphore(VkSemaphore semaphore);
 
         void Reset();
 

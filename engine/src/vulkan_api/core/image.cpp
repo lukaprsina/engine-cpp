@@ -113,7 +113,6 @@ namespace engine
             {
                 throw VulkanException{result, "Cannot create Image"};
             }
-            ENG_CORE_TRACE("{}", (void *)m_Handle);
         }
 
         Image::Image(Image &&other)
@@ -123,8 +122,8 @@ namespace engine
               m_Type{other.m_Type},
               m_Extent{other.m_Extent},
               m_Format{other.m_Format},
-              m_SampleCount{other.m_SampleCount},
               m_Usage{other.m_Usage},
+              m_SampleCount{other.m_SampleCount},
               m_Tiling{other.m_Tiling},
               m_Subresource{other.m_Subresource},
               m_MappedData{other.m_MappedData},

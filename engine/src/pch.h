@@ -16,4 +16,7 @@
 #include "common/strings.h"
 #include "common/vulkan.h"
 
-namespace fs = std::filesystem;
+namespace std
+{
+    namespace fs = filesystem;
+}

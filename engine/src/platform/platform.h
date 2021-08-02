@@ -32,14 +32,15 @@ namespace engine
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
+        // TODO std::fs
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return s_Arguments; };
 
         static void SetExternalStorageDirectory(const std::string &directory) { s_ExternalStorageDirectory = directory; };
-        std::string &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
+        static const std::string &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
 
         static void SetTempDirectory(const std::string &directory) { s_TempDirectory = directory; };
-        std::string &GetTempDirectory() { return s_TempDirectory; };
+        static const std::string &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
         std::unique_ptr<Window> m_Window{};

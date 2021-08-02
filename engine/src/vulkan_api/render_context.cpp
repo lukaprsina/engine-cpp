@@ -11,7 +11,9 @@ namespace engine
                                  std::vector<VkSurfaceFormatKHR> surface_format_priority,
                                  uint32_t width,
                                  uint32_t height)
-        : m_Device(device), m_SurfaceExtent({width, height})
+        : m_Device(device),
+          m_QueueFamily(device.GetSuitableGraphicsQueueFamily()),
+          m_SurfaceExtent({width, height})
     {
         VkSurfaceCapabilitiesKHR surface_properties;
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.GetGPU().GetHandle(),
@@ -47,7 +49,7 @@ namespace engine
         if (transform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR || transform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
             std::swap(width, height);
 
-        m_Swapchain = std::make_unique<Swapchain>(*m_Swapchain, VkExtent2D(width, height), transform);
+        m_Swapchain = std::make_unique<Swapchain>(*m_Swapchain, VkExtent2D{width, height}, transform);
         m_PreTransform = transform;
 
         Recreate();
@@ -97,6 +99,80 @@ namespace engine
         return GetActiveFrame().RequestCommandBuffer(queue, reset_mode);
     }
 
+    void RenderContext::Submit(CommandBuffer &command_buffer)
+    {
+        Submit({&command_buffer});
+    }
+
+    void RenderContext::Submit(const std::vector<CommandBuffer *> &command_buffers)
+    {
+        assert(m_FrameActive && "RenderContext is inactive, cannot submit command buffer. Please call begin()");
+
+        VkSemaphore render_semaphore = VK_NULL_HANDLE;
+
+        if (m_Swapchain)
+        {
+            assert(m_AcquiredSemaphore && "We do not have acquired_semaphore, it was probably consumed?\n");
+            render_semaphore = Submit(m_QueueFamily.GetQueues()[0], command_buffers, m_AcquiredSemaphore, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+        }
+        else
+        {
+            Submit(m_QueueFamily.GetQueues()[0], command_buffers);
+        }
+
+        EndFrame(render_semaphore);
+    }
+
+    VkSemaphore RenderContext::Submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers, VkSemaphore wait_semaphore, VkPipelineStageFlags wait_pipeline_stage)
+    {
+        std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
+        std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const CommandBuffer *cmd_buf)
+                       { return cmd_buf->GetHandle(); });
+
+        RenderFrame &frame = GetActiveFrame();
+
+        VkSemaphore signal_semaphore = frame.RequestSemaphore();
+
+        VkSubmitInfo submit_info{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+
+        submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
+        submit_info.pCommandBuffers = cmd_buf_handles.data();
+
+        if (wait_semaphore != VK_NULL_HANDLE)
+        {
+            submit_info.waitSemaphoreCount = 1;
+            submit_info.pWaitSemaphores = &wait_semaphore;
+            submit_info.pWaitDstStageMask = &wait_pipeline_stage;
+        }
+
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = &signal_semaphore;
+
+        VkFence fence = frame.RequestFence();
+
+        queue.Submit({submit_info}, fence);
+
+        return signal_semaphore;
+    }
+
+    void RenderContext::Submit(const Queue &queue, const std::vector<CommandBuffer *> &command_buffers)
+    {
+        std::vector<VkCommandBuffer> cmd_buf_handles(command_buffers.size(), VK_NULL_HANDLE);
+        std::transform(command_buffers.begin(), command_buffers.end(), cmd_buf_handles.begin(), [](const CommandBuffer *cmd_buf)
+                       { return cmd_buf->GetHandle(); });
+
+        RenderFrame &frame = GetActiveFrame();
+
+        VkSubmitInfo submit_info{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+
+        submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
+        submit_info.pCommandBuffers = cmd_buf_handles.data();
+
+        VkFence fence = frame.RequestFence();
+
+        queue.Submit({submit_info}, fence);
+    }
+
     void RenderContext::BeginFrame()
     {
         if (m_Swapchain)
@@ -132,6 +208,37 @@ namespace engine
     {
         RenderFrame &frame = GetActiveFrame();
         frame.Reset();
+    }
+
+    void RenderContext::EndFrame(VkSemaphore semaphore)
+    {
+        assert(m_FrameActive && "Frame is not active, please call begin_frame");
+
+        if (m_Swapchain)
+        {
+            VkSwapchainKHR vk_swapchain = m_Swapchain->GetHandle();
+
+            VkPresentInfoKHR present_info{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
+
+            present_info.waitSemaphoreCount = 1;
+            present_info.pWaitSemaphores = &semaphore;
+            present_info.swapchainCount = 1;
+            present_info.pSwapchains = &vk_swapchain;
+            present_info.pImageIndices = &m_ActiveFrameIndex;
+
+            VkResult result = m_QueueFamily.GetQueues()[0].Present(present_info);
+
+            if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
+                HandleSurfaceChanges();
+        }
+
+        // Frame is not active anymore
+        if (m_AcquiredSemaphore)
+        {
+            ReleaseOwnedSemaphore(m_AcquiredSemaphore);
+            m_AcquiredSemaphore = VK_NULL_HANDLE;
+        }
+        m_FrameActive = false;
     }
 
     RenderFrame &RenderContext::GetActiveFrame()
@@ -199,4 +306,9 @@ namespace engine
         m_Device.GetResourceCache();
     }
 
+    void RenderContext::ReleaseOwnedSemaphore(VkSemaphore semaphore)
+    {
+        RenderFrame &frame = GetActiveFrame();
+        frame.ReleaseOwnedSemaphore(semaphore);
+    }
 }

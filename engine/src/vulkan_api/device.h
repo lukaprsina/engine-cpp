@@ -3,6 +3,7 @@
 #include "vulkan_api/physical_device.h"
 #include "vulkan_api/resource_cache.h"
 #include "vulkan_api/queue.h"
+#include "vulkan_api/queue_family.h"
 
 namespace engine
 {
@@ -18,6 +19,8 @@ namespace engine
 
         VkResult WaitIdle();
         bool IsExtensionSupported(const char *requested_extension) const;
+        const QueueFamily &GetSuitableGraphicsQueueFamily();
+
         VkDevice GetHandle() const { return m_Handle; }
         PhysicalDevice GetGPU() const { return m_Gpu; }
         VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
