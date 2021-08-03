@@ -3,6 +3,7 @@
 #include "window/glfw_window.h"
 #include "window/headless_window.h"
 #include "events/event.h"
+#include "platform/filesystem.h"
 
 #ifndef VK_MVK_MACOS_SURFACE_EXTENSION_NAME
 #define VK_MVK_MACOS_SURFACE_EXTENSION_NAME "VK_MVK_macos_surface"
@@ -16,27 +17,29 @@ namespace engine
 {
     namespace
     {
-        inline const std::string GetTempPathFromEnvironment()
+        inline std::fs::path GetTempPathFromEnvironment()
         {
-            std::string temp_path = "/tmp/";
+            std::fs::path temp_path = "/tmp/";
 
             if (const char *env_ptr = std::getenv("TMPDIR"))
-            {
-                temp_path = std::string(env_ptr) + "/";
-            }
+                temp_path = std::fs::path(env_ptr);
 
             return temp_path;
+        }
+
+        inline std::fs::path GetRootFolder()
+        {
+            auto working_directory = fs::path::Get(fs::path::Type::WorkingDirectory);
+            return working_directory.parent_path();
         }
     }
 
     UnixPlatform::UnixPlatform(const UnixType &type, int argc, char *argv[])
-        : Platform(), m_Type(type)
+        : Platform(std::vector<std::string>(argv, argv + argc)),
+          m_Type(type)
     {
-        Platform::SetArguments({argv + 1, argv + argc});
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
-
-        auto external_storage_directory = std::fs::current_path().append("build/");
-        Platform::SetExternalStorageDirectory(external_storage_directory.c_str());
+        Platform::SetExternalStorageDirectory(GetRootFolder());
     }
 
     bool UnixPlatform::Initialize(std::unique_ptr<Application> &&app)

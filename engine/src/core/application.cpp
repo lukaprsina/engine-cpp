@@ -10,7 +10,7 @@
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/rendering/render_pipeline.h"
-#include "vulkan_api/shaders/shader.h"
+#include "renderer/shader.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 

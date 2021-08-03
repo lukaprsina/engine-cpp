@@ -74,6 +74,9 @@
         "hash_map": "cpp",
         "numbers": "cpp",
         "semaphore": "cpp",
-        "*.inc": "cpp"
-    }
+        "*.inc": "cpp",
+        "any": "cpp",
+        "netfwd": "cpp"
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

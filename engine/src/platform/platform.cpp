@@ -6,8 +6,19 @@
 namespace engine
 {
     std::vector<std::string> Platform::s_Arguments = {};
-    std::string Platform::s_ExternalStorageDirectory = "";
-    std::string Platform::s_TempDirectory = "";
+    std::fs::path Platform::s_ExternalStorageDirectory = {};
+    std::fs::path Platform::s_TempDirectory = {};
+
+    Platform::Platform(const std::vector<std::string> &arguments)
+    {
+        auto program_name = std::fs::path(arguments[0]);
+        std::fs::current_path(program_name.parent_path().parent_path());
+
+        std::vector<std::string> args = arguments;
+        args.erase(args.begin());
+
+        Platform::SetArguments(args);
+    }
 
     bool Platform::Initialize(std::unique_ptr<Application> &&app)
     {

@@ -10,5 +10,7 @@ namespace engine
 
     private:
         std::string m_Filename;
+        std::string m_FileContent;
+        size_t m_Hash;
     };
 }

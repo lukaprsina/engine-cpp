@@ -78,8 +78,12 @@ set(VULKAN_API_FILES
     src/vulkan_api/queue_family.h
     src/vulkan_api/rendering/render_pipeline.h
     src/vulkan_api/subpasses/subpass.h
-    src/vulkan_api/shaders/shader.h
+    src/renderer/shader.h
     src/platform/filesystem.h
+    src/vulkan_api/subpasses/geometry_subpass.h
+    src/vulkan_api/subpasses/forward_subpass.h
+    src/scene/scene.h
+    src/renderer/camera.h
     #Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -99,8 +103,12 @@ set(VULKAN_API_FILES
     src/vulkan_api/queue_family.cpp
     src/vulkan_api/rendering/render_pipeline.cpp
     src/vulkan_api/subpasses/subpass.cpp
-    src/vulkan_api/shaders/shader.cpp
+    src/renderer/shader.cpp
     src/platform/filesystem.cpp
+    src/vulkan_api/subpasses/geometry_subpass.cpp
+    src/vulkan_api/subpasses/forward_subpass.cpp
+    src/scene/scene.cpp
+    src/renderer/camera.cpp
 )
 
 set(PROJECT_FILES

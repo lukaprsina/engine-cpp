@@ -18,7 +18,7 @@ namespace engine
     class Platform
     {
     public:
-        Platform() = default;
+        Platform(const std::vector<std::string> &arguments);
         virtual ~Platform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app);
@@ -36,11 +36,11 @@ namespace engine
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return s_Arguments; };
 
-        static void SetExternalStorageDirectory(const std::string &directory) { s_ExternalStorageDirectory = directory; };
-        static const std::string &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
+        static void SetExternalStorageDirectory(const std::fs::path &directory) { s_ExternalStorageDirectory = directory; };
+        static const std::fs::path &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
 
-        static void SetTempDirectory(const std::string &directory) { s_TempDirectory = directory; };
-        static const std::string &GetTempDirectory() { return s_TempDirectory; };
+        static void SetTempDirectory(const std::fs::path &directory) { s_TempDirectory = directory; };
+        static const std::fs::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
         std::unique_ptr<Window> m_Window{};
@@ -51,7 +51,7 @@ namespace engine
 
     private:
         static std::vector<std::string> s_Arguments;
-        static std::string s_ExternalStorageDirectory;
-        static std::string s_TempDirectory;
+        static std::fs::path s_ExternalStorageDirectory;
+        static std::fs::path s_TempDirectory;
     };
 }

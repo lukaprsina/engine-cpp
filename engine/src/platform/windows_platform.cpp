@@ -49,7 +49,7 @@ namespace engine
         return str;
     }
 
-    inline std::vector<std::string> get_args()
+    inline std::vector<std::string> GetArgs()
     {
         LPWSTR *argv;
         int argc;
@@ -70,7 +70,7 @@ namespace engine
 
     WindowsPlatform::WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                                      PSTR lpCmdLine, INT nCmdShow)
-        : Platform()
+        : Platform(GetArgs())
     {
         if (!AllocConsole())
         {
@@ -82,7 +82,6 @@ namespace engine
         freopen_s(&fp, "conout$", "w", stdout);
         freopen_s(&fp, "conout$", "w", stderr);
 
-        Platform::SetArguments(get_args());
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
     }
 

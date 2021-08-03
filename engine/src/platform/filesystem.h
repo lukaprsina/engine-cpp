@@ -13,13 +13,15 @@ namespace engine
                 Assets,
 
                 ExternalStorage,
-                WorkingDirectory = ExternalStorage,
+                WorkingDirectory,
                 Temp
             };
 
             extern const std::unordered_map<Type, std::fs::path> relative_paths;
 
-            std::fs::path Get(const Type type, const std::fs::path &file);
+            std::fs::path Get(const Type type, const std::string &filename = "");
         }
+
+        std::string ReadTextFile(const std::fs::path &path);
     }
 }
