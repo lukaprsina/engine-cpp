@@ -51,6 +51,7 @@ namespace engine
         ~$u_filename();
     };
 }
+
 EOT
 
 cat <<EOT >> "${fullpath_filename}.cpp"

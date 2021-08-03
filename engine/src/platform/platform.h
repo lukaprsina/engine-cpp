@@ -36,6 +36,9 @@ namespace engine
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return s_Arguments; };
 
+        static void SetSourceDirectory(const std::fs::path &directory) { s_SourceDirectory = directory; };
+        static const std::fs::path &GetSourceDirectory() { return s_SourceDirectory; };
+
         static void SetExternalStorageDirectory(const std::fs::path &directory) { s_ExternalStorageDirectory = directory; };
         static const std::fs::path &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
 
@@ -50,7 +53,9 @@ namespace engine
         virtual void CreatePlatformWindow() = 0;
 
     private:
+        std::string m_EngineName = "engine";
         static std::vector<std::string> s_Arguments;
+        static std::fs::path s_SourceDirectory;
         static std::fs::path s_ExternalStorageDirectory;
         static std::fs::path s_TempDirectory;
     };

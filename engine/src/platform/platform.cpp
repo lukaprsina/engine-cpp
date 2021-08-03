@@ -6,11 +6,14 @@
 namespace engine
 {
     std::vector<std::string> Platform::s_Arguments = {};
+    std::fs::path Platform::s_SourceDirectory = {};
     std::fs::path Platform::s_ExternalStorageDirectory = {};
     std::fs::path Platform::s_TempDirectory = {};
 
     Platform::Platform(const std::vector<std::string> &arguments)
     {
+        Platform::SetSourceDirectory(std::fs::current_path() / m_EngineName);
+
         auto program_name = std::fs::path(arguments[0]);
         std::fs::current_path(program_name.parent_path().parent_path());
 

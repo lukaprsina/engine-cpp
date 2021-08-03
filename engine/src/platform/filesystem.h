@@ -12,6 +12,7 @@ namespace engine
                 Shaders,
                 Assets,
 
+                SourceDirectory,
                 ExternalStorage,
                 WorkingDirectory,
                 Temp

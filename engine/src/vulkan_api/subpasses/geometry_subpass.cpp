@@ -1,13 +1,22 @@
 #include "vulkan_api/subpasses/geometry_subpass.h"
 
+#include "scene/scene.h"
+#include "renderer/camera.h"
+
 namespace engine
 {
-    GeometrySubpass::GeometrySubpass(RenderContext &render_context, Shader &&vertex_source, Shader &&fragment_source, Scene &scene, Camera &camera)
-        : Subpass(render_context, std::move(vertex_source), std::move(fragment_source))
+    GeometrySubpass::GeometrySubpass(RenderContext &render_context, Shader &&vertex_shader, Shader &&fragment_shader, Scene &scene, Camera &camera)
+        : Subpass(render_context,
+                  std::move(vertex_shader),
+                  std::move(fragment_shader))
     {
     }
 
     GeometrySubpass::~GeometrySubpass()
+    {
+    }
+
+    void GeometrySubpass::Prepare()
     {
     }
 }

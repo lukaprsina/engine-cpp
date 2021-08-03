@@ -84,6 +84,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/forward_subpass.h
     src/scene/scene.h
     src/renderer/camera.h
+
     #Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -108,7 +109,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.cpp
     src/vulkan_api/subpasses/forward_subpass.cpp
     src/scene/scene.cpp
-    src/renderer/camera.cpp
+    src/renderer/camera.cpp    
 )
 
 set(PROJECT_FILES

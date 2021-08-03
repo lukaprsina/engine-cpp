@@ -11,6 +11,7 @@ namespace engine
     class Instance;
     class Device;
     class RenderContext;
+    class Scene;
     class RenderTarget;
     class RenderPipeline;
     class CommandBuffer;
@@ -47,6 +48,12 @@ namespace engine
         void SetHeadless(bool headless) { m_Headless = headless; };
         bool IsHeadless() const { return m_Headless; };
 
+        RenderContext &GetRenderContext()
+        {
+            assert(m_RenderContext && "Render context is not valid");
+            return *m_RenderContext;
+        }
+
         void AddInstanceExtension(const char *extension, bool optional = false) { m_InstanceExtensions[extension] = optional; }
         const std::unordered_map<const char *, bool> GetInstanceExtensions() { return m_InstanceExtensions; }
         void AddDeviceExtension(const char *extension, bool optional = false) { m_DeviceExtensions[extension] = optional; }
@@ -63,6 +70,7 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
+        std::unique_ptr<Scene> m_Scene{};
         std::unique_ptr<RenderContext> m_RenderContext{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
 

@@ -44,6 +44,7 @@ option(VMA_BUILD_SAMPLE "Build VulkanMemoryAllocator sample application" OFF)
 option(VMA_BUILD_SAMPLE_SHADERS "Build VulkanMemoryAllocator sample application's shaders" OFF)
 option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
 
+add_subdirectory(vma)
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
 
 #volk

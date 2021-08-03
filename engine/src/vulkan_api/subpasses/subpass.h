@@ -14,6 +14,8 @@ namespace engine
                 Shader &&fragment_shader);
         virtual ~Subpass();
 
+        virtual void Prepare() = 0;
+
     private:
         RenderContext &m_RenderContext;
         Shader m_VertexShader;

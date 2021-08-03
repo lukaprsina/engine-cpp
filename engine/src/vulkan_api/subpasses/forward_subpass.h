@@ -1,11 +1,18 @@
 #pragma once
 
+#include "vulkan_api/subpasses/geometry_subpass.h"
+
 namespace engine
 {
-    class Forward_subpass
+    class ForwardSubpass : public GeometrySubpass
     {
     public:
-        Forward_subpass();
-        ~Forward_subpass();
+        ForwardSubpass(RenderContext &render_context,
+                       Shader &&vertex_shader,
+                       Shader &&fragment_shader,
+                       Scene &scene, Camera &camera);
+        ~ForwardSubpass();
+
+        virtual void Prepare() override;
     };
 }

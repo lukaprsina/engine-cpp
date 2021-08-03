@@ -10,7 +10,10 @@
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/rendering/render_pipeline.h"
+#include "vulkan_api/subpasses/forward_subpass.h"
 #include "renderer/shader.h"
+#include "renderer/camera.h"
+#include "scene/scene.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -101,15 +104,17 @@ namespace engine
 
         Shader vert_shader("base.vert");
         Shader frag_shader("base.frag");
-        /* auto scene_subpass = std::make_unique<ForwardSubpass>(m_RenderContext,
+
+        auto camera = std::make_unique<Camera>();
+        m_Scene = std::make_unique<Scene>();
+
+        auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
-                                                              *scene, *camera);
+                                                              *m_Scene, *camera);
 
-        auto render_pipeline = RenderPipeline();
-        render_pipeline.AddSubpass(std::move(scene_subpass));
-
-        m_RenderPipeline = std::make_unique<RenderPipeline>(std::move(render_pipeline)); */
+        m_RenderPipeline = std::make_unique<RenderPipeline>();
+        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
         return true;
     }

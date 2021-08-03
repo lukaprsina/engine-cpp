@@ -22,6 +22,9 @@ namespace engine
 
                 switch (type)
                 {
+                case Type::SourceDirectory:
+                    path = Platform::GetSourceDirectory();
+                    break;
                 case Type::ExternalStorage:
                     path = Platform::GetExternalStorageDirectory();
                     break;
@@ -39,7 +42,7 @@ namespace engine
                     else if (it->second.empty())
                         throw std::runtime_error("Path was found, but it is empty");
 
-                    path = Platform::GetExternalStorageDirectory() / it->second;
+                    path = Platform::GetSourceDirectory() / it->second;
                 }
 
                 if (!std::fs::exists(path))
