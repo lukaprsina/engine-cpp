@@ -19,3 +19,6 @@
 [submodule "engine/vendor/shaderc"]
 	path = engine/vendor/shaderc
 	url = https://github.com/google/shaderc
+[submodule "engine/vendor/spirv-reflect"]
+	path = engine/vendor/spirv-reflect
+	url = https://github.com/KhronosGroup/SPIRV-Reflect

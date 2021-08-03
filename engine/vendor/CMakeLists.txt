@@ -72,3 +72,5 @@ option(SHADERC_SKIP_EXAMPLES "Skip building examples" ON)
 add_subdirectory(shaderc)
 target_link_libraries(Engine PRIVATE shaderc)
 install(TARGETS shaderc)
+
+add_subdirectory(spirv-reflect)
