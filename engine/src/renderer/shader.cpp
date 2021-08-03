@@ -2,6 +2,9 @@
 
 #include "platform/filesystem.h"
 
+#include "shaderc/shaderc.hpp"
+#include "spirv_reflect.h"
+
 namespace engine
 {
     Shader::Shader(const std::string &filename)

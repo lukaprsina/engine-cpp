@@ -6,7 +6,7 @@ option(WITH_EXAMPLE "Build example." OFF)
 option(USE_BOOST_REGEX "Replace std::regex with Boost.Regex" OFF)
 
 add_subdirectory(docopt)
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/docopt)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/docopt)
 target_link_libraries(Engine PRIVATE docopt)
 install(TARGETS docopt)
 
@@ -19,7 +19,7 @@ option(GLFW_INSTALL "Generate installation target" OFF)
 option(GLFW_VULKAN_STATIC "Assume the Vulkan loader is linked with the application" OFF)
 
 add_subdirectory(glfw)
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include)
 target_link_libraries(Engine PRIVATE glfw)
 install(TARGETS glfw)
 
@@ -35,7 +35,7 @@ option(SPDLOG_BUILD_TESTS "Build tests" OFF)
 option(SPDLOG_BUILD_TESTS_HO "Build tests using the header only version" OFF)
 
 add_subdirectory(spdlog)
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
 target_link_libraries(Engine PRIVATE spdlog)
 install(TARGETS spdlog)
 
@@ -45,7 +45,7 @@ option(VMA_BUILD_SAMPLE_SHADERS "Build VulkanMemoryAllocator sample application'
 option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
 
 add_subdirectory(vma)
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
 
 #volk
 option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
@@ -73,4 +73,11 @@ add_subdirectory(shaderc)
 target_link_libraries(Engine PRIVATE shaderc)
 install(TARGETS shaderc)
 
-add_subdirectory(spirv-reflect)
+#spirv-reflect
+add_library(spirv-reflect STATIC
+${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect/spirv_reflect.h
+${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect/spirv_reflect.c)
+
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect)
+target_link_libraries(Engine PRIVATE spirv-reflect)
+install(TARGETS spirv-reflect)
