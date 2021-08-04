@@ -32,18 +32,18 @@ namespace engine
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
-        // TODO std::fs
+        // TODO std::filesystem
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return s_Arguments; };
 
-        static void SetSourceDirectory(const std::fs::path &directory) { s_SourceDirectory = directory; };
-        static const std::fs::path &GetSourceDirectory() { return s_SourceDirectory; };
+        static void SetSourceDirectory(const std::filesystem::path &directory) { s_SourceDirectory = directory; };
+        static const std::filesystem::path &GetSourceDirectory() { return s_SourceDirectory; };
 
-        static void SetExternalStorageDirectory(const std::fs::path &directory) { s_ExternalStorageDirectory = directory; };
-        static const std::fs::path &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
+        static void SetExternalStorageDirectory(const std::filesystem::path &directory) { s_ExternalStorageDirectory = directory; };
+        static const std::filesystem::path &GetExternalStorageDirectory() { return s_ExternalStorageDirectory; };
 
-        static void SetTempDirectory(const std::fs::path &directory) { s_TempDirectory = directory; };
-        static const std::fs::path &GetTempDirectory() { return s_TempDirectory; };
+        static void SetTempDirectory(const std::filesystem::path &directory) { s_TempDirectory = directory; };
+        static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
         std::unique_ptr<Window> m_Window{};
@@ -55,8 +55,8 @@ namespace engine
     private:
         std::string m_EngineName = "engine";
         static std::vector<std::string> s_Arguments;
-        static std::fs::path s_SourceDirectory;
-        static std::fs::path s_ExternalStorageDirectory;
-        static std::fs::path s_TempDirectory;
+        static std::filesystem::path s_SourceDirectory;
+        static std::filesystem::path s_ExternalStorageDirectory;
+        static std::filesystem::path s_TempDirectory;
     };
 }

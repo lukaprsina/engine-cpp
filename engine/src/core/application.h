@@ -36,7 +36,12 @@ namespace engine
         void Draw(CommandBuffer &command_buffer);
         void Finish();
 
-        void SetName(const std::string &name) { m_Name = name; }
+        void LoadScene(const std::string &path);
+
+        void SetName(const std::string &name)
+        {
+            m_Name = name;
+        }
         std::string GetName() const { return m_Name; };
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }

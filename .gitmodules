@@ -22,3 +22,9 @@
 [submodule "engine/vendor/spirv-reflect"]
 	path = engine/vendor/spirv-reflect
 	url = https://github.com/KhronosGroup/SPIRV-Reflect
+[submodule "engine/vendor/tinygltf"]
+	path = engine/vendor/tinygltf
+	url = https://github.com/syoyo/tinygltf
+[submodule "engine/assets"]
+	path = engine/assets
+	url = https://github.com/KhronosGroup/Vulkan-Samples-Assets

@@ -14,6 +14,7 @@
 #include "renderer/shader.h"
 #include "renderer/camera.h"
 #include "scene/scene.h"
+#include "scene/gltf_loader.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -102,11 +103,11 @@ namespace engine
 
         m_RenderContext->Prepare();
 
-        Shader vert_shader("base.vert");
-        Shader frag_shader("base.frag");
+        ShaderSource vert_shader("base.vert");
+        ShaderSource frag_shader("base.frag");
 
         auto camera = std::make_unique<Camera>();
-        m_Scene = std::make_unique<Scene>();
+        LoadScene("scenes/sponza/Sponza01.gltf");
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
                                                               std::move(vert_shader),
@@ -167,5 +168,14 @@ namespace engine
     void Application::ParseOptions(std::vector<std::string> &arguments)
     {
         m_Options.ParseOptions(m_Usage, arguments);
+    }
+
+    void Application::LoadScene(const std::string &path)
+    {
+        GLTFLoader loader(*m_Device);
+        loader.ReadSceneFromFile(path);
+
+        if (!m_Scene)
+            throw std::runtime_error("Cannot load scene: " + path);
     }
 }

@@ -15,8 +15,3 @@
 #include "common/error.h"
 #include "common/strings.h"
 #include "common/vulkan.h"
-
-namespace std
-{
-    namespace fs = filesystem;
-}

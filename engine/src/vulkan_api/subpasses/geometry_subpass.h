@@ -13,8 +13,8 @@ namespace engine
     {
     public:
         GeometrySubpass(RenderContext &render_context,
-                        Shader &&vertex_shader,
-                        Shader &&fragment_shader,
+                        ShaderSource &&vertex_shader,
+                        ShaderSource &&fragment_shader,
                         Scene &scene, Camera &camera);
         virtual ~GeometrySubpass();
 

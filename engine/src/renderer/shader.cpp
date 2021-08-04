@@ -7,7 +7,7 @@
 
 namespace engine
 {
-    Shader::Shader(const std::string &filename)
+    ShaderSource::ShaderSource(const std::string &filename)
         : m_Filename(filename)
     {
         m_FileContent = fs::ReadTextFile(fs::path::Get(fs::path::Type::Shaders, filename));
@@ -16,7 +16,7 @@ namespace engine
         m_Hash = hasher(m_FileContent);
     }
 
-    Shader::~Shader()
+    ShaderSource::~ShaderSource()
     {
     }
 }

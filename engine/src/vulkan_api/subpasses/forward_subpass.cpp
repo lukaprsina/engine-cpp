@@ -1,10 +1,12 @@
 #include "vulkan_api/subpasses/forward_subpass.h"
 
+#include "vulkan_api/render_context.h"
+
 namespace engine
 {
     ForwardSubpass::ForwardSubpass(RenderContext &render_context,
-                                   Shader &&vertex_shader,
-                                   Shader &&fragment_shader,
+                                   ShaderSource &&vertex_shader,
+                                   ShaderSource &&fragment_shader,
                                    Scene &scene, Camera &camera)
         : GeometrySubpass(render_context,
                           std::move(vertex_shader),
@@ -19,5 +21,6 @@ namespace engine
 
     void ForwardSubpass::Prepare()
     {
-    }
+        auto &device = m_RenderContext.GetDevice();
+        }
 }

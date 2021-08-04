@@ -40,8 +40,7 @@ namespace engine
             return;
         }
 
-        // TODO
-        m_Device.GetResourceCache();
+        // TODO resource cache
 
         auto width = extent.width;
         auto height = extent.height;
@@ -302,8 +301,7 @@ namespace engine
             ++frame_it;
         }
 
-        //TODO
-        m_Device.GetResourceCache();
+        // TODO resource cache
     }
 
     void RenderContext::ReleaseOwnedSemaphore(VkSemaphore semaphore)

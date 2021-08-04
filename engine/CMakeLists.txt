@@ -84,6 +84,15 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/forward_subpass.h
     src/scene/scene.h
     src/renderer/camera.h
+    src/vulkan_api/core/pipeline_layout.h
+    src/vulkan_api/core/descriptor_set_layout.h
+    src/vulkan_api/core/descriptor_pool.h
+    src/vulkan_api/core/render_pass.h
+    src/vulkan_api/core/graphics_pipeline.h
+    src/vulkan_api/core/compute_pipeline.h
+    src/vulkan_api/core/descriptor_set.h
+    src/vulkan_api/core/framebuffer.h
+    src/scene/gltf_loader.h
 
     #Source files
     src/vulkan_api/instance.cpp
@@ -109,7 +118,16 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.cpp
     src/vulkan_api/subpasses/forward_subpass.cpp
     src/scene/scene.cpp
-    src/renderer/camera.cpp    
+    src/renderer/camera.cpp
+    src/vulkan_api/core/pipeline_layout.cpp 
+    src/vulkan_api/core/descriptor_set_layout.cpp   
+    src/vulkan_api/core/descriptor_pool.cpp
+    src/vulkan_api/core/render_pass.cpp
+    src/vulkan_api/core/graphics_pipeline.cpp
+    src/vulkan_api/core/compute_pipeline.cpp
+    src/vulkan_api/core/descriptor_set.cpp
+    src/vulkan_api/core/framebuffer.cpp
+    src/scene/gltf_loader.cpp
 )
 
 set(PROJECT_FILES

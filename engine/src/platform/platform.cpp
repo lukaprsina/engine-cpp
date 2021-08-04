@@ -3,19 +3,27 @@
 #include "events/event.h"
 #include "core/application.h"
 
+#include <filesystem>
+
 namespace engine
 {
     std::vector<std::string> Platform::s_Arguments = {};
-    std::fs::path Platform::s_SourceDirectory = {};
-    std::fs::path Platform::s_ExternalStorageDirectory = {};
-    std::fs::path Platform::s_TempDirectory = {};
+    std::filesystem::path Platform::s_SourceDirectory = {};
+    std::filesystem::path Platform::s_ExternalStorageDirectory = {};
+    std::filesystem::path Platform::s_TempDirectory = {};
 
     Platform::Platform(const std::vector<std::string> &arguments)
     {
-        Platform::SetSourceDirectory(std::fs::current_path() / m_EngineName);
+        auto program_name = std::filesystem::path(arguments[0]);
 
-        auto program_name = std::fs::path(arguments[0]);
-        std::fs::current_path(program_name.parent_path().parent_path());
+        if (!program_name.is_absolute())
+            program_name = std::filesystem::current_path() / program_name;
+
+        program_name = std::filesystem::canonical(program_name);
+
+        std::filesystem::current_path(program_name.parent_path().parent_path().parent_path());
+
+        Platform::SetSourceDirectory(std::filesystem::current_path() / m_EngineName);
 
         std::vector<std::string> args = arguments;
         args.erase(args.begin());

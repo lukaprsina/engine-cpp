@@ -1,5 +1,7 @@
 #include "scene/scene.h"
 
+#include "entt/entt.hpp"
+
 namespace engine
 {
     Scene::Scene()
@@ -10,4 +12,3 @@ namespace engine
     {
     }
 }
-

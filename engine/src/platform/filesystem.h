@@ -18,11 +18,11 @@ namespace engine
                 Temp
             };
 
-            extern const std::unordered_map<Type, std::fs::path> relative_paths;
+            extern const std::unordered_map<Type, std::filesystem::path> relative_paths;
 
-            std::fs::path Get(const Type type, const std::string &filename = "");
+            std::filesystem::path Get(const Type type, const std::string &filename = "");
         }
 
-        std::string ReadTextFile(const std::fs::path &path);
+        std::string ReadTextFile(const std::filesystem::path &path);
     }
 }

@@ -61,6 +61,8 @@ namespace engine
 
         void ReleaseOwnedSemaphore(VkSemaphore semaphore);
 
+        Device &GetDevice() { return m_Device; }
+
     private:
         Device &m_Device;
         const QueueFamily &m_QueueFamily;

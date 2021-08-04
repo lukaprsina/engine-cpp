@@ -10,15 +10,15 @@ namespace engine
     {
         namespace path
         {
-            const std::unordered_map<Type, std::fs::path> relative_paths = {
+            const std::unordered_map<Type, std::filesystem::path> relative_paths = {
                 {Type::Assets, "assets"},
                 {Type::Shaders, "shaders"},
                 {Type::Storage, "output"},
             };
 
-            std::fs::path Get(const Type type, const std::string &filename)
+            std::filesystem::path Get(const Type type, const std::string &filename)
             {
-                std::fs::path path;
+                std::filesystem::path path;
 
                 switch (type)
                 {
@@ -32,7 +32,7 @@ namespace engine
                     path = Platform::GetTempDirectory();
                     break;
                 case Type::WorkingDirectory:
-                    path = std::fs::current_path();
+                    path = std::filesystem::current_path();
                     break;
                 default:
                     auto it = relative_paths.find(type);
@@ -45,14 +45,14 @@ namespace engine
                     path = Platform::GetSourceDirectory() / it->second;
                 }
 
-                if (!std::fs::exists(path))
-                    std::fs::create_directory(path);
+                if (!std::filesystem::exists(path))
+                    std::filesystem::create_directory(path);
 
                 return path / filename;
             }
         }
 
-        std::string ReadTextFile(const std::fs::path &path)
+        std::string ReadTextFile(const std::filesystem::path &path)
         {
             // https://insanecoding.blogspot.com/2011/11/how-to-read-in-file-in-c.html
 

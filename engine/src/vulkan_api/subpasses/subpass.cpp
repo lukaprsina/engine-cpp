@@ -4,16 +4,16 @@
 
 namespace engine
 {
-    Subpass::Subpass(RenderContext &render_context,
-                     Shader &&vertex_shader,
-                     Shader &&fragment_shader)
-        : m_RenderContext(render_context),
-          m_VertexShader(std::move(vertex_shader)),
-          m_FragmentShader(std::move(fragment_shader))
-    {
-    }
+  Subpass::Subpass(RenderContext &render_context,
+                   ShaderSource &&vertex_shader,
+                   ShaderSource &&fragment_shader)
+      : m_RenderContext(render_context),
+        m_VertexShader(std::move(vertex_shader)),
+        m_FragmentShader(std::move(fragment_shader))
+  {
+  }
 
-    Subpass::~Subpass()
-    {
-    }
+  Subpass::~Subpass()
+  {
+  }
 }

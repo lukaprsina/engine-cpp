@@ -5,6 +5,7 @@
 namespace engine
 {
     ResourceCache::ResourceCache(Device &device)
+        : m_Device(device)
     {
     }
 

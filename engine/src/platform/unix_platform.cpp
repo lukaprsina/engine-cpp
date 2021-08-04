@@ -17,17 +17,17 @@ namespace engine
 {
     namespace
     {
-        inline std::fs::path GetTempPathFromEnvironment()
+        inline std::filesystem::path GetTempPathFromEnvironment()
         {
-            std::fs::path temp_path = "/tmp/";
+            std::filesystem::path temp_path = "/tmp/";
 
             if (const char *env_ptr = std::getenv("TMPDIR"))
-                temp_path = std::fs::path(env_ptr);
+                temp_path = std::filesystem::path(env_ptr);
 
             return temp_path;
         }
 
-        inline std::fs::path GetRootFolder()
+        inline std::filesystem::path GetRootFolder()
         {
             auto working_directory = fs::path::Get(fs::path::Type::WorkingDirectory);
             return working_directory.parent_path();

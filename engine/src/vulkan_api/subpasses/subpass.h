@@ -4,21 +4,23 @@
 
 namespace engine
 {
-    class Shader;
+    class ShaderSource;
     class RenderContext;
     class Subpass
     {
     public:
         Subpass(RenderContext &render_context,
-                Shader &&vertex_shader,
-                Shader &&fragment_shader);
+                ShaderSource &&vertex_shader,
+                ShaderSource &&fragment_shader);
         virtual ~Subpass();
 
         virtual void Prepare() = 0;
 
-    private:
+    protected:
         RenderContext &m_RenderContext;
-        Shader m_VertexShader;
-        Shader m_FragmentShader;
+
+    private:
+        ShaderSource m_VertexShader;
+        ShaderSource m_FragmentShader;
     };
 }

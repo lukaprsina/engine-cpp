@@ -2,11 +2,11 @@
 
 namespace engine
 {
-    class Shader
+    class ShaderSource
     {
     public:
-        Shader(const std::string &filename);
-        ~Shader();
+        ShaderSource(const std::string &filename);
+        ~ShaderSource();
 
     private:
         std::string m_Filename;
