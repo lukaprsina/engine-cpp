@@ -24,7 +24,7 @@ namespace engine
 
     VkResult Queue::Submit(const std::vector<VkSubmitInfo> &submit_infos, VkFence fence) const
     {
-        return vkQueueSubmit(m_Handle, to_u32(submit_infos.size()), submit_infos.data(), fence);
+        return vkQueueSubmit(m_Handle, ToUint32_t(submit_infos.size()), submit_infos.data(), fence);
     }
 
     VkResult Queue::Present(const VkPresentInfoKHR &present_info) const

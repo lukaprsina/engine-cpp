@@ -28,3 +28,6 @@
 [submodule "engine/assets"]
 	path = engine/assets
 	url = https://github.com/KhronosGroup/Vulkan-Samples-Assets
+[submodule "engine/vendor/glm"]
+	path = engine/vendor/glm
+	url = https://github.com/g-truc/glm

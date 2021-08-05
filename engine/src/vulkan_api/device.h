@@ -18,6 +18,7 @@ namespace engine
         ~Device();
 
         VkResult WaitIdle();
+        bool IsExtensionEnabled(const char *extension);
         bool IsExtensionSupported(const char *requested_extension) const;
         const QueueFamily &GetSuitableGraphicsQueueFamily();
 

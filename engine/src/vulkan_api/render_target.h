@@ -30,6 +30,13 @@ namespace engine
         static const CreateFunc s_DefaultCreateFunction;
 
         const std::vector<core::ImageView> &GetViews() const { return m_ImageViews; }
+        const VkExtent2D &GetExtent() const { return m_Extent; }
+        const std::vector<Attachment> &GetAttachments() const { return m_Attachments; }
+
+        void SetInputAttachments(std::vector<uint32_t> &input) { m_InputAttachments = input; }
+        const std::vector<uint32_t> &GetInputAttachments() const { return m_InputAttachments; }
+        void SetOutputAttachments(std::vector<uint32_t> &output) { m_OutputAttachments = output; }
+        const std::vector<uint32_t> &GetOutputAttachments() const { return m_OutputAttachments; }
 
     private:
         Device &m_Device;
@@ -37,5 +44,11 @@ namespace engine
         std::vector<core::Image> m_Images{};
         std::vector<core::ImageView> m_ImageViews{};
         std::vector<Attachment> m_Attachments{};
+
+        /// By default there are no input attachments
+        std::vector<uint32_t> m_InputAttachments = {};
+
+        /// By default the output attachments is attachment 0
+        std::vector<uint32_t> m_OutputAttachments = {0};
     };
 }

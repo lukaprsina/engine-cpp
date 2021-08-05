@@ -146,12 +146,58 @@ namespace engine
 
     void Application::Draw(CommandBuffer &command_buffer)
     {
-        // auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
-        // TODO memory barrier
+        auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
+
+        {
+            // Image 0 is the swapchain
+            ImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+            memory_barrier.new_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            memory_barrier.src_access_mask = 0;
+            memory_barrier.dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
+
+            // Skip 1 as it is handled later as a depth-stencil attachment
+            for (size_t i = 2; i < views.size(); ++i)
+            {
+                command_buffer.CreateImageMemoryBarrier(views.at(i), memory_barrier);
+            }
+        }
+
+        {
+            ImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+            memory_barrier.new_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            memory_barrier.src_access_mask = 0;
+            memory_barrier.dst_access_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+
+            command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
+        }
+
+        SetViewportAndScissor(command_buffer,
+                              m_RenderContext->GetActiveFrame().GetRenderTarget().GetExtent());
 
         if (m_RenderPipeline)
             m_RenderPipeline->Draw(command_buffer,
                                    m_RenderContext->GetActiveFrame().GetRenderTarget());
+
+        command_buffer.EndRenderPass();
+
+        {
+            ImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            memory_barrier.new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            memory_barrier.src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
+        }
     }
 
     void Application::Finish()
@@ -173,9 +219,23 @@ namespace engine
     void Application::LoadScene(const std::string &path)
     {
         GLTFLoader loader(*m_Device);
-        loader.ReadSceneFromFile(path);
+        m_Scene = loader.ReadSceneFromFile(path);
 
         if (!m_Scene)
             throw std::runtime_error("Cannot load scene: " + path);
+    }
+
+    void Application::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const
+    {
+        VkViewport viewport{};
+        viewport.width = static_cast<float>(extent.width);
+        viewport.height = static_cast<float>(extent.height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        command_buffer.SetViewport(0, {viewport});
+
+        VkRect2D scissor{};
+        scissor.extent = extent;
+        command_buffer.SetScissor(0, {scissor});
     }
 }

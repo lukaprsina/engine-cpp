@@ -94,8 +94,8 @@ namespace engine
         if (m_AcquiredSemaphore == VK_NULL_HANDLE)
             throw std::runtime_error("Couldn't begin frame!");
 
-        const auto &queue = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
-        return GetActiveFrame().RequestCommandBuffer(queue, reset_mode);
+        const auto &queue_family = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+        return GetActiveFrame().RequestCommandBuffer(queue_family, reset_mode);
     }
 
     void RenderContext::Submit(CommandBuffer &command_buffer)
@@ -134,7 +134,7 @@ namespace engine
 
         VkSubmitInfo submit_info{VK_STRUCTURE_TYPE_SUBMIT_INFO};
 
-        submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
+        submit_info.commandBufferCount = ToUint32_t(cmd_buf_handles.size());
         submit_info.pCommandBuffers = cmd_buf_handles.data();
 
         if (wait_semaphore != VK_NULL_HANDLE)
@@ -164,7 +164,7 @@ namespace engine
 
         VkSubmitInfo submit_info{VK_STRUCTURE_TYPE_SUBMIT_INFO};
 
-        submit_info.commandBufferCount = to_u32(cmd_buf_handles.size());
+        submit_info.commandBufferCount = ToUint32_t(cmd_buf_handles.size());
         submit_info.pCommandBuffers = cmd_buf_handles.data();
 
         VkFence fence = frame.RequestFence();
@@ -254,7 +254,7 @@ namespace engine
             return;
         }
         VkSurfaceCapabilitiesKHR surface_properties;
-        m_Device.GetGPU();
+
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_Device.GetGPU().GetHandle(),
                                                            m_Swapchain->GetSurface(),
                                                            &surface_properties));

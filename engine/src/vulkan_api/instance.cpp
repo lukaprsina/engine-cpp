@@ -186,10 +186,10 @@ namespace engine
         instance_info.pApplicationInfo = &app_info;
         instance_info.flags = VK_FLAGS_NONE;
 
-        instance_info.enabledExtensionCount = to_u32(m_EnabledExtensions.size());
+        instance_info.enabledExtensionCount = ToUint32_t(m_EnabledExtensions.size());
         instance_info.ppEnabledExtensionNames = m_EnabledExtensions.data();
 
-        instance_info.enabledLayerCount = to_u32(requested_validation_layers.size());
+        instance_info.enabledLayerCount = ToUint32_t(requested_validation_layers.size());
         instance_info.ppEnabledLayerNames = requested_validation_layers.data();
 
 #if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
@@ -223,7 +223,7 @@ namespace engine
             static const std::array<VkValidationFeatureEnableEXT, 2> enable_features = {
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT,
                 VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
-            };            
+            };
 
             validation_features_info.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
             validation_features_info.enabledValidationFeatureCount = static_cast<uint32_t>(enable_features.size());

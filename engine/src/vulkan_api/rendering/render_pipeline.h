@@ -19,5 +19,8 @@ namespace engine
 
     private:
         std::vector<std::unique_ptr<Subpass>> m_Subpasses{};
+        std::vector<LoadStoreInfo> m_LoadStore = std::vector<LoadStoreInfo>(2);
+        std::vector<VkClearValue> m_ClearValue = std::vector<VkClearValue>(2);
+        size_t m_ActiveSubpassIndex{0};
     };
 }

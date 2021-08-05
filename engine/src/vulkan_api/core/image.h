@@ -39,7 +39,7 @@ namespace engine
             void Unmap();
 
             Device &GetDevice() { return m_Device; }
-            VkImage &GetHandle() { return m_Handle; }
+            VkImage GetHandle() const { return m_Handle; }
             const VkExtent3D &GetExtent() const { return m_Extent; }
             VkImageType GetType() const { return m_Type; }
             VkFormat GetFormat() const { return m_Format; }

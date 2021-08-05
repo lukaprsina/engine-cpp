@@ -21,6 +21,6 @@ namespace engine
 
     void ForwardSubpass::Prepare()
     {
-        auto &device = m_RenderContext.GetDevice();
-        }
+        // auto &device = m_RenderContext.GetDevice();
+    }
 }

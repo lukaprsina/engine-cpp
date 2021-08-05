@@ -23,7 +23,11 @@ target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glfw/inclu
 target_link_libraries(Engine PRIVATE glfw)
 install(TARGETS glfw)
 
-#add_subdirectory(glm)
+#glm
+add_subdirectory(glm)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
+target_link_libraries(Engine PRIVATE glm)
+install(TARGETS glm)
 
 #spdlog
 option(SPDLOG_BUILD_ALL "Build all artifacts" OFF)

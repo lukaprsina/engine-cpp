@@ -38,6 +38,8 @@ namespace engine
 
         void LoadScene(const std::string &path);
 
+        void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
+
         void SetName(const std::string &name)
         {
             m_Name = name;

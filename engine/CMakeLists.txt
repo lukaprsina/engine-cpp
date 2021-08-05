@@ -93,6 +93,12 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/descriptor_set.h
     src/vulkan_api/core/framebuffer.h
     src/scene/gltf_loader.h
+    src/scene/components/light.h
+    src/vulkan_api/rendering/resource_binding_state.h
+    src/vulkan_api/rendering/pipeline_state.h
+    src/vulkan_api/core/sampler.h
+    src/vulkan_api/core/buffer.h
+    src/vulkan_api/core/buffer_pool.h
 
     #Source files
     src/vulkan_api/instance.cpp
@@ -128,6 +134,12 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/descriptor_set.cpp
     src/vulkan_api/core/framebuffer.cpp
     src/scene/gltf_loader.cpp
+    src/scene/components/light.cpp
+    src/vulkan_api/rendering/resource_binding_state.cpp
+    src/vulkan_api/rendering/pipeline_state.cpp
+    src/vulkan_api/core/sampler.cpp
+    src/vulkan_api/core/buffer.cpp
+    src/vulkan_api/core/buffer_pool.cpp
 )
 
 set(PROJECT_FILES

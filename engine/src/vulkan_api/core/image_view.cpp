@@ -66,5 +66,11 @@ namespace engine
             if (m_Handle != VK_NULL_HANDLE)
                 vkDestroyImageView(m_Device.GetHandle(), m_Handle, nullptr);
         }
+
+        const Image &ImageView::GetImage() const
+        {
+            assert(m_Image && "Image view is referring an invalid image");
+            return *m_Image;
+        }
     }
 }

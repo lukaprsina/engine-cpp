@@ -19,7 +19,7 @@ namespace engine
         ENG_CORE_INFO("Selected GPU: {}", gpu.GetProperties().deviceName);
 
         std::vector<VkQueueFamilyProperties> queue_family_properties = gpu.GetQueueFamilyProperties();
-        uint32_t queue_family_properties_count = to_u32(queue_family_properties.size());
+        uint32_t queue_family_properties_count = ToUint32_t(queue_family_properties.size());
 
         std::vector<VkDeviceQueueCreateInfo> queue_create_infos(queue_family_properties_count);
         std::vector<std::vector<float>> queue_priorities(queue_family_properties_count);
@@ -93,9 +93,9 @@ namespace engine
         VkDeviceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos = queue_create_infos.data();
-        create_info.queueCreateInfoCount = to_u32(queue_create_infos.size());
+        create_info.queueCreateInfoCount = ToUint32_t(queue_create_infos.size());
         create_info.ppEnabledExtensionNames = m_EnabledExtensions.data();
-        create_info.enabledExtensionCount = to_u32(m_EnabledExtensions.size());
+        create_info.enabledExtensionCount = ToUint32_t(m_EnabledExtensions.size());
 
         const auto requested_gpu_features = gpu.GetRequestedFeatures();
         create_info.pEnabledFeatures = &requested_gpu_features;
@@ -184,6 +184,12 @@ namespace engine
     VkResult Device::WaitIdle()
     {
         return VK_SUCCESS;
+    }
+
+    bool Device::IsExtensionEnabled(const char *extension)
+    {
+        return std::find_if(m_EnabledExtensions.begin(), m_EnabledExtensions.end(), [extension](const char *enabled_extension)
+                            { return std::strcmp(extension, enabled_extension) == 0; }) != m_EnabledExtensions.end();
     }
 
     bool Device::IsExtensionSupported(const char *requested_extension) const

@@ -11,6 +11,7 @@ namespace engine
 {
     class Device;
     class Scene;
+    class Light;
 
     class GLTFLoader
     {
@@ -24,7 +25,23 @@ namespace engine
         Device &m_Device;
         tinygltf::Model m_Model;
         std::filesystem::path m_ModelPath;
+        static std::unordered_map<std::string, bool> m_SupportedExtensions;
 
         Scene LoadScene(int scene_index = -1);
+
+        void CheckExtensions();
+        void LoadLights(Scene &scene);
+        void LoadSamplers(Scene &scene);
+        void LoadImages(Scene &scene);
+        void LoadTextures(Scene &scene);
+        void LoadMaterials(Scene &scene);
+        void LoadMeshes(Scene &scene);
+        void LoadCameras(Scene &scene);
+        void LoadAnimations(Scene &scene);
+        void LoadScenes(Scene &scene);
+
+        std::vector<std::unique_ptr<Light>> ParseKHRLightsPunctual();
+
+        bool IsExtensionEnabled(const std::string &requested_extension);
     };
 }

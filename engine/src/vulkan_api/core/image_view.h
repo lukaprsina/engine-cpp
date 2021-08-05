@@ -20,6 +20,10 @@ namespace engine
             ImageView &operator=(ImageView &&) = delete;
 
             void SetImage(Image &image) { m_Image = &image; }
+            const Image &GetImage() const;
+            VkImageSubresourceRange GetSubresourceRange() const { return m_SubresourceRange; }
+            VkFormat GetFormat() const { return m_Format; }
+            VkImageView GetHandle() const { return m_Handle; }
 
         private:
             Device &m_Device;
