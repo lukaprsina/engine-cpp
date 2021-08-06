@@ -9,6 +9,8 @@
 #include "vulkan_api/core/compute_pipeline.h"
 #include "vulkan_api/core/descriptor_set.h"
 #include "vulkan_api/core/framebuffer.h"
+#include "vulkan_api/resource_record.h"
+#include "vulkan_api/resource_replay.h"
 
 #include <entt/entt.hpp>
 

@@ -25,12 +25,12 @@
 #include "vulkan_api/rendering/pipeline_state.h"
 #include "vulkan_api/render_target.h"
 
-#include "common/base.h"
+#include "common/helpers.h"
 
-namespace engine
+namespace std
 {
 	template <>
-	struct std::hash<engine::ShaderSource>
+	struct hash<engine::ShaderSource>
 	{
 		std::size_t operator()(const engine::ShaderSource &shader_source) const
 		{
@@ -43,7 +43,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::ShaderVariant>
+	struct hash<engine::ShaderVariant>
 	{
 		std::size_t operator()(const engine::ShaderVariant &shader_variant) const
 		{
@@ -56,7 +56,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::ShaderModule>
+	struct hash<engine::ShaderModule>
 	{
 		std::size_t operator()(const engine::ShaderModule &shader_module) const
 		{
@@ -69,7 +69,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::DescriptorSetLayout>
+	struct hash<engine::DescriptorSetLayout>
 	{
 		std::size_t operator()(const engine::DescriptorSetLayout &descriptor_set_layout) const
 		{
@@ -82,7 +82,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::DescriptorPool>
+	struct hash<engine::DescriptorPool>
 	{
 		std::size_t operator()(const engine::DescriptorPool &descriptor_pool) const
 		{
@@ -95,7 +95,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::PipelineLayout>
+	struct hash<engine::PipelineLayout>
 	{
 		std::size_t operator()(const engine::PipelineLayout &pipeline_layout) const
 		{
@@ -108,7 +108,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::RenderPass>
+	struct hash<engine::RenderPass>
 	{
 		std::size_t operator()(const engine::RenderPass &render_pass) const
 		{
@@ -121,7 +121,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::Attachment>
+	struct hash<engine::Attachment>
 	{
 		std::size_t operator()(const engine::Attachment &attachment) const
 		{
@@ -137,7 +137,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::LoadStoreInfo>
+	struct hash<engine::LoadStoreInfo>
 	{
 		std::size_t operator()(const engine::LoadStoreInfo &load_store_info) const
 		{
@@ -151,7 +151,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::SubpassInfo>
+	struct hash<engine::SubpassInfo>
 	{
 		std::size_t operator()(const engine::SubpassInfo &subpass_info) const
 		{
@@ -181,7 +181,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::SpecializationConstantState>
+	struct hash<engine::SpecializationConstantState>
 	{
 		std::size_t operator()(const engine::SpecializationConstantState &specialization_constant_state) const
 		{
@@ -201,7 +201,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::ShaderResource>
+	struct hash<engine::ShaderResource>
 	{
 		std::size_t operator()(const engine::ShaderResource &shader_resource) const
 		{
@@ -225,7 +225,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkDescriptorBufferInfo>
+	struct hash<VkDescriptorBufferInfo>
 	{
 		std::size_t operator()(const VkDescriptorBufferInfo &descriptor_buffer_info) const
 		{
@@ -240,7 +240,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkDescriptorImageInfo>
+	struct hash<VkDescriptorImageInfo>
 	{
 		std::size_t operator()(const VkDescriptorImageInfo &descriptor_image_info) const
 		{
@@ -255,7 +255,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkWriteDescriptorSet>
+	struct hash<VkWriteDescriptorSet>
 	{
 		std::size_t operator()(const VkWriteDescriptorSet &write_descriptor_set) const
 		{
@@ -308,7 +308,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkVertexInputAttributeDescription>
+	struct hash<VkVertexInputAttributeDescription>
 	{
 		std::size_t operator()(const VkVertexInputAttributeDescription &vertex_attrib) const
 		{
@@ -324,7 +324,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkVertexInputBindingDescription>
+	struct hash<VkVertexInputBindingDescription>
 	{
 		std::size_t operator()(const VkVertexInputBindingDescription &vertex_binding) const
 		{
@@ -339,7 +339,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::StencilOpState>
+	struct hash<engine::StencilOpState>
 	{
 		std::size_t operator()(const engine::StencilOpState &stencil) const
 		{
@@ -355,7 +355,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkExtent2D>
+	struct hash<VkExtent2D>
 	{
 		size_t operator()(const VkExtent2D &extent) const
 		{
@@ -369,7 +369,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkOffset2D>
+	struct hash<VkOffset2D>
 	{
 		size_t operator()(const VkOffset2D &offset) const
 		{
@@ -383,7 +383,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkRect2D>
+	struct hash<VkRect2D>
 	{
 		size_t operator()(const VkRect2D &rect) const
 		{
@@ -397,7 +397,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<VkViewport>
+	struct hash<VkViewport>
 	{
 		size_t operator()(const VkViewport &viewport) const
 		{
@@ -415,7 +415,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::ColorBlendAttachmentState>
+	struct hash<engine::ColorBlendAttachmentState>
 	{
 		std::size_t operator()(const engine::ColorBlendAttachmentState &color_blend_attachment) const
 		{
@@ -435,7 +435,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::RenderTarget>
+	struct hash<engine::RenderTarget>
 	{
 		std::size_t operator()(const engine::RenderTarget &render_target) const
 		{
@@ -444,7 +444,7 @@ namespace engine
 			for (auto &view : render_target.GetViews())
 			{
 				engine::HashCombine(result, view.GetHandle());
-				engine::HashCombine(result, view.get_image().GetHandle());
+				engine::HashCombine(result, view.GetImage().GetHandle());
 			}
 
 			return result;
@@ -452,7 +452,7 @@ namespace engine
 	};
 
 	template <>
-	struct std::hash<engine::PipelineState>
+	struct hash<engine::PipelineState>
 	{
 		std::size_t operator()(const engine::PipelineState &pipeline_state) const
 		{
@@ -470,7 +470,7 @@ namespace engine
 
 			engine::HashCombine(result, pipeline_state.GetSubpassIndex());
 
-			for (auto shader_module : pipeline_state.GetPipelineLayout().get_shader_modules())
+			for (auto shader_module : pipeline_state.GetPipelineLayout().GetShaderModules())
 			{
 				engine::HashCombine(result, shader_module->GetID());
 			}
@@ -531,126 +531,126 @@ namespace engine
 			return result;
 		}
 	};
-} // namespace std
+}
 
-namespace vkb
+namespace engine
 {
 	namespace
 	{
 		template <typename T>
-		inline void hash_param(size_t &seed, const T &value)
+		inline void HashParam(size_t &seed, const T &value)
 		{
-			HashCombine(seed, value);
+			engine::HashCombine(seed, value);
 		}
 
 		template <>
-		inline void hash_param(size_t & /*seed*/, const VkPipelineCache & /*value*/)
+		inline void HashParam(size_t & /*seed*/, const VkPipelineCache & /*value*/)
 		{
 		}
 
 		template <>
-		inline void hash_param<std::vector<uint8_t>>(
+		inline void HashParam<std::vector<uint8_t>>(
 			size_t &seed,
 			const std::vector<uint8_t> &value)
 		{
-			HashCombine(seed, std::string{value.begin(), value.end()});
+			engine::HashCombine(seed, std::string{value.begin(), value.end()});
 		}
 
 		template <>
-		inline void hash_param<std::vector<Attachment>>(
+		inline void HashParam<std::vector<Attachment>>(
 			size_t &seed,
 			const std::vector<Attachment> &value)
 		{
 			for (auto &attachment : value)
 			{
-				HashCombine(seed, attachment);
+				engine::HashCombine(seed, attachment);
 			}
 		}
 
 		template <>
-		inline void hash_param<std::vector<LoadStoreInfo>>(
+		inline void HashParam<std::vector<LoadStoreInfo>>(
 			size_t &seed,
 			const std::vector<LoadStoreInfo> &value)
 		{
 			for (auto &load_store_info : value)
 			{
-				HashCombine(seed, load_store_info);
+				engine::HashCombine(seed, load_store_info);
 			}
 		}
 
 		template <>
-		inline void hash_param<std::vector<SubpassInfo>>(
+		inline void HashParam<std::vector<SubpassInfo>>(
 			size_t &seed,
 			const std::vector<SubpassInfo> &value)
 		{
 			for (auto &subpass_info : value)
 			{
-				HashCombine(seed, subpass_info);
+				engine::HashCombine(seed, subpass_info);
 			}
 		}
 
 		template <>
-		inline void hash_param<std::vector<ShaderModule *>>(
+		inline void HashParam<std::vector<ShaderModule *>>(
 			size_t &seed,
 			const std::vector<ShaderModule *> &value)
 		{
 			for (auto &shader_module : value)
 			{
-				HashCombine(seed, shader_module->GetID());
+				engine::HashCombine(seed, shader_module->GetID());
 			}
 		}
 
 		template <>
-		inline void hash_param<std::vector<ShaderResource>>(
+		inline void HashParam<std::vector<ShaderResource>>(
 			size_t &seed,
 			const std::vector<ShaderResource> &value)
 		{
 			for (auto &resource : value)
 			{
-				HashCombine(seed, resource);
+				engine::HashCombine(seed, resource);
 			}
 		}
 
 		template <>
-		inline void hash_param<std::map<uint32_t, std::map<uint32_t, VkDescriptorBufferInfo>>>(
+		inline void HashParam<std::map<uint32_t, std::map<uint32_t, VkDescriptorBufferInfo>>>(
 			size_t &seed,
 			const std::map<uint32_t, std::map<uint32_t, VkDescriptorBufferInfo>> &value)
 		{
 			for (auto &binding_set : value)
 			{
-				HashCombine(seed, binding_set.first);
+				engine::HashCombine(seed, binding_set.first);
 
 				for (auto &binding_element : binding_set.second)
 				{
-					HashCombine(seed, binding_element.first);
-					HashCombine(seed, binding_element.second);
+					engine::HashCombine(seed, binding_element.first);
+					engine::HashCombine(seed, binding_element.second);
 				}
 			}
 		}
 
 		template <>
-		inline void hash_param<std::map<uint32_t, std::map<uint32_t, VkDescriptorImageInfo>>>(
+		inline void HashParam<std::map<uint32_t, std::map<uint32_t, VkDescriptorImageInfo>>>(
 			size_t &seed,
 			const std::map<uint32_t, std::map<uint32_t, VkDescriptorImageInfo>> &value)
 		{
 			for (auto &binding_set : value)
 			{
-				HashCombine(seed, binding_set.first);
+				engine::HashCombine(seed, binding_set.first);
 
 				for (auto &binding_element : binding_set.second)
 				{
-					HashCombine(seed, binding_element.first);
-					HashCombine(seed, binding_element.second);
+					engine::HashCombine(seed, binding_element.first);
+					engine::HashCombine(seed, binding_element.second);
 				}
 			}
 		}
 
 		template <typename T, typename... Args>
-		inline void hash_param(size_t &seed, const T &first_arg, const Args &...args)
+		inline void HashParam(size_t &seed, const T &first_arg, const Args &...args)
 		{
-			hash_param(seed, first_arg);
+			HashParam(seed, first_arg);
 
-			hash_param(seed, args...);
+			HashParam(seed, args...);
 		}
 
 		template <class T, class... A>
@@ -671,12 +671,12 @@ namespace vkb
 		{
 			size_t record(ResourceRecord &recorder, A &...args)
 			{
-				return recorder.register_shader_module(args...);
+				return recorder.RegisterShaderModule(args...);
 			}
 
 			void index(ResourceRecord &recorder, size_t index, ShaderModule &shader_module)
 			{
-				recorder.set_shader_module(index, shader_module);
+				recorder.SetShaderModule(index, shader_module);
 			}
 		};
 
@@ -685,12 +685,12 @@ namespace vkb
 		{
 			size_t record(ResourceRecord &recorder, A &...args)
 			{
-				return recorder.register_pipeline_layout(args...);
+				return recorder.RegisterPipelineLayout(args...);
 			}
 
 			void index(ResourceRecord &recorder, size_t index, PipelineLayout &pipeline_layout)
 			{
-				recorder.set_pipeline_layout(index, pipeline_layout);
+				recorder.SetPipelineLayout(index, pipeline_layout);
 			}
 		};
 
@@ -699,12 +699,12 @@ namespace vkb
 		{
 			size_t record(ResourceRecord &recorder, A &...args)
 			{
-				return recorder.register_render_pass(args...);
+				return recorder.RegisterRenderPass(args...);
 			}
 
 			void index(ResourceRecord &recorder, size_t index, RenderPass &render_pass)
 			{
-				recorder.set_render_pass(index, render_pass);
+				recorder.SetRenderPass(index, render_pass);
 			}
 		};
 
@@ -713,15 +713,15 @@ namespace vkb
 		{
 			size_t record(ResourceRecord &recorder, A &...args)
 			{
-				return recorder.register_graphics_pipeline(args...);
+				return recorder.RegisterGraphicsPipeline(args...);
 			}
 
 			void index(ResourceRecord &recorder, size_t index, GraphicsPipeline &graphics_pipeline)
 			{
-				recorder.set_graphics_pipeline(index, graphics_pipeline);
+				recorder.SetGraphicsPipeline(index, graphics_pipeline);
 			}
 		};
-	} // namespace
+	}
 
 	template <class T, class... A>
 	T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map<std::size_t, T> &resources, A &...args)
@@ -729,7 +729,7 @@ namespace vkb
 		RecordHelper<T, A...> record_helper;
 
 		std::size_t hash{0U};
-		hash_param(hash, args...);
+		HashParam(hash, args...);
 
 		auto res_it = resources.find(hash);
 
@@ -742,7 +742,7 @@ namespace vkb
 		const char *res_type = typeid(T).name();
 		size_t res_id = resources.size();
 
-		LOGD("Building #{} cache object ({})", res_id, res_type);
+		ENG_CORE_TRACE("Building #{} cache object ({})", res_id, res_type);
 
 // Only error handle in release
 #ifndef DEBUG
@@ -769,11 +769,11 @@ namespace vkb
 		}
 		catch (const std::exception &e)
 		{
-			LOGE("Creation error for #{} cache object ({})", res_id, res_type);
+			ENG_CORE_ERROR("Creation error for #{} cache object ({})", res_id, res_type);
 			throw e;
 		}
 #endif
 
 		return res_it->second;
 	}
-} // namespace vkb
+}

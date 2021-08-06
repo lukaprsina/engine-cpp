@@ -61,6 +61,7 @@ namespace engine
     class ShaderSource
     {
     public:
+        ShaderSource() = default;
         ShaderSource(const std::string &filename);
         ~ShaderSource();
 
@@ -105,6 +106,7 @@ namespace engine
 
     class ShaderModule
     {
+    public:
         ShaderModule(Device &device,
                      VkShaderStageFlagBits stage,
                      const ShaderSource &glsl_source,

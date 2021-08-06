@@ -1,11 +1,5 @@
 #pragma once
 
-#include "common/glm.h"
-
-//ENG_DISABLE_WARNINGS()
-#include <glm/gtx/hash.hpp>
-//ENG_ENABLE_WARNINGS()
-
 #define ENG_ASSERT(condition) assert(condition)
 
 #define BIT(x) (1 << x)
@@ -46,13 +40,6 @@ namespace engine
     {
         return std::vector<uint8_t>{reinterpret_cast<const uint8_t *>(&value),
                                     reinterpret_cast<const uint8_t *>(&value) + sizeof(T)};
-    }
-
-    template <class T>
-    inline void HashCombine(size_t &seed, const T &v)
-    {
-        std::hash<T> hasher;
-        glm::detail::hash_combine(seed, hasher(v));
     }
 
     template <class T>
