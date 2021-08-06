@@ -1,6 +1,7 @@
 #include "vulkan_api/resource_replay.h"
 
 #include "rendering/pipeline_state.h"
+#include "vulkan_api/render_target.h"
 #include "vulkan_api/resource_cache.h"
 #include "common/helpers.h"
 

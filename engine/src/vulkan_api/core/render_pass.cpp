@@ -1,5 +1,7 @@
 #include "vulkan_api/core/render_pass.h"
+
 #include "vulkan_api/device.h"
+#include "vulkan_api/render_target.h"
 
 namespace engine
 {
@@ -223,13 +225,13 @@ namespace engine
     }
 
     template <typename T>
-    std::vector<T> GetSubpassDependencies(const size_t subpass_count)
+    std::vector<T> GetSubpassDependencies(const size_t m_SubpassCount)
     {
-        std::vector<T> dependencies(subpass_count - 1);
+        std::vector<T> dependencies(m_SubpassCount - 1);
 
-        if (subpass_count > 1)
+        if (m_SubpassCount > 1)
         {
-            for (uint32_t i = 0; i < to_u32(dependencies.size()); ++i)
+            for (uint32_t i = 0; i < ToUint32_t(dependencies.size()); ++i)
             {
                 // Transition input attachments from color attachment to shader read
                 dependencies[i].srcSubpass = i;
@@ -263,11 +265,11 @@ namespace engine
         auto attachment_descriptions = GetAttachmentDescriptions<T_AttachmentDescription>(attachments, load_store_infos);
 
         // Store attachments for every subpass
-        std::vector<std::vector<T_AttachmentReference>> input_attachments{subpass_count};
-        std::vector<std::vector<T_AttachmentReference>> color_attachments{subpass_count};
-        std::vector<std::vector<T_AttachmentReference>> depth_stencil_attachments{subpass_count};
-        std::vector<std::vector<T_AttachmentReference>> color_resolve_attachments{subpass_count};
-        std::vector<std::vector<T_AttachmentReference>> depth_resolve_attachments{subpass_count};
+        std::vector<std::vector<T_AttachmentReference>> input_attachments{m_SubpassCount};
+        std::vector<std::vector<T_AttachmentReference>> color_attachments{m_SubpassCount};
+        std::vector<std::vector<T_AttachmentReference>> depth_stencil_attachments{m_SubpassCount};
+        std::vector<std::vector<T_AttachmentReference>> color_resolve_attachments{m_SubpassCount};
+        std::vector<std::vector<T_AttachmentReference>> depth_resolve_attachments{m_SubpassCount};
 
         for (size_t i = 0; i < subpasses.size(); ++i)
         {
@@ -305,7 +307,7 @@ namespace engine
                                   { return IsDepthStencilFormat(attachment.format); });
                 if (it != attachments.end())
                 {
-                    auto i_depth_stencil = vkb::to_u32(std::distance(attachments.begin(), it));
+                    auto i_depth_stencil = ToUint32_t(std::distance(attachments.begin(), it));
                     auto initial_layout = it->initial_layout == VK_IMAGE_LAYOUT_UNDEFINED ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL : it->initial_layout;
                     depth_stencil_attachments[i].push_back(GetAttachmentReference<T_AttachmentReference>(i_depth_stencil, initial_layout));
 
@@ -320,7 +322,7 @@ namespace engine
         }
 
         std::vector<T_SubpassDescription> subpass_descriptions;
-        subpass_descriptions.reserve(subpass_count);
+        subpass_descriptions.reserve(m_SubpassCount);
         VkSubpassDescriptionDepthStencilResolveKHR depth_resolve{};
         for (size_t i = 0; i < subpasses.size(); ++i)
         {
@@ -331,10 +333,10 @@ namespace engine
             subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
             subpass_description.pInputAttachments = input_attachments[i].empty() ? nullptr : input_attachments[i].data();
-            subpass_description.inputAttachmentCount = to_u32(input_attachments[i].size());
+            subpass_description.inputAttachmentCount = ToUint32_t(input_attachments[i].size());
 
             subpass_description.pColorAttachments = color_attachments[i].empty() ? nullptr : color_attachments[i].data();
-            subpass_description.colorAttachmentCount = to_u32(color_attachments[i].size());
+            subpass_description.colorAttachmentCount = ToUint32_t(color_attachments[i].size());
 
             subpass_description.pResolveAttachments = color_resolve_attachments[i].empty() ? nullptr : color_resolve_attachments[i].data();
 
@@ -371,7 +373,7 @@ namespace engine
             subpass_description.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
             uint32_t default_depth_stencil_attachment{VK_ATTACHMENT_UNUSED};
 
-            for (uint32_t k = 0U; k < to_u32(attachment_descriptions.size()); ++k)
+            for (uint32_t k = 0U; k < ToUint32_t(attachment_descriptions.size()); ++k)
             {
                 if (IsDepthStencilFormat(attachments[k].format))
                 {
@@ -399,24 +401,24 @@ namespace engine
 
         SetAttachmentLayouts<T_SubpassDescription, T_AttachmentDescription, T_AttachmentReference>(subpass_descriptions, attachment_descriptions);
 
-        color_output_count.reserve(subpass_count);
-        for (size_t i = 0; i < subpass_count; i++)
+        m_ColorOutputCount.reserve(m_SubpassCount);
+        for (size_t i = 0; i < m_SubpassCount; i++)
         {
-            color_output_count.push_back(to_u32(color_attachments[i].size()));
+            m_ColorOutputCount.push_back(ToUint32_t(color_attachments[i].size()));
         }
 
-        const auto &subpass_dependencies = GetSubpassDependencies<T_SubpassDependency>(subpass_count);
+        const auto &subpass_dependencies = GetSubpassDependencies<T_SubpassDependency>(m_SubpassCount);
 
         T_RenderPassCreateInfo create_info{};
         SetStructureType(create_info);
-        create_info.attachmentCount = to_u32(attachment_descriptions.size());
+        create_info.attachmentCount = ToUint32_t(attachment_descriptions.size());
         create_info.pAttachments = attachment_descriptions.data();
-        create_info.subpassCount = to_u32(subpass_descriptions.size());
+        create_info.subpassCount = ToUint32_t(subpass_descriptions.size());
         create_info.pSubpasses = subpass_descriptions.data();
-        create_info.dependencyCount = to_u32(subpass_dependencies.size());
+        create_info.dependencyCount = ToUint32_t(subpass_dependencies.size());
         create_info.pDependencies = subpass_dependencies.data();
 
-        auto result = CreateVkRenderpass(device.get_handle(), create_info, &handle);
+        auto result = CreateVkRenderpass(m_Device.GetHandle(), create_info, &m_Handle);
 
         if (result != VK_SUCCESS)
         {

@@ -20,8 +20,10 @@
 #include "vulkan_api/core/pipeline.h"
 #include "vulkan_api/core/pipeline_layout.h"
 #include "vulkan_api/core/render_pass.h"
+#include "vulkan_api/render_target.h"
 #include "renderer/shader.h"
 #include "vulkan_api/resource_cache.h"
+
 #include "common/helpers.h"
 
 namespace engine

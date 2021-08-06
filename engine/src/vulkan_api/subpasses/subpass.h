@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/shader.h"
+#include "vulkan_api/rendering/pipeline_state.h"
 #include "vulkan_api/core/buffer_pool.h"
 #include "renderer/shader.h"
 #include "common/glm.h"
@@ -10,6 +11,7 @@ namespace engine
     class CommandBuffer;
     class ShaderSource;
     class RenderContext;
+    class RenderTarget;
 
     struct alignas(16) LightInfo
     {

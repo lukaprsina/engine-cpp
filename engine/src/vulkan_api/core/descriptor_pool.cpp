@@ -1,6 +1,7 @@
 #include "vulkan_api/core/descriptor_pool.h"
 
 #include "vulkan_api/core/descriptor_set_layout.h"
+#include "vulkan_api/device.h"
 
 namespace engine
 {
@@ -31,6 +32,39 @@ namespace engine
 
     DescriptorPool::~DescriptorPool()
     {
+    }
+
+    VkDescriptorSet DescriptorPool::Allocate()
+    {
+        m_PoolIndex = FindAvailablePool(m_PoolIndex);
+
+        // Increment allocated set count for the current pool
+        ++m_PoolSetsCount[m_PoolIndex];
+
+        VkDescriptorSetLayout set_layout = GetDescriptorSetLayout().GetHandle();
+
+        VkDescriptorSetAllocateInfo alloc_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+        alloc_info.descriptorPool = m_Pools[m_PoolIndex];
+        alloc_info.descriptorSetCount = 1;
+        alloc_info.pSetLayouts = &set_layout;
+
+        VkDescriptorSet handle = VK_NULL_HANDLE;
+
+        // Allocate a new descriptor set from the current pool
+        auto result = vkAllocateDescriptorSets(m_Device.GetHandle(), &alloc_info, &handle);
+
+        if (result != VK_SUCCESS)
+        {
+            // Decrement allocated set count for the current pool
+            --m_PoolSetsCount[m_PoolIndex];
+
+            return VK_NULL_HANDLE;
+        }
+
+        // Store mapping between the descriptor set and the pool
+        m_SetPoolMapping.emplace(handle, m_PoolIndex);
+
+        return handle;
     }
 
     const DescriptorSetLayout &DescriptorPool::GetDescriptorSetLayout() const

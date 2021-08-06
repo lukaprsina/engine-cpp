@@ -80,6 +80,7 @@ namespace engine
     class ShaderVariant
     {
     public:
+        ShaderVariant() = default;
         ShaderVariant(std::string &&preamble, std::vector<std::string> &&processes);
 
         void AddDefine(const std::string &definition);

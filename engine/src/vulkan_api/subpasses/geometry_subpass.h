@@ -19,5 +19,6 @@ namespace engine
         virtual ~GeometrySubpass();
 
         virtual void Prepare() override;
+        virtual void Draw(CommandBuffer &command_buffer) override;
     };
 }

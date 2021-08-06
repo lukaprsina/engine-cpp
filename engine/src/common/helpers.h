@@ -6,6 +6,8 @@ ENG_DISABLE_WARNINGS()
 #include <glm/gtx/hash.hpp>
 ENG_ENABLE_WARNINGS()
 
+#include <set>
+
 namespace engine
 {
     template <typename T>

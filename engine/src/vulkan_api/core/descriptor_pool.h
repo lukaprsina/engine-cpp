@@ -14,6 +14,8 @@ namespace engine
                        uint32_t pool_size = MAX_SETS_PER_POOL);
         ~DescriptorPool();
 
+        VkDescriptorSet Allocate();
+
         const DescriptorSetLayout &GetDescriptorSetLayout() const;
 
     private:

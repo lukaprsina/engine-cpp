@@ -188,4 +188,16 @@ namespace engine
         other.m_Handle = VK_NULL_HANDLE;
     }
 
+    std::unique_ptr<VkDescriptorSetLayoutBinding> DescriptorSetLayout::GetLayoutBinding(uint32_t binding_index) const
+    {
+        auto it = m_BindingsLookup.find(binding_index);
+
+        if (it == m_BindingsLookup.end())
+        {
+            return nullptr;
+        }
+
+        return std::make_unique<VkDescriptorSetLayoutBinding>(it->second);
+    }
+
 }

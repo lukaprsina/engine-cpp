@@ -5,14 +5,11 @@
 #include "vulkan_api/core/descriptor_set_layout.h"
 #include "vulkan_api/core/descriptor_pool.h"
 #include "vulkan_api/core/render_pass.h"
-#include "vulkan_api/core/graphics_pipeline.h"
-#include "vulkan_api/core/compute_pipeline.h"
 #include "vulkan_api/core/descriptor_set.h"
 #include "vulkan_api/core/framebuffer.h"
 #include "vulkan_api/resource_record.h"
 #include "vulkan_api/resource_replay.h"
-
-#include <entt/entt.hpp>
+#include "vulkan_api/core/pipeline.h"
 
 namespace engine
 {
@@ -33,117 +30,67 @@ namespace engine
         ResourceCache &operator=(const ResourceCache &) = delete;
         ResourceCache &operator=(ResourceCache &&) = delete;
 
-        struct ShaderSourceLoader : entt::resource_loader<ShaderSourceLoader, ShaderSource>
-        {
-            std::shared_ptr<ShaderSource> load(const std::string &filename) const
-            {
-                return std::shared_ptr<ShaderSource>(new ShaderSource{filename});
-            }
-        };
+        ShaderModule &RequestShaderModule(VkShaderStageFlagBits stage, const ShaderSource &glsl_source, const ShaderVariant &shader_variant = {});
 
-        struct PipelineLayoutLoader : entt::resource_loader<PipelineLayoutLoader, PipelineLayout>
-        {
-            std::shared_ptr<PipelineLayout> load() const
-            {
-                return std::shared_ptr<PipelineLayout>(new PipelineLayout{});
-            }
-        };
+        PipelineLayout &RequestPipelineLayout(const std::vector<ShaderModule *> &shader_modules);
 
-        struct DescriptorSetLayoutLoader : entt::resource_loader<DescriptorSetLayoutLoader, DescriptorSetLayout>
-        {
-            std::shared_ptr<DescriptorSetLayout> load() const
-            {
-                return std::shared_ptr<DescriptorSetLayout>(new DescriptorSetLayout{});
-            }
-        };
+        DescriptorSetLayout &RequestDescriptorSetLayout(const uint32_t set_index,
+                                                        const std::vector<ShaderModule *> &shader_modules,
+                                                        const std::vector<ShaderResource> &set_resources);
 
-        struct RenderPassLoader : entt::resource_loader<RenderPassLoader, RenderPass>
-        {
-            std::shared_ptr<RenderPass> load() const
-            {
-                return std::shared_ptr<RenderPass>(new RenderPass{});
-            }
-        };
+        GraphicsPipeline &RequestGraphicsPipeline(PipelineState &pipeline_state);
 
-        struct GraphicsPipelineLoader : entt::resource_loader<GraphicsPipelineLoader, GraphicsPipeline>
-        {
-            std::shared_ptr<GraphicsPipeline> load() const
-            {
-                return std::shared_ptr<GraphicsPipeline>(new GraphicsPipeline{});
-            }
-        };
+        ComputePipeline &RequestComputePipeline(PipelineState &pipeline_state);
 
-        struct ComputePipelineLoader : entt::resource_loader<ComputePipelineLoader, ComputePipeline>
-        {
-            std::shared_ptr<ComputePipeline> load() const
-            {
-                return std::shared_ptr<ComputePipeline>(new ComputePipeline{});
-            }
-        };
+        DescriptorSet &RequestDescriptorSet(DescriptorSetLayout &descriptor_set_layout,
+                                            const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
+                                            const BindingMap<VkDescriptorImageInfo> &image_infos);
 
-        struct DescriptorSetLoader : entt::resource_loader<DescriptorSetLoader, DescriptorSet>
-        {
-            std::shared_ptr<DescriptorSet> load() const
-            {
-                return std::shared_ptr<DescriptorSet>(new DescriptorSet{});
-            }
-        };
+        RenderPass &RequestRenderPass(const std::vector<Attachment> &attachments,
+                                      const std::vector<LoadStoreInfo> &load_store_infos,
+                                      const std::vector<SubpassInfo> &subpasses);
 
-        struct FramebufferLoader : entt::resource_loader<FramebufferLoader, Framebuffer>
-        {
-            std::shared_ptr<Framebuffer> load(const RenderTarget &render_target, const RenderPass &render_pass) const
-            {
-                return std::shared_ptr<Framebuffer>(new Framebuffer{m_Device, render_target, render_pass});
-            }
-        };
+        Framebuffer &RequestFramebuffer(const RenderTarget &render_target,
+                                        const RenderPass &render_pass);
+
+        void SetPipelineCache(VkPipelineCache pipeline_cache);
+        void ClearPipelines();
+        void UpdateDescriptorSets(const std::vector<core::ImageView> &old_views, const std::vector<core::ImageView> &new_views);
+        void ClearFramebuffers();
+        void Clear();
 
         struct State
         {
-            entt::resource_cache<ShaderSource> shader_modules;
-            entt::resource_cache<PipelineLayout> pipeline_layouts;
-            entt::resource_cache<DescriptorSetLayout> descriptor_set_layouts;
-            entt::resource_cache<DescriptorPool> descriptor_pools;
-            entt::resource_cache<RenderPass> render_passes;
-            entt::resource_cache<GraphicsPipeline> graphics_pipelines;
-            entt::resource_cache<ComputePipeline> compute_pipelines;
-            entt::resource_cache<DescriptorSet> descriptor_sets;
-            entt::resource_cache<Framebuffer> framebuffers;
+            std::unordered_map<std::size_t, ShaderModule> shader_modules;
+            std::unordered_map<std::size_t, PipelineLayout> pipeline_layouts;
+            std::unordered_map<std::size_t, DescriptorSetLayout> descriptor_set_layouts;
+            std::unordered_map<std::size_t, DescriptorPool> descriptor_pools;
+            std::unordered_map<std::size_t, RenderPass> render_passes;
+            std::unordered_map<std::size_t, GraphicsPipeline> graphics_pipelines;
+            std::unordered_map<std::size_t, ComputePipeline> compute_pipelines;
+            std::unordered_map<std::size_t, DescriptorSet> descriptor_sets;
+            std::unordered_map<std::size_t, Framebuffer> framebuffers;
+        };
+
+        struct Mutexes
+        {
+            std::mutex shader_module;
+            std::mutex pipeline_layout;
+            std::mutex descriptor_set_layout;
+
+            std::mutex render_pass;
+            std::mutex graphics_pipeline;
+            std::mutex compute_pipeline;
+            std::mutex descriptor_set;
+            std::mutex framebuffer;
         };
 
     private:
         Device &m_Device;
         VkPipelineCache m_PipelineCache{VK_NULL_HANDLE};
-
+        ResourceRecord m_Recorder;
+        ResourceReplay m_Replayer;
         State m_State;
+        Mutexes m_Mutexes;
     };
 }
-/*
-struct Mutexes
-{
-    std::mutex shader_module;
-    std::mutex pipeline_layout;
-    std::mutex descriptor_set_layout;
-
-    std::mutex render_pass;
-    std::mutex graphics_pipeline;
-    std::mutex compute_pipeline;
-    std::mutex descriptor_set;
-    std::mutex framebuffer;
-};
-
-struct Loaders
-{
-    ShaderSourceLoader shader_module;
-    PipelineLayoutLoader pipeline_layout;
-    DescriptorSetLayoutLoader descriptor_set_layout;
-    RenderPassLoader render_pass;
-    GraphicsPipelineLoader graphics_pipeline;
-    ComputePipelineLoader compute_pipeline;
-    DescriptorSetLoader descriptor_set;
-    FramebufferLoader framebuffer;
-};
-
-const State &GetState() const { return m_State; }
-const Mutexes &GetMutexes() const { return m_Mutexes; }
-const Loaders &GetLoaders() const { return m_Loaders; }
-* /

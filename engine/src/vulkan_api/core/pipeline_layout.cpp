@@ -2,7 +2,9 @@
 
 namespace engine
 {
-    PipelineLayout::PipelineLayout()
+    PipelineLayout::PipelineLayout(Device &device,
+                                   const std::vector<ShaderModule *> &shader_modules)
+        : m_Device(device), m_ShaderModules(shader_modules)
     {
     }
 

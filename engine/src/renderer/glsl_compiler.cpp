@@ -94,8 +94,8 @@ namespace engine
         shader.setStringsWithLengthsAndNames(&shader_source, nullptr, file_name_list, 1);
         shader.setEntryPoint(entry_point.c_str());
         shader.setSourceEntryPoint(entry_point.c_str());
-        shader.setPreamble(shader_variant.get_preamble().c_str());
-        shader.addProcesses(shader_variant.get_processes());
+        shader.setPreamble(shader_variant.GetPreamble().c_str());
+        shader.addProcesses(shader_variant.GetProcesses());
         if (GLSLCompiler::EnvTargetLanguage != glslang::EShTargetLanguage::EShTargetNone)
         {
             shader.setEnvTarget(GLSLCompiler::EnvTargetLanguage, GLSLCompiler::EnvTargetLanguageVersion);

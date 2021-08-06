@@ -24,8 +24,9 @@
 #include "vulkan_api/core/pipeline.h"
 #include "vulkan_api/rendering/pipeline_state.h"
 #include "vulkan_api/render_target.h"
-
 #include "common/helpers.h"
+
+#include "entt/entt.hpp"
 
 namespace std
 {
@@ -724,7 +725,7 @@ namespace engine
 	}
 
 	template <class T, class... A>
-	T &request_resource(Device &device, ResourceRecord *recorder, std::unordered_map<std::size_t, T> &resources, A &...args)
+	T &RequestResource(Device &device, ResourceRecord *recorder, std::unordered_map<std::size_t, T> &resources, A &...args)
 	{
 		RecordHelper<T, A...> record_helper;
 

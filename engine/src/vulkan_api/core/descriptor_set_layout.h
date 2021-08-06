@@ -19,6 +19,8 @@ namespace engine
 
         VkDescriptorSetLayout GetHandle() const { return m_Handle; }
         const std::vector<VkDescriptorSetLayoutBinding> &GetBindings() const { return m_Bindings; }
+        std::unique_ptr<VkDescriptorSetLayoutBinding> GetLayoutBinding(uint32_t binding_index) const;
+        const uint32_t GetIndex() const { return m_SetIndex; }
 
     private:
         Device &m_Device;

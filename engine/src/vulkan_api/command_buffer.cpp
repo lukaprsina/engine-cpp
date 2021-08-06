@@ -124,7 +124,7 @@ namespace engine
         m_DescriptorSetLayoutBindingState.clear();
 
         auto &render_pass = GetRenderPass(render_target, load_store_infos, subpasses);
-        auto &framebuffer = m_CommandPool.GetDevice().GetResourceCache().GetLoaders().framebuffer.load(render_target, render_pass);
+        auto &framebuffer = m_CommandPool.GetDevice().GetResourceCache().RequestFramebuffer(render_target, render_pass);
 
         BeginRenderPass(render_target, render_pass, framebuffer, clear_values, contents);
     }
@@ -187,7 +187,7 @@ namespace engine
             ++subpass_info_it;
         }
 
-        return m_CommandPool.GetDevice().GetResourceCache().GetLoaders().render_pass.load(render_target.GetAttachments(), load_store_infos, subpass_infos);
+        return m_CommandPool.GetDevice().GetResourceCache().RequestRenderPass(render_target.GetAttachments(), load_store_infos, subpass_infos);
     }
 
     void CommandBuffer::NextSubpass()

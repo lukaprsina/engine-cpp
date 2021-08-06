@@ -32,7 +32,6 @@ namespace engine
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
-        // TODO std::filesystem
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
         std::vector<std::string> &GetArguments() { return s_Arguments; };
 

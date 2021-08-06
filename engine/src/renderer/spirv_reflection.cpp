@@ -10,7 +10,7 @@ namespace engine
                                        std::vector<ShaderResource> &resources,
                                        const ShaderVariant &variant)
         {
-            LOGE("Not implemented! Read shader resources of type.");
+            ENG_CORE_ERROR("Not implemented! Read shader resources of type.");
         }
 
         template <spv::Decoration T>
@@ -19,7 +19,7 @@ namespace engine
                                            ShaderResource & /*shader_resource*/,
                                            const ShaderVariant & /* variant */)
         {
-            LOGE("Not implemented! Read resources decoration of type.");
+            ENG_CORE_ERROR("Not implemented! Read resources decoration of type.");
         }
 
         template <>
@@ -110,7 +110,7 @@ namespace engine
                 array_size = variant.GetRuntimeArraySizes().at(resource.name);
             }
 
-            shader_resource.size = to_u32(compiler.get_declared_struct_size_runtime_array(spirv_type, array_size));
+            shader_resource.size = ToUint32_t(compiler.get_declared_struct_size_runtime_array(spirv_type, array_size));
         }
 
         inline void ReadResourceSize(const spirv_cross::Compiler &compiler,

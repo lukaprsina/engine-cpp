@@ -90,8 +90,6 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/descriptor_set_layout.h
     src/vulkan_api/core/descriptor_pool.h
     src/vulkan_api/core/render_pass.h
-    src/vulkan_api/core/graphics_pipeline.h
-    src/vulkan_api/core/compute_pipeline.h
     src/vulkan_api/core/descriptor_set.h
     src/vulkan_api/core/framebuffer.h
     src/scene/gltf_loader.h
@@ -136,8 +134,6 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/descriptor_set_layout.cpp   
     src/vulkan_api/core/descriptor_pool.cpp
     src/vulkan_api/core/render_pass.cpp
-    src/vulkan_api/core/graphics_pipeline.cpp
-    src/vulkan_api/core/compute_pipeline.cpp
     src/vulkan_api/core/descriptor_set.cpp
     src/vulkan_api/core/framebuffer.cpp
     src/scene/gltf_loader.cpp
