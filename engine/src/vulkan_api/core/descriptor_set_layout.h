@@ -7,5 +7,10 @@ namespace engine
     public:
         DescriptorSetLayout();
         ~DescriptorSetLayout();
+
+        VkDescriptorSetLayout GetHandle() const { return m_Handle; }
+
+    private:
+        VkDescriptorSetLayout m_Handle{VK_NULL_HANDLE};
     };
 }

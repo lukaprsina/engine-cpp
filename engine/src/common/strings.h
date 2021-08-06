@@ -26,4 +26,6 @@ namespace engine
     const std::string ToString(VkStencilOp operation);
     const std::string ToString(VkLogicOp operation);
     const std::string ToString(VkBlendOp operation);
+
+    std::vector<std::string> Split(const std::string &input, char delim);
 }

@@ -9,12 +9,18 @@
 #include "vulkan_api/core/compute_pipeline.h"
 #include "vulkan_api/core/descriptor_set.h"
 #include "vulkan_api/core/framebuffer.h"
-#include "vulkan_api/device.h"
 
 #include <entt/entt.hpp>
 
 namespace engine
 {
+    class Device;
+
+    namespace core
+    {
+        class ImageView;
+    }
+
     class ResourceCache
     {
     public:
@@ -102,41 +108,40 @@ namespace engine
             entt::resource_cache<Framebuffer> framebuffers;
         };
 
-        struct Mutexes
-        {
-            std::mutex shader_module;
-            std::mutex pipeline_layout;
-            std::mutex descriptor_set_layout;
-
-            std::mutex render_pass;
-            std::mutex graphics_pipeline;
-            std::mutex compute_pipeline;
-            std::mutex descriptor_set;
-            std::mutex framebuffer;
-        };
-
-        struct Loaders
-        {
-            ShaderSourceLoader shader_module;
-            PipelineLayoutLoader pipeline_layout;
-            DescriptorSetLayoutLoader descriptor_set_layout;
-            RenderPassLoader render_pass;
-            GraphicsPipelineLoader graphics_pipeline;
-            ComputePipelineLoader compute_pipeline;
-            DescriptorSetLoader descriptor_set;
-            FramebufferLoader framebuffer;
-        };
-
-        const State &GetState() const { return m_State; }
-        const Mutexes &GetMutexes() const { return m_Mutexes; }
-        const Loaders &GetLoaders() const { return m_Loaders; }
-
     private:
         Device &m_Device;
         VkPipelineCache m_PipelineCache{VK_NULL_HANDLE};
 
         State m_State;
-        Mutexes m_Mutexes;
-        Loaders m_Loaders;
     };
 }
+/*
+struct Mutexes
+{
+    std::mutex shader_module;
+    std::mutex pipeline_layout;
+    std::mutex descriptor_set_layout;
+
+    std::mutex render_pass;
+    std::mutex graphics_pipeline;
+    std::mutex compute_pipeline;
+    std::mutex descriptor_set;
+    std::mutex framebuffer;
+};
+
+struct Loaders
+{
+    ShaderSourceLoader shader_module;
+    PipelineLayoutLoader pipeline_layout;
+    DescriptorSetLayoutLoader descriptor_set_layout;
+    RenderPassLoader render_pass;
+    GraphicsPipelineLoader graphics_pipeline;
+    ComputePipelineLoader compute_pipeline;
+    DescriptorSetLoader descriptor_set;
+    FramebufferLoader framebuffer;
+};
+
+const State &GetState() const { return m_State; }
+const Mutexes &GetMutexes() const { return m_Mutexes; }
+const Loaders &GetLoaders() const { return m_Loaders; }
+* /

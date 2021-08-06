@@ -1,5 +1,11 @@
 #pragma once
 
+#include "common/glm.h"
+
+//ENG_DISABLE_WARNINGS()
+#include <glm/gtx/hash.hpp>
+//ENG_ENABLE_WARNINGS()
+
 #define ENG_ASSERT(condition) assert(condition)
 
 #define BIT(x) (1 << x)
@@ -20,25 +26,35 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-template <class T>
-uint32_t ToUint32_t(T value)
+namespace engine
 {
-    static_assert(std::is_arithmetic<T>::value, "T must be numeric");
-
-    if (static_cast<uintmax_t>(value) > static_cast<uintmax_t>(std::numeric_limits<uint32_t>::max()))
+    template <class T>
+    uint32_t ToUint32_t(T value)
     {
-        throw std::runtime_error("ToUint32_t() failed, value is too big to be converted to uint32_t");
+        static_assert(std::is_arithmetic<T>::value, "T must be numeric");
+
+        if (static_cast<uintmax_t>(value) > static_cast<uintmax_t>(std::numeric_limits<uint32_t>::max()))
+        {
+            throw std::runtime_error("ToUint32_t() failed, value is too big to be converted to uint32_t");
+        }
+
+        return static_cast<uint32_t>(value);
     }
 
-    return static_cast<uint32_t>(value);
-}
+    template <typename T>
+    inline std::vector<uint8_t> ToBytes(const T &value)
+    {
+        return std::vector<uint8_t>{reinterpret_cast<const uint8_t *>(&value),
+                                    reinterpret_cast<const uint8_t *>(&value) + sizeof(T)};
+    }
 
-template <typename T>
-inline std::vector<uint8_t> ToBytes(const T &value)
-{
-    return std::vector<uint8_t>{reinterpret_cast<const uint8_t *>(&value),
-                                reinterpret_cast<const uint8_t *>(&value) + sizeof(T)};
-}
+    template <class T>
+    inline void HashCombine(size_t &seed, const T &v)
+    {
+        std::hash<T> hasher;
+        glm::detail::hash_combine(seed, hasher(v));
+    }
 
-template <class T>
-using BindingMap = std::map<uint32_t, std::map<uint32_t, T>>;
+    template <class T>
+    using BindingMap = std::map<uint32_t, std::map<uint32_t, T>>;
+}

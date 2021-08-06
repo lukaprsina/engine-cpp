@@ -16,6 +16,7 @@ set(COMMON_FILES
     src/common/error.h
     src/common/vulkan.h
     src/common/strings.h
+    src/common/resource_caching.h
     #Source files
     src/common/error.cpp
     src/common/vulkan.cpp
@@ -99,6 +100,9 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/sampler.h
     src/vulkan_api/core/buffer.h
     src/vulkan_api/core/buffer_pool.h
+    src/vulkan_api/core/pipeline.h
+    src/renderer/glsl_compiler.h
+    src/renderer/spirv_reflection.h
 
     #Source files
     src/vulkan_api/instance.cpp
@@ -140,8 +144,11 @@ set(VULKAN_API_FILES
     src/vulkan_api/core/sampler.cpp
     src/vulkan_api/core/buffer.cpp
     src/vulkan_api/core/buffer_pool.cpp
-)
-
+    src/vulkan_api/core/pipeline.cpp
+    src/renderer/glsl_compiler.cpp
+    src/renderer/spirv_reflection.cpp
+    )
+    
 set(PROJECT_FILES
     ${CORE_FILES}
     ${COMMON_FILES}

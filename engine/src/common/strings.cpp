@@ -1228,9 +1228,9 @@ namespace engine
                                                    {VK_COLOR_COMPONENT_G_BIT, "G"},
                                                    {VK_COLOR_COMPONENT_B_BIT, "B"},
                                                    {VK_COLOR_COMPONENT_A_BIT, "A"}});
-    }
+    } */
 
-    std::vector<std::string> split(const std::string &input, char delim)
+    std::vector<std::string> Split(const std::string &input, char delim)
     {
         std::vector<std::string> tokens;
 
@@ -1242,5 +1242,5 @@ namespace engine
         }
 
         return tokens;
-    } */
+    }
 }

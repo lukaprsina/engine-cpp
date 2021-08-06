@@ -11,7 +11,7 @@ namespace engine
     class ShaderSource;
     class RenderContext;
 
-    struct alignas(16) Light
+    struct alignas(16) LightInfo
     {
         glm::vec4 position;  // position.w represents type of light
         glm::vec4 color;     // color.w represents light intensity
@@ -21,9 +21,9 @@ namespace engine
 
     struct LightingState
     {
-        std::vector<Light> directional_lights;
-        std::vector<Light> point_lights;
-        std::vector<Light> spot_lights;
+        std::vector<LightInfo> directional_lights;
+        std::vector<LightInfo> point_lights;
+        std::vector<LightInfo> spot_lights;
         // TODO
         BufferAllocation light_buffer;
     };

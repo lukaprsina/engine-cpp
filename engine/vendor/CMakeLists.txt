@@ -68,23 +68,22 @@ add_subdirectory(entt)
 target_link_libraries(Engine PRIVATE EnTT::EnTT)
 install(TARGETS EnTT)
 
-#shaderc
-option(SHADERC_SKIP_INSTALL "Skip installation" ON)
-option(SHADERC_SKIP_TESTS "Skip building tests" ON)
-option(SHADERC_SKIP_EXAMPLES "Skip building examples" ON)
+#glslang
+option(ENABLE_SPVREMAPPER OFF)
+option(ENABLE_GLSLANG_BINARIES OFF)
+option(ENABLE_HLSL OFF)
+option(ENABLE_OPT OFF)
+option(BUILD_TESTING OFF)
+option(BUILD_EXTERNAL OFF)
 
-add_subdirectory(shaderc)
-target_link_libraries(Engine PRIVATE shaderc)
-install(TARGETS shaderc)
+add_subdirectory(glslang)
+target_link_libraries(Engine PRIVATE glslang)
+install(TARGETS glslang)
 
-#spirv-reflect
-add_library(spirv-reflect STATIC
-${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect/spirv_reflect.h
-${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect/spirv_reflect.c)
+#spirv-cross
+add_subdirectory(spirv-cross)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-reflect)
-target_link_libraries(Engine PRIVATE spirv-reflect)
-install(TARGETS spirv-reflect)
 
 #tinygltf
 option(TINYGLTF_BUILD_LOADER_EXAMPLE "Build loader_example(load glTF and dump infos)" OFF)
