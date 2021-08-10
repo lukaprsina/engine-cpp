@@ -69,19 +69,35 @@ target_link_libraries(Engine PRIVATE EnTT::EnTT)
 install(TARGETS EnTT)
 
 #glslang
-option(ENABLE_SPVREMAPPER OFF)
-option(ENABLE_GLSLANG_BINARIES OFF)
-option(ENABLE_HLSL OFF)
-option(ENABLE_OPT OFF)
-option(BUILD_TESTING OFF)
-option(BUILD_EXTERNAL OFF)
+option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+option(BUILD_EXTERNAL "Build external dependencies in /External" ON)
 
 add_subdirectory(glslang)
+
+add_library(glslang-default-resource-limits
+                glslang/StandAlone/ResourceLimits.cpp)
+
+target_include_directories(glslang-default-resource-limits
+                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)      
+                
 target_link_libraries(Engine PRIVATE glslang)
+target_link_libraries(Engine PRIVATE glslang-default-resource-limits)
+target_link_libraries(Engine PRIVATE SPIRV)
 install(TARGETS glslang)
+install(TARGETS glslang-default-resource-limits)
+install(TARGETS SPIRV)
 
 #spirv-cross
 add_subdirectory(spirv-cross)
+target_link_libraries(Engine PRIVATE spirv-cross-core)
+target_link_libraries(Engine PRIVATE spirv-cross-core)
+target_link_libraries(Engine PRIVATE spirv-cross-glsl)
+target_link_libraries(Engine PRIVATE spirv-cross-cpp)
+target_link_libraries(Engine PRIVATE spirv-cross-reflect)
+target_link_libraries(Engine PRIVATE spirv-cross-msl)
+target_link_libraries(Engine PRIVATE spirv-cross-hlsl)
+target_link_libraries(Engine PRIVATE spirv-cross-util)
+target_link_libraries(Engine PRIVATE spirv-cross-c)
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
 

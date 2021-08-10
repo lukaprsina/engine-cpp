@@ -18,6 +18,19 @@ namespace engine
         Prepare();
     }
 
+    DescriptorSet::DescriptorSet(DescriptorSet &&other)
+        : m_Device{other.m_Device},
+          m_DescriptorSetLayout{other.m_DescriptorSetLayout},
+          m_DescriptorPool{other.m_DescriptorPool},
+          m_BufferInfos{std::move(other.m_BufferInfos)},
+          m_ImageInfos{std::move(other.m_ImageInfos)},
+          m_Handle{other.m_Handle},
+          m_WriteDescriptorSets{std::move(other.m_WriteDescriptorSets)},
+          m_UpdatedBindings{std::move(other.m_UpdatedBindings)}
+    {
+        other.m_Handle = VK_NULL_HANDLE;
+    }
+
     void DescriptorSet::Prepare()
     {
         if (!m_WriteDescriptorSets.empty())

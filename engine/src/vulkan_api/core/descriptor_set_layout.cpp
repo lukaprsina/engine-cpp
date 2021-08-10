@@ -176,14 +176,14 @@ namespace engine
 
     DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout &&other)
         : m_Device{other.m_Device},
-          m_ShaderModules{other.m_ShaderModules},
           m_Handle{other.m_Handle},
           m_SetIndex{other.m_SetIndex},
           m_Bindings{std::move(other.m_Bindings)},
           m_BindingFlags{std::move(other.m_BindingFlags)},
           m_BindingsLookup{std::move(other.m_BindingsLookup)},
           m_BindingFlagsLookup{std::move(other.m_BindingFlagsLookup)},
-          m_ResourcesLookup{std::move(other.m_ResourcesLookup)}
+          m_ResourcesLookup{std::move(other.m_ResourcesLookup)},
+          m_ShaderModules{other.m_ShaderModules}
     {
         other.m_Handle = VK_NULL_HANDLE;
     }

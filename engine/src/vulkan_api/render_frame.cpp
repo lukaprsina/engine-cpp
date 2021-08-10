@@ -1,5 +1,8 @@
 #include "vulkan_api/render_frame.h"
 
+#include "vulkan_api/device.h"
+#include "vulkan_api/queue_family.h"
+
 namespace engine
 {
     RenderFrame::RenderFrame(Device &device,

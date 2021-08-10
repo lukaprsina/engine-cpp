@@ -1,9 +1,9 @@
 #pragma once
 
-#include "vulkan_api/device.h"
-
 namespace engine
 {
+    class Device;
+
     class SemaphorePool
     {
     public:

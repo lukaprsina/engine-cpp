@@ -19,6 +19,7 @@ namespace engine
 
         VkDescriptorSetLayout GetHandle() const { return m_Handle; }
         const std::vector<VkDescriptorSetLayoutBinding> &GetBindings() const { return m_Bindings; }
+        const std::vector<VkDescriptorBindingFlagsEXT> &GetBindingFlags() const { return m_BindingFlags; }
         std::unique_ptr<VkDescriptorSetLayoutBinding> GetLayoutBinding(uint32_t binding_index) const;
         const uint32_t GetIndex() const { return m_SetIndex; }
 

@@ -52,14 +52,14 @@ namespace engine
         return RequestResource(m_Device, m_Recorder, m_Mutexes.pipeline_layout, m_State.descriptor_set_layouts, set_index, shader_modules, set_resources);
     }
 
-    GraphicsPipeline &ResourceCache::RequestGraphicsPipeline(PipelineState &pipeline_m_State)
+    GraphicsPipeline &ResourceCache::RequestGraphicsPipeline(PipelineState &pipeline_state)
     {
-        return RequestResource(m_Device, m_Recorder, m_Mutexes.graphics_pipeline, m_State.graphics_pipelines, m_PipelineCache, pipeline_m_State);
+        return RequestResource(m_Device, m_Recorder, m_Mutexes.graphics_pipeline, m_State.graphics_pipelines, m_PipelineCache, pipeline_state);
     }
 
-    ComputePipeline &ResourceCache::RequestComputePipeline(PipelineState &pipeline_m_State)
+    ComputePipeline &ResourceCache::RequestComputePipeline(PipelineState &pipeline_state)
     {
-        return RequestResource(m_Device, m_Recorder, m_Mutexes.compute_pipeline, m_State.compute_pipelines, m_PipelineCache, pipeline_m_State);
+        return RequestResource(m_Device, m_Recorder, m_Mutexes.compute_pipeline, m_State.compute_pipelines, m_PipelineCache, pipeline_state);
     }
 
     DescriptorSet &ResourceCache::RequestDescriptorSet(DescriptorSetLayout &descriptor_set_layout, const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos)

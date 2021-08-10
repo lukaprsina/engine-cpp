@@ -131,7 +131,10 @@ namespace engine
         void SetConstant(uint32_t constant_id, const T &data);
         void SetConstant(uint32_t constant_id, const std::vector<uint8_t> &value);
         void SetSpecializationConstantState(const std::map<uint32_t, std::vector<uint8_t>> &state);
-        const std::map<uint32_t, std::vector<uint8_t>> &GetSpecializationConstantState() const;
+        const std::map<uint32_t, std::vector<uint8_t>> &GetSpecializationConstantState() const
+        {
+            return m_SpecializationConstantState;
+        }
 
     private:
         bool m_Dirty{false};

@@ -23,4 +23,8 @@ namespace engine
     {
         // auto &device = m_RenderContext.GetDevice();
     }
+
+    void ForwardSubpass::Draw(CommandBuffer &command_buffer)
+    {
+    }
 }

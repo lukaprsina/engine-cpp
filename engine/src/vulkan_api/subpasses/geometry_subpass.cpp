@@ -19,4 +19,8 @@ namespace engine
     void GeometrySubpass::Prepare()
     {
     }
+
+    void GeometrySubpass::Draw(CommandBuffer &command_buffer)
+    {
+    }
 }

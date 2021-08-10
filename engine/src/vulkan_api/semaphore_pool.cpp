@@ -1,5 +1,7 @@
 #include "vulkan_api/semaphore_pool.h"
 
+#include "vulkan_api/device.h"
+
 namespace engine
 {
     SemaphorePool::SemaphorePool(Device &device)

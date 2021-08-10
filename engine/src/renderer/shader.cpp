@@ -183,4 +183,20 @@ namespace engine
         m_ID = hasher(std::string{reinterpret_cast<const char *>(m_Spirv.data()),
                                   reinterpret_cast<const char *>(m_Spirv.data() + m_Spirv.size())});
     }
+
+    ShaderModule::~ShaderModule()
+    {
+    }
+
+    ShaderModule::ShaderModule(ShaderModule &&other)
+        : m_Device{other.m_Device},
+          m_ID{other.m_ID},
+          m_Stage{other.m_Stage},
+          m_EntryPoint{other.m_EntryPoint},
+          m_Spirv{other.m_Spirv},
+          m_Resources{other.m_Resources},
+          m_InfoLog{other.m_InfoLog}
+    {
+        other.m_Stage = {};
+    }
 }

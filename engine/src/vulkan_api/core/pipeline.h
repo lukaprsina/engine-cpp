@@ -11,6 +11,17 @@ namespace engine
     public:
         Pipeline(Device &device);
         virtual ~Pipeline();
+        Pipeline(Pipeline &&other);
+        Pipeline(const Pipeline &) = delete;
+        Pipeline &operator=(const Pipeline &) = delete;
+        Pipeline &operator=(Pipeline &&) = delete;
+
+    protected:
+        PipelineState m_State;
+        VkPipeline m_Handle = VK_NULL_HANDLE;
+
+    private:
+        Device &m_Device;
     };
 
     class GraphicsPipeline : public Pipeline
@@ -19,7 +30,8 @@ namespace engine
         GraphicsPipeline(Device &device,
                          VkPipelineCache pipeline_cache,
                          PipelineState &pipeline_state);
-        ~GraphicsPipeline();
+        virtual ~GraphicsPipeline();
+        GraphicsPipeline(GraphicsPipeline &&) = default;
     };
 
     class ComputePipeline : public Pipeline
@@ -28,6 +40,7 @@ namespace engine
         ComputePipeline(Device &device,
                         VkPipelineCache pipeline_cache,
                         PipelineState &pipeline_state);
-        ~ComputePipeline();
+        virtual ~ComputePipeline();
+        ComputePipeline(ComputePipeline &&) = default;
     };
 }

@@ -121,6 +121,9 @@ namespace engine
         ShaderModule &operator=(ShaderModule &&) = delete;
 
         size_t GetID() const { return m_ID; }
+        VkShaderStageFlagBits GetStage() const { return m_Stage; }
+        const std::string &GetEntryPoint() const { return m_EntryPoint; }
+        const std::vector<uint32_t> &GetBinary() const { return m_Spirv; }
 
     private:
         Device &m_Device;
