@@ -183,7 +183,7 @@ namespace engine
 
     VkResult Device::WaitIdle()
     {
-        return VK_SUCCESS;
+        return vkDeviceWaitIdle(m_Handle);
     }
 
     bool Device::IsExtensionEnabled(const char *extension)

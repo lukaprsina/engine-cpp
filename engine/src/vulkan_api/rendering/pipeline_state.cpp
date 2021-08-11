@@ -94,7 +94,7 @@ namespace engine
         m_MultisampleState = {};
         m_DepthStencilState = {};
         m_ColorBlendState = {};
-        m_SubpassIndex = {};
+        m_SubpassIndex = {0U};
     }
 
     void PipelineState::SetPipelineLayout(PipelineLayout &new_pipeline_layout)

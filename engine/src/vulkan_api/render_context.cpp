@@ -40,7 +40,7 @@ namespace engine
             return;
         }
 
-        // TODO resource cache
+        m_Device.GetResourceCache().ClearFramebuffers();
 
         auto width = extent.width;
         auto height = extent.height;
@@ -267,6 +267,7 @@ namespace engine
         {
             m_Device.WaitIdle();
             UpdateSwapchain(surface_properties.currentExtent, m_PreTransform);
+            m_SurfaceExtent = surface_properties.currentExtent;
         }
     }
 
@@ -301,7 +302,7 @@ namespace engine
             ++frame_it;
         }
 
-        // TODO resource cache
+        m_Device.GetResourceCache().ClearFramebuffers();
     }
 
     void RenderContext::ReleaseOwnedSemaphore(VkSemaphore semaphore)

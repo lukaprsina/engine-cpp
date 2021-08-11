@@ -746,7 +746,7 @@ namespace engine
 		ENG_CORE_TRACE("Building #{} cache object ({})", res_id, res_type);
 
 // Only error handle in release
-#ifndef DEBUG
+#ifndef ENG_DEBUG
 		try
 		{
 #endif
@@ -766,7 +766,7 @@ namespace engine
 				size_t index = record_helper.record(*recorder, args...);
 				record_helper.index(*recorder, index, res_it->second);
 			}
-#ifndef DEBUG
+#ifndef ENG_DEBUG
 		}
 		catch (const std::exception &e)
 		{
