@@ -165,6 +165,7 @@ namespace engine
 
     Device::~Device()
     {
+        m_ResourceCache.Clear();
         m_CommandPool.reset();
         m_FencePool.reset();
 

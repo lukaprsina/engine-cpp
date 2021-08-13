@@ -83,6 +83,8 @@ namespace engine
 
         m_App.reset();
         m_Window.reset();
+
+        spdlog::drop_all();
     }
 
     void Platform::Close() const
