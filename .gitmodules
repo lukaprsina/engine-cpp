@@ -34,3 +34,15 @@
 [submodule "engine/vendor/spirv-cross"]
 	path = engine/vendor/spirv-cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross
+[submodule "engine/vendor/thread_pool"]
+	path = engine/vendor/thread_pool
+	url = https://github.com/progschj/ThreadPool
+[submodule "engine/vendor/astc-encoder"]
+	path = engine/vendor/astc-encoder
+	url = https://github.com/ARM-software/astc-encoder
+[submodule "engine/vendor/ktx-software"]
+	path = engine/vendor/ktx-software
+	url = https://github.com/KhronosGroup/KTX-Software
+[submodule "engine/vendor/stb"]
+	path = engine/vendor/stb
+	url = https://github.com/nothings/stb

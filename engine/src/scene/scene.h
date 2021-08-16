@@ -1,9 +1,11 @@
 #pragma once
 
-#include "entt/entt.hpp"
+#include <entt/entt.hpp>
 
 namespace engine
 {
+    class Entity;
+
     class Scene
     {
     public:
@@ -12,7 +14,10 @@ namespace engine
         ~Scene();
         Scene(const Scene &);
 
-        const entt::registry &GetRegistry() const { return m_Registry; }
+        template <typename T>
+        void OnComponentAdded(Entity entity, T &component);
+
+        entt::registry &GetRegistry() { return m_Registry; }
 
     private:
         std::string m_Name{"Unnamed scene"};

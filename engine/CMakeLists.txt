@@ -104,6 +104,7 @@ set(VULKAN_API_FILES
     src/renderer/spirv_reflection.h
     src/vulkan_api/resource_record.h
     src/vulkan_api/resource_replay.h
+    src/scene/entity.h
 
     #Source files
     src/vulkan_api/instance.cpp
@@ -148,6 +149,7 @@ set(VULKAN_API_FILES
     src/renderer/spirv_reflection.cpp
     src/vulkan_api/resource_record.cpp
     src/vulkan_api/resource_replay.cpp
+    src/scene/entity.cpp
     )
     
 set(PROJECT_FILES

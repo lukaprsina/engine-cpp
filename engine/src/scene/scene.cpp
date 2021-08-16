@@ -1,5 +1,7 @@
 #include "scene/scene.h"
 
+#include "scene/entity.h"
+
 namespace engine
 {
     Scene::Scene()
@@ -16,6 +18,11 @@ namespace engine
     }
 
     Scene::Scene(const Scene &)
+    {
+    }
+
+    template <typename T>
+    void OnComponentAdded(Entity entity, T &component)
     {
     }
 }
