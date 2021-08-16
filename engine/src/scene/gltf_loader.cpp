@@ -5,7 +5,6 @@
 #include "core/timer.h"
 #include "scene/components/sampler.h"
 #include "scene/components/image.h"
-#include "scene/components/image/astc.h"
 #include "scene/components/light.h"
 #include "platform/filesystem.h"
 
@@ -384,7 +383,7 @@ namespace engine
         return std::make_unique<sg::Sampler>(name, std::move(vk_sampler));
     }
 
-    std::unique_ptr<sg::Image> GLTFLoader::ParseImage(const tinygltf::Image &gltf_image) const
+    std::unique_ptr<sg::Image> GLTFLoader::ParseImage(tinygltf::Image &gltf_image) const
     {
         std::unique_ptr<sg::Image> image{nullptr};
         auto image_uri = m_ModelPath / gltf_image.uri;
@@ -406,12 +405,12 @@ namespace engine
         // Check whether the format is supported by the GPU
         if (sg::IsAstc(image->GetFormat()))
         {
-            if (!m_Device.IsImageFormatSupported(image->GetFormat()))
+            /* if (!m_Device.IsImageFormatSupported(image->GetFormat()))
             {
                 ENG_CORE_WARN("ASTC not supported: decoding {}", image_uri.generic_string());
                 image = std::make_unique<sg::Astc>(*image);
                 image->GenerateMipmaps();
-            }
+            } */
         }
 
         image->CreateVkImage(m_Device);

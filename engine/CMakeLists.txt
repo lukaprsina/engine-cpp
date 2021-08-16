@@ -107,7 +107,6 @@ set(VULKAN_API_FILES
     src/scene/entity.h
     src/scene/components/sampler.h
     src/scene/components/image.h
-    src/scene/components/image/astc.h
     src/scene/components/image/ktx.h
     src/scene/components/image/stb.h
 
@@ -157,7 +156,6 @@ set(VULKAN_API_FILES
     src/scene/entity.cpp
     src/scene/components/sampler.cpp
     src/scene/components/image.cpp
-    src/scene/components/image/astc.cpp
     src/scene/components/image/ktx.cpp
     src/scene/components/image/stb.cpp
     )

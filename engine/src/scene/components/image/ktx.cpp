@@ -79,12 +79,12 @@ namespace engine
 			if (texture->pData)
 			{
 				// Already loaded
-				set_data(texture->pData, texture->dataSize);
+				SetData(texture->pData, texture->dataSize);
 			}
 			else
 			{
 				// Load
-				auto &mut_data = get_mut_data();
+				auto &mut_data = GetMutData();
 				auto size = texture->dataSize;
 				mut_data.resize(size);
 				auto load_data_result = ktxTexture_LoadImageData(texture, mut_data.data(), size);
@@ -95,10 +95,10 @@ namespace engine
 			}
 
 			// Update width and height
-			set_width(texture->baseWidth);
-			set_height(texture->baseHeight);
-			set_depth(texture->baseDepth);
-			set_layers(texture->numLayers);
+			SetWidth(texture->baseWidth);
+			SetHeight(texture->baseHeight);
+			SetDepth(texture->baseDepth);
+			SetLayers(texture->numLayers);
 
 			bool cubemap = false;
 
@@ -106,15 +106,15 @@ namespace engine
 			if (texture->numLayers == 1 && texture->numFaces == 6)
 			{
 				cubemap = true;
-				set_layers(texture->numFaces);
+				SetLayers(texture->numFaces);
 			}
 
 			// Update format
 			auto updated_format = ktxTexture_GetVkFormat(texture);
-			set_format(updated_format);
+			SetFormat(updated_format);
 
 			// Update mip levels
-			auto &mipmap_levels = get_mut_mipmaps();
+			auto &mipmap_levels = GetMutMipmaps();
 			mipmap_levels.resize(texture->numLevels);
 			auto result = ktxTexture_IterateLevels(texture, optimal_tiling_callback, &mipmap_levels);
 			if (result != KTX_SUCCESS)
@@ -147,7 +147,7 @@ namespace engine
 					}
 					offsets.push_back(layer_offsets);
 				}
-				set_offsets(offsets);
+				SetOffsets(offsets);
 			}
 			else
 			{
@@ -157,7 +157,7 @@ namespace engine
 				{
 					offsets[0].push_back(static_cast<VkDeviceSize>(mipmap_levels[level].offset));
 				}
-				set_offsets(offsets);
+				SetOffsets(offsets);
 			}
 
 			ktxTexture_Destroy(texture);

@@ -74,17 +74,17 @@ option(BUILD_EXTERNAL "Build external dependencies in /External" ON)
 
 add_subdirectory(glslang)
 
-add_library(glslang-default-resource-limits
-                glslang/StandAlone/ResourceLimits.cpp)
+#add_library(glslang-default-resource-limits
+#                glslang/StandAlone/ResourceLimits.cpp)
 
-target_include_directories(glslang-default-resource-limits
-                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)      
+#target_include_directories(glslang-default-resource-limits
+#                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)      
                 
 target_link_libraries(Engine PRIVATE glslang)
-target_link_libraries(Engine PRIVATE glslang-default-resource-limits)
+#target_link_libraries(Engine PRIVATE glslang-default-resource-limits)
 target_link_libraries(Engine PRIVATE SPIRV)
 install(TARGETS glslang)
-install(TARGETS glslang-default-resource-limits)
+#install(TARGETS glslang-default-resource-limits)
 install(TARGETS SPIRV)
 
 #spirv-cross
@@ -106,12 +106,15 @@ target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_poo
 #stb
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
 
-#astc-encoder
-add_subdirectory(astc-encoder)
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder/Source)
-
 #ktx-software
+option( KTX_FEATURE_DOC "Create KTX documentation" OFF )
+option( KTX_FEATURE_LOADTEST_APPS "Create load tests apps that load and display various KTX textures" OFF )
+option( KTX_FEATURE_STATIC_LIBRARY "Create static libraries (shared otherwise)" ON )
+option( KTX_FEATURE_TESTS "Create unit tests" OFF )
+
 add_subdirectory(ktx-software)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ktx-software/include)
+target_link_libraries(Engine PRIVATE ktx-software)
 
 
 #tinygltf

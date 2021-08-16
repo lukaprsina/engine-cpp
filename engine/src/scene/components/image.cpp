@@ -1,7 +1,6 @@
 #include "scene/components/image.h"
 
 #include "platform/filesystem.h"
-#include "scene/components/image/astc.h"
 #include "scene/components/image/ktx.h"
 #include "scene/components/image/stb.h"
 #include "vulkan_api/core/image.h"
@@ -48,7 +47,11 @@ namespace engine
                     format == VK_FORMAT_ASTC_12x12_SRGB_BLOCK);
         }
 
-        Image::Image()
+        Image::Image(const std::string &name, std::vector<uint8_t> &&data, std::vector<Mipmap> &&mipmaps)
+            : m_Name{name},
+              m_Data{std::move(data)},
+              m_Format{VK_FORMAT_R8G8B8A8_UNORM},
+              m_Mipmaps{std::move(mipmaps)}
         {
         }
 
@@ -66,10 +69,6 @@ namespace engine
             if (extension == "png" || extension == "jpg")
             {
                 image = std::make_unique<Stb>(name, data);
-            }
-            else if (extension == "astc")
-            {
-                image = std::make_unique<Astc>(name, data);
             }
             else if (extension == "ktx")
             {

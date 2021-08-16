@@ -47,7 +47,7 @@ namespace engine
 
         std::vector<std::unique_ptr<Light>> ParseKHRLightsPunctual();
         std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;
-        std::unique_ptr<sg::Image> ParseImage(const tinygltf::Image &gltf_image) const;
+        std::unique_ptr<sg::Image> ParseImage(tinygltf::Image &gltf_image) const;
 
         bool IsExtensionEnabled(const std::string &requested_extension);
     };
