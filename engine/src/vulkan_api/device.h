@@ -20,6 +20,7 @@ namespace engine
         VkResult WaitIdle();
         bool IsExtensionEnabled(const char *extension);
         bool IsExtensionSupported(const char *requested_extension) const;
+        bool IsImageFormatSupported(VkFormat format) const;
         const QueueFamily &GetSuitableGraphicsQueueFamily();
 
         VkDevice GetHandle() const { return m_Handle; }

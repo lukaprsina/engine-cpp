@@ -24,5 +24,6 @@ namespace engine
         }
 
         std::string ReadTextFile(const std::filesystem::path &path);
+        std::vector<uint8_t> ReadBinaryFile(const std::filesystem::path &path);
     }
 }

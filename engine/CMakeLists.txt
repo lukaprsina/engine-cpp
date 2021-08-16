@@ -105,6 +105,11 @@ set(VULKAN_API_FILES
     src/vulkan_api/resource_record.h
     src/vulkan_api/resource_replay.h
     src/scene/entity.h
+    src/scene/components/sampler.h
+    src/scene/components/image.h
+    src/scene/components/image/astc.h
+    src/scene/components/image/ktx.h
+    src/scene/components/image/stb.h
 
     #Source files
     src/vulkan_api/instance.cpp
@@ -150,6 +155,11 @@ set(VULKAN_API_FILES
     src/vulkan_api/resource_record.cpp
     src/vulkan_api/resource_replay.cpp
     src/scene/entity.cpp
+    src/scene/components/sampler.cpp
+    src/scene/components/image.cpp
+    src/scene/components/image/astc.cpp
+    src/scene/components/image/ktx.cpp
+    src/scene/components/image/stb.cpp
     )
     
 set(PROJECT_FILES

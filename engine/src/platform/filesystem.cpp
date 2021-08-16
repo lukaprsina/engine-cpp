@@ -69,5 +69,27 @@ namespace engine
             }
             throw std::runtime_error("Can't open file " + path.generic_string());
         }
+
+        std::vector<uint8_t> ReadBinaryFile(const std::filesystem::path &path)
+        {
+            std::vector<uint8_t> data;
+
+            std::ifstream file;
+
+            file.open(path, std::ios::in | std::ios::binary);
+
+            if (!file.is_open())
+                throw std::runtime_error("Failed to open file: " + path.generic_string());
+
+            file.seekg(0, std::ios::end);
+            uint64_t read_count = static_cast<uint64_t>(file.tellg());
+            file.seekg(0, std::ios::beg);
+
+            data.resize(static_cast<size_t>(read_count));
+            file.read(reinterpret_cast<char *>(data.data()), read_count);
+            file.close();
+
+            return data;
+        }
     }
 }

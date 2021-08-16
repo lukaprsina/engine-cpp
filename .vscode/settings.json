@@ -76,7 +76,8 @@
         "semaphore": "cpp",
         "*.inc": "cpp",
         "any": "cpp",
-        "netfwd": "cpp"
+        "netfwd": "cpp",
+        "cfenv": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
     "C_Cpp.errorSquiggles": "Enabled"

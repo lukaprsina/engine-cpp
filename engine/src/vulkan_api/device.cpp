@@ -205,6 +205,20 @@ namespace engine
         return it != m_DeviceExtensions.end();
     }
 
+    bool Device::IsImageFormatSupported(VkFormat format) const
+    {
+        VkImageFormatProperties format_properties;
+
+        auto result = vkGetPhysicalDeviceImageFormatProperties(m_Gpu.GetHandle(),
+                                                               format,
+                                                               VK_IMAGE_TYPE_2D,
+                                                               VK_IMAGE_TILING_OPTIMAL,
+                                                               VK_IMAGE_USAGE_SAMPLED_BIT,
+                                                               0, // no create flags
+                                                               &format_properties);
+        return result != VK_ERROR_FORMAT_NOT_SUPPORTED;
+    }
+
     const QueueFamily &Device::GetSuitableGraphicsQueueFamily()
     {
         for (auto &queue_family : m_QueueFamilies)

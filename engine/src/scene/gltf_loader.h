@@ -12,6 +12,11 @@ namespace engine
     class Device;
     class Scene;
     class Light;
+    namespace sg
+    {
+        class Sampler;
+        class Image;
+    }
 
     class GLTFLoader
     {
@@ -30,9 +35,9 @@ namespace engine
         Scene LoadScene(int scene_index = -1);
 
         void CheckExtensions();
-        void LoadLights(Scene &scene);
-        void LoadSamplers(Scene &scene);
-        void LoadImages(Scene &scene);
+        std::vector<std::unique_ptr<Light>> LoadLights(Scene &scene);
+        std::vector<std::unique_ptr<sg::Sampler>> LoadSamplers(Scene &scene);
+        std::vector<std::unique_ptr<sg::Image>> LoadImages(Scene &scene);
         void LoadTextures(Scene &scene);
         void LoadMaterials(Scene &scene);
         void LoadMeshes(Scene &scene);
@@ -41,6 +46,8 @@ namespace engine
         void LoadScenes(Scene &scene);
 
         std::vector<std::unique_ptr<Light>> ParseKHRLightsPunctual();
+        std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;
+        std::unique_ptr<sg::Image> ParseImage(const tinygltf::Image &gltf_image) const;
 
         bool IsExtensionEnabled(const std::string &requested_extension);
     };

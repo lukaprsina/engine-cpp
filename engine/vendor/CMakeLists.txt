@@ -100,6 +100,19 @@ target_link_libraries(Engine PRIVATE spirv-cross-util)
 target_link_libraries(Engine PRIVATE spirv-cross-c)
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
+#thread_pool
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
+
+#stb
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
+
+#astc-encoder
+add_subdirectory(astc-encoder)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder/Source)
+
+#ktx-software
+add_subdirectory(ktx-software)
+
 
 #tinygltf
 option(TINYGLTF_BUILD_LOADER_EXAMPLE "Build loader_example(load glTF and dump infos)" OFF)
