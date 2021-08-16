@@ -73,18 +73,10 @@ option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 option(BUILD_EXTERNAL "Build external dependencies in /External" ON)
 
 add_subdirectory(glslang)
-
-#add_library(glslang-default-resource-limits
-#                glslang/StandAlone/ResourceLimits.cpp)
-
-#target_include_directories(glslang-default-resource-limits
-#                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)      
                 
 target_link_libraries(Engine PRIVATE glslang)
-#target_link_libraries(Engine PRIVATE glslang-default-resource-limits)
 target_link_libraries(Engine PRIVATE SPIRV)
 install(TARGETS glslang)
-#install(TARGETS glslang-default-resource-limits)
 install(TARGETS SPIRV)
 
 #spirv-cross
@@ -104,7 +96,7 @@ target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cros
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
 
 #stb
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
+target_include_directories(stb INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
 
 #ktx-software
 option( KTX_FEATURE_DOC "Create KTX documentation" OFF )
