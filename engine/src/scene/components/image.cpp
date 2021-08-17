@@ -66,15 +66,15 @@ namespace engine
             auto data = fs::ReadBinaryFile(fs::path::Get(fs::path::Type::Assets, path));
             auto extension = path.extension().generic_string();
 
-            if (extension == "png" || extension == "jpg")
+            if (extension == ".png" || extension == ".jpg")
             {
                 image = std::make_unique<Stb>(name, data);
             }
-            else if (extension == "ktx")
+            else if (extension == ".ktx")
             {
                 image = std::make_unique<Ktx>(name, data);
             }
-            else if (extension == "ktx2")
+            else if (extension == ".ktx2")
             {
                 image = std::make_unique<Ktx>(name, data);
             }
@@ -88,8 +88,6 @@ namespace engine
 
             if (m_Mipmaps.size() > 1)
                 return;
-
-            // TODO
 
             auto extent = GetExtent();
             auto next_width = std::max<uint32_t>(1u, extent.width / 2);
@@ -145,6 +143,30 @@ namespace engine
                                                       flags);
 
             m_VkImageView = std::make_unique<core::ImageView>(*m_VkImage, image_view_type);
+        }
+
+        void Image::SetData(const uint8_t *raw_data, size_t size)
+        {
+            ENG_ASSERT(m_Data.empty() && "Image data already set");
+            m_Data = {raw_data, raw_data + size};
+        }
+
+        void Image::ClearData()
+        {
+            m_Data.clear();
+            m_Data.shrink_to_fit();
+        }
+
+        const core::Image &Image::GetVkImage() const
+        {
+            ENG_ASSERT(m_VkImage && "Vulkan image was not created");
+            return *m_VkImage;
+        }
+
+        const core::ImageView &Image::GetVkImageView() const
+        {
+            ENG_ASSERT(m_VkImageView && "Vulkan image view was not created");
+            return *m_VkImageView;
         }
     }
 }

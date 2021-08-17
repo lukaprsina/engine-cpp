@@ -34,7 +34,7 @@ namespace engine
             }
         }
 
-        //TODO
+        //TODO: buffer pools?
         /* for (auto &buffer_pools_per_usage : m_BufferPools)
         {
             for (auto &buffer_pool : buffer_pools_per_usage.second)

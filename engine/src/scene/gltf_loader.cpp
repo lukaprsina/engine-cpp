@@ -1,12 +1,17 @@
+#define TINYGLTF_IMPLEMENTATION
 #include "scene/gltf_loader.h"
 
 #include "vulkan_api/device.h"
 #include "scene/scene.h"
 #include "core/timer.h"
 #include "scene/components/sampler.h"
+#include "vulkan_api/fence_pool.h"
+#include "vulkan_api/command_pool.h"
 #include "scene/components/image.h"
+#include "scene/components/image/astc.h"
 #include "scene/components/light.h"
 #include "platform/filesystem.h"
+#include "vulkan_api/core/buffer.h"
 
 #include <ThreadPool.h>
 
@@ -82,6 +87,55 @@ namespace engine
                 return VK_SAMPLER_ADDRESS_MODE_REPEAT;
             }
         };
+
+        inline void UploadImageToGpu(CommandBuffer &command_buffer, core::Buffer &staging_buffer, sg::Image &image)
+        {
+            // Clean up the image data, as they are copied in the staging buffer
+            image.ClearData();
+
+            {
+                ImageMemoryBarrier memory_barrier{};
+                memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+                memory_barrier.new_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                memory_barrier.src_access_mask = 0;
+                memory_barrier.dst_access_mask = VK_ACCESS_TRANSFER_WRITE_BIT;
+                memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_HOST_BIT;
+                memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+                command_buffer.CreateImageMemoryBarrier(image.GetVkImageView(), memory_barrier);
+            }
+
+            // Create a buffer image copy for every mip level
+            auto &mipmaps = image.GetMipmaps();
+
+            std::vector<VkBufferImageCopy> buffer_copy_regions(mipmaps.size());
+
+            for (size_t i = 0; i < mipmaps.size(); ++i)
+            {
+                auto &mipmap = mipmaps[i];
+                auto &copy_region = buffer_copy_regions[i];
+
+                copy_region.bufferOffset = mipmap.offset;
+                copy_region.imageSubresource = image.GetVkImageView().GetSubresourceLayers();
+                // Update miplevel
+                copy_region.imageSubresource.mipLevel = mipmap.level;
+                copy_region.imageExtent = mipmap.extent;
+            }
+
+            command_buffer.CopyBufferToImage(staging_buffer, image.GetVkImage(), buffer_copy_regions);
+
+            {
+                ImageMemoryBarrier memory_barrier{};
+                memory_barrier.old_layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                memory_barrier.new_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                memory_barrier.src_access_mask = VK_ACCESS_TRANSFER_WRITE_BIT;
+                memory_barrier.dst_access_mask = VK_ACCESS_SHADER_READ_BIT;
+                memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+                memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+                command_buffer.CreateImageMemoryBarrier(image.GetVkImageView(), memory_barrier);
+            }
+        }
     }
 
     std::unordered_map<std::string, bool> GLTFLoader::m_SupportedExtensions = {
@@ -128,6 +182,8 @@ namespace engine
             ENG_CORE_WARN("{}", warn.c_str());
         }
 
+        m_ModelPath = fs::path::Get(fs::path::Type::Assets, file_name).parent_path();
+
         return std::make_unique<Scene>(LoadScene(scene_index));
     }
 
@@ -162,34 +218,32 @@ namespace engine
         }
     }
 
-    std::vector<std::unique_ptr<Light>> GLTFLoader::LoadLights(Scene &scene)
+    void GLTFLoader::LoadLights(Scene &scene)
     {
-        std::vector<std::unique_ptr<Light>> light_components = ParseKHRLightsPunctual();
-        return light_components;
+        m_Lights = ParseKHRLightsPunctual();
     }
 
-    std::vector<std::unique_ptr<sg::Sampler>> GLTFLoader::LoadSamplers(Scene &scene)
+    void GLTFLoader::LoadSamplers(Scene &scene)
     {
-        std::vector<std::unique_ptr<sg::Sampler>>
-            sampler_components(m_Model.samplers.size());
+        m_Samplers.resize(m_Model.samplers.size());
 
         for (size_t sampler_index = 0; sampler_index < m_Model.samplers.size(); sampler_index++)
         {
             auto sampler = ParseSampler(m_Model.samplers.at(sampler_index));
-            sampler_components[sampler_index] = std::move(sampler);
+            m_Samplers[sampler_index] = std::move(sampler);
         }
-
-        return sampler_components;
     }
 
-    std::vector<std::unique_ptr<sg::Image>> GLTFLoader::LoadImages(Scene &scene)
+    void GLTFLoader::LoadImages(Scene &scene)
     {
         Timer timer;
         timer.Start();
 
         auto thread_count = std::thread::hardware_concurrency();
 
+        // TODO: have central thread pool
         thread_count = thread_count == 0 ? 1 : thread_count;
+        // thread_count = 1;
         ThreadPool thread_pool(thread_count);
 
         auto image_count = ToUint32_t(m_Model.images.size());
@@ -209,6 +263,50 @@ namespace engine
 
             image_component_futures.push_back(std::move(fut));
         }
+
+        for (auto &fut : image_component_futures)
+        {
+            m_Images.push_back(fut.get());
+        }
+
+        std::vector<core::Buffer> transient_buffers;
+
+        auto &command_buffer = m_Device.RequestCommandBuffer();
+
+        command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, 0);
+
+        for (size_t image_index = 0; image_index < image_count; image_index++)
+        {
+            auto &image = m_Images.at(image_index);
+
+            core::Buffer stage_buffer{m_Device,
+                                      image->GetData().size(),
+                                      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                      VMA_MEMORY_USAGE_CPU_ONLY};
+
+            stage_buffer.Update(image->GetData());
+
+            UploadImageToGpu(command_buffer, stage_buffer, *image);
+
+            transient_buffers.push_back(std::move(stage_buffer));
+        }
+
+        command_buffer.End();
+
+        auto &queue = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+
+        queue.GetQueues()[0].Submit(command_buffer, m_Device.RequestFence());
+
+        m_Device.GetFencePool().Wait();
+        m_Device.GetFencePool().Reset();
+        m_Device.GetCommandPool().ResetPool();
+        m_Device.WaitIdle();
+
+        transient_buffers.clear();
+
+        auto elapsed_time = timer.Stop();
+
+        ENG_CORE_INFO("Time spent loading images: {} seconds across {} threads.", engine::ToString(elapsed_time), thread_count);
     }
 
     void GLTFLoader::LoadTextures(Scene &scene)
@@ -364,7 +462,7 @@ namespace engine
 
         VkSamplerAddressMode address_mode_u = FindWrapMode(gltf_sampler.wrapS);
         VkSamplerAddressMode address_mode_v = FindWrapMode(gltf_sampler.wrapT);
-        // TODO
+        // TODO: tinygltf incompatible
         VkSamplerAddressMode address_mode_w = FindWrapMode(TINYGLTF_TEXTURE_WRAP_REPEAT);
 
         VkSamplerCreateInfo sampler_info{};
@@ -402,15 +500,16 @@ namespace engine
             image = sg::Image::Load(gltf_image.name, image_uri);
         }
 
+        // TODO: astc old commit
         // Check whether the format is supported by the GPU
         if (sg::IsAstc(image->GetFormat()))
         {
-            /* if (!m_Device.IsImageFormatSupported(image->GetFormat()))
+            if (!m_Device.IsImageFormatSupported(image->GetFormat()))
             {
                 ENG_CORE_WARN("ASTC not supported: decoding {}", image_uri.generic_string());
                 image = std::make_unique<sg::Astc>(*image);
                 image->GenerateMipmaps();
-            } */
+            }
         }
 
         image->CreateVkImage(m_Device);

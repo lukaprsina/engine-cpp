@@ -2,6 +2,11 @@
 
 #include "platform/platform.h"
 
+ENG_DISABLE_WARNINGS()
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+ENG_ENABLE_WARNINGS()
+
 #include <fstream>
 
 namespace engine

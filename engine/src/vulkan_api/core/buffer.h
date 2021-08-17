@@ -17,7 +17,15 @@ namespace engine
 
             Buffer(Buffer &&other);
 
+            void Update(const uint8_t *data, size_t size, size_t offset = 0);
+            void Update(void *data, size_t size, size_t offset = 0);
+            void Update(const std::vector<uint8_t> &data, size_t offset = 0);
+
+            uint8_t *Map();
             void Unmap();
+            void Flush() const;
+
+            VkBuffer GetHandle() const { return m_Handle; }
 
         private:
             Device &m_Device;

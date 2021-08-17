@@ -43,5 +43,13 @@ namespace engine
     }
 
     template <class T>
+    inline std::string ToString(const T &value)
+    {
+        std::stringstream ss;
+        ss << std::fixed << value;
+        return ss.str();
+    }
+
+    template <class T>
     using BindingMap = std::map<uint32_t, std::map<uint32_t, T>>;
 }

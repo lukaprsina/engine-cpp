@@ -65,6 +65,7 @@ namespace engine
                                   const std::vector<std::unique_ptr<Subpass>> &subpasses);
         void NextSubpass();
         void EndRenderPass();
+        void CopyBufferToImage(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions);
 
         const VkCommandBuffer &GetHandle() const { return m_Handle; }
 

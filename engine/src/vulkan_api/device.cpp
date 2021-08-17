@@ -50,7 +50,8 @@ namespace engine
             }
         }
 
-        if (IsExtensionSupported("VK_KHR_get_memory_requirements2") &&
+        // TODO: extensions create errors
+        /* if (IsExtensionSupported("VK_KHR_get_memory_requirements2") &&
             IsExtensionSupported("VK_KHR_dedicated_allocation"))
         {
             m_EnabledExtensions.push_back("VK_KHR_get_memory_requirements2");
@@ -58,6 +59,13 @@ namespace engine
 
             ENG_CORE_INFO("Dedicated Allocation enabled");
         }
+
+        if (IsExtensionSupported("VK_KHR_device_group"))
+        {
+            m_EnabledExtensions.push_back("VK_KHR_device_group");
+
+            ENG_CORE_INFO("Multiple physical devices supported.");
+        } */
 
         std::vector<const char *> unsupported_extensions;
         for (auto &extension : requested_extensions)
@@ -137,7 +145,8 @@ namespace engine
         allocator_info.device = m_Handle;
         allocator_info.instance = gpu.GetInstance().GetHandle();
 
-        if (IsExtensionSupported("VK_KHR_get_memory_requirements2") &&
+        // TODO: extensions create errors
+        /* if (IsExtensionSupported("VK_KHR_get_memory_requirements2") &&
             IsExtensionSupported("VK_KHR_dedicated_allocation"))
         {
             allocator_info.flags |= VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT;
@@ -148,7 +157,7 @@ namespace engine
         if (IsExtensionSupported(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) && IsExtensionSupported(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME))
         {
             allocator_info.flags |= VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-        }
+        } */
 
         allocator_info.pVulkanFunctions = &vma_vulkan_func;
 
@@ -245,5 +254,15 @@ namespace engine
         }
 
         throw std::runtime_error("Queue not found");
+    }
+
+    VkFence Device::RequestFence()
+    {
+        return m_FencePool->RequestFence();
+    }
+
+    CommandBuffer &Device::RequestCommandBuffer()
+    {
+        return m_CommandPool->RequestCommandBuffer();
     }
 }

@@ -72,5 +72,15 @@ namespace engine
             assert(m_Image && "Image view is referring an invalid image");
             return *m_Image;
         }
+
+        VkImageSubresourceLayers ImageView::GetSubresourceLayers() const
+        {
+            VkImageSubresourceLayers subresource{};
+            subresource.aspectMask = m_SubresourceRange.aspectMask;
+            subresource.baseArrayLayer = m_SubresourceRange.baseArrayLayer;
+            subresource.layerCount = m_SubresourceRange.layerCount;
+            subresource.mipLevel = m_SubresourceRange.baseMipLevel;
+            return subresource;
+        }
     }
 }

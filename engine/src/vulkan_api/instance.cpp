@@ -150,6 +150,8 @@ namespace engine
         bool debug_utils = EnableDebugCallback(available_instance_extensions);
         bool validation_features = EnableValidationFeatures();
         AddSwapchainExtension(available_instance_extensions, headless);
+        // TODO: add instance extension system
+        m_EnabledExtensions.emplace_back("VK_KHR_device_group_creation");
         ValidateExtensions(required_extensions, available_instance_extensions);
 
         uint32_t validation_layer_count;

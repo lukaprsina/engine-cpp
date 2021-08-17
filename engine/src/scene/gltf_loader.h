@@ -35,15 +35,19 @@ namespace engine
         Scene LoadScene(int scene_index = -1);
 
         void CheckExtensions();
-        std::vector<std::unique_ptr<Light>> LoadLights(Scene &scene);
-        std::vector<std::unique_ptr<sg::Sampler>> LoadSamplers(Scene &scene);
-        std::vector<std::unique_ptr<sg::Image>> LoadImages(Scene &scene);
+        void LoadLights(Scene &scene);
+        void LoadSamplers(Scene &scene);
+        void LoadImages(Scene &scene);
         void LoadTextures(Scene &scene);
         void LoadMaterials(Scene &scene);
         void LoadMeshes(Scene &scene);
         void LoadCameras(Scene &scene);
         void LoadAnimations(Scene &scene);
         void LoadScenes(Scene &scene);
+
+        std::vector<std::unique_ptr<Light>> m_Lights;
+        std::vector<std::unique_ptr<sg::Sampler>> m_Samplers;
+        std::vector<std::unique_ptr<sg::Image>> m_Images;
 
         std::vector<std::unique_ptr<Light>> ParseKHRLightsPunctual();
         std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;

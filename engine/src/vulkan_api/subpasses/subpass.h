@@ -26,7 +26,7 @@ namespace engine
         std::vector<LightInfo> directional_lights;
         std::vector<LightInfo> point_lights;
         std::vector<LightInfo> spot_lights;
-        // TODO
+        // TODO: buffers?
         BufferAllocation light_buffer;
     };
 

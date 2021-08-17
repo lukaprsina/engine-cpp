@@ -286,4 +286,11 @@ namespace engine
     {
         vkCmdEndRenderPass(m_Handle);
     }
+
+    void CommandBuffer::CopyBufferToImage(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions)
+    {
+        vkCmdCopyBufferToImage(m_Handle, buffer.GetHandle(),
+                               image.GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                               ToUint32_t(regions.size()), regions.data());
+    }
 }

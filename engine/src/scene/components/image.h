@@ -31,8 +31,14 @@ namespace engine
             void GenerateMipmaps();
             void CreateVkImage(Device &device, VkImageViewType image_view_type = VK_IMAGE_VIEW_TYPE_2D, VkImageCreateFlags flags = 0);
 
+            void ClearData();
+            const std::string &GetName() const { return m_Name; }
             VkFormat GetFormat() const { return m_Format; }
             const VkExtent3D &GetExtent() const { return m_Mipmaps.at(0).extent; }
+            const std::vector<uint8_t> &GetData() const { return m_Data; }
+            const core::Image &GetVkImage() const;
+            const core::ImageView &GetVkImageView() const;
+            const std::vector<Mipmap> &GetMipmaps() const { return m_Mipmaps; }
 
         protected:
             std::vector<uint8_t> &GetMutData() { return m_Data; }

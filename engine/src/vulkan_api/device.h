@@ -23,12 +23,16 @@ namespace engine
         bool IsImageFormatSupported(VkFormat format) const;
         const QueueFamily &GetSuitableGraphicsQueueFamily();
 
+        QueueFamily &GetQueueFamilyByFlags(VkQueueFlags required_queue_flags);
+        VkFence RequestFence();
+        CommandBuffer &RequestCommandBuffer();
+
         VkDevice GetHandle() const { return m_Handle; }
         PhysicalDevice GetGPU() const { return m_Gpu; }
         VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
         ResourceCache &GetResourceCache() { return m_ResourceCache; }
-
-        QueueFamily &GetQueueFamilyByFlags(VkQueueFlags required_queue_flags);
+        CommandPool &GetCommandPool() { return *m_CommandPool; }
+        FencePool &GetFencePool() { return *m_FencePool; }
 
     private:
         PhysicalDevice &m_Gpu;
