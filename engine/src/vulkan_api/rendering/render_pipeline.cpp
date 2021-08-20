@@ -14,7 +14,7 @@ namespace engine
             subpass->Prepare();
         }
 
-        m_ClearValue[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+        m_ClearValue[0].color = {0.0f, 0.3f, 0.0f, 1.0f};
         m_ClearValue[1].depthStencil = {0.0f, ~0U};
     }
 

@@ -17,8 +17,8 @@ set(COMMON_FILES
     src/common/vulkan.h
     src/common/strings.h
     src/common/resource_caching.h
-    src/common/helpers.h
     # Source files
+    src/common/base.cpp
     src/common/error.cpp
     src/common/vulkan.cpp
     src/common/strings.cpp)
@@ -105,6 +105,13 @@ set(VULKAN_API_FILES
     src/scene/components/image/ktx.h
     src/scene/components/image/stb.h
     src/scene/components/image/astc.h
+    src/scene/components/texture.h
+    src/scene/components/material.h
+    src/scene/components/pbr_material.h
+    src/scene/components/mesh.h
+    src/scene/components/aabb.h
+    src/scene/components/submesh.h
+    src/scene/components/transform.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -153,7 +160,14 @@ set(VULKAN_API_FILES
     src/scene/components/image.cpp
     src/scene/components/image/ktx.cpp
     src/scene/components/image/stb.cpp
-    src/scene/components/image/astc.cpp)
+    src/scene/components/image/astc.cpp
+    src/scene/components/texture.cpp
+    src/scene/components/material.cpp
+    src/scene/components/pbr_material.cpp
+    src/scene/components/mesh.cpp
+    src/scene/components/aabb.cpp
+    src/scene/components/submesh.cpp
+    src/scene/components/transform.cpp)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})

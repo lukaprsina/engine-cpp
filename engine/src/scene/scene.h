@@ -12,10 +12,11 @@ namespace engine
         Scene();
         Scene(const std::string &name);
         ~Scene();
-        Scene(const Scene &);
 
         template <typename T>
-        void OnComponentAdded(Entity entity, T &component);
+        void OnComponentAdded(Entity &entity, T &component);
+
+        Entity CreateEntity();
 
         entt::registry &GetRegistry() { return m_Registry; }
 

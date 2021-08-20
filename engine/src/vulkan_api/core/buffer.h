@@ -26,6 +26,7 @@ namespace engine
             void Flush() const;
 
             VkBuffer GetHandle() const { return m_Handle; }
+            VkDeviceSize GetSize() const { return m_Size; }
 
         private:
             Device &m_Device;

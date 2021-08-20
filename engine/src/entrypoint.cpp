@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-#ifndef DEBUG
+#ifndef ENG_DEBUG
     try
     {
 #endif
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
         {
             platform.Terminate(engine::ExitCode::UnableToRun);
         }
-#ifndef DEBUG
+#ifndef ENG_DEBUG
     }
     catch (const std::exception &e)
     {

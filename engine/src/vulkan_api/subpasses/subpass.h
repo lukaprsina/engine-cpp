@@ -2,8 +2,12 @@
 
 #include "renderer/shader.h"
 #include "vulkan_api/rendering/pipeline_state.h"
+#include "scene/components/light.h"
+#include "scene/components/transform.h"
 #include "vulkan_api/core/buffer_pool.h"
+#include "vulkan_api/render_context.h"
 #include "renderer/shader.h"
+#include "scene/entity.h"
 #include "common/glm.h"
 
 namespace engine
@@ -15,10 +19,10 @@ namespace engine
 
     struct alignas(16) LightInfo
     {
-        glm::vec4 position;  // position.w represents type of light
-        glm::vec4 color;     // color.w represents light intensity
-        glm::vec4 direction; // direction.w represents range
-        glm::vec2 info;      // (only used for spot lights) info.x represents light inner cone angle, info.y represents light outer cone angle
+        glm::vec4 position;
+        glm::vec4 color;
+        glm::vec4 direction;
+        glm::vec2 info;
     };
 
     struct LightingState
@@ -26,9 +30,12 @@ namespace engine
         std::vector<LightInfo> directional_lights;
         std::vector<LightInfo> point_lights;
         std::vector<LightInfo> spot_lights;
-        // TODO: buffers?
         BufferAllocation light_buffer;
     };
+
+    extern const std::vector<std::string> light_type_definitions;
+
+    glm::mat4 VulkanStyleProjection(const glm::mat4 &proj);
 
     class Subpass
     {
@@ -41,8 +48,6 @@ namespace engine
         virtual void Prepare() = 0;
         virtual void Draw(CommandBuffer &command_buffer) = 0;
         void UpdateRenderTargetAttachments(RenderTarget &render_target);
-
-        RenderContext &get_render_context();
 
         const ShaderSource &GetVertexShader() const { return m_VertexShader; }
         const ShaderSource &GetFragmentShader() const { return m_FragmentShader; }
@@ -62,15 +67,77 @@ namespace engine
         void SetSampleCount(VkSampleCountFlagBits sample_count) { m_SampleCount = sample_count; }
         LightingState &GetLightingState() { return m_LightingState; }
 
+        template <typename T>
+        void AllocateLights(const std::vector<sg::Light *> &scene_lights,
+                            size_t light_count)
+        {
+            ENG_ASSERT(scene_lights.size() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");
+
+            m_LightingState.directional_lights.clear();
+            m_LightingState.point_lights.clear();
+            m_LightingState.spot_lights.clear();
+
+            for (auto &scene_light : scene_lights)
+            {
+                const auto &properties = scene_light->GetLightProperties();
+                auto &transform = scene_light->GetEntity().GetComponent<sg::Transform>();
+
+                LightInfo light{{transform.GetTranslation(), static_cast<float>(scene_light->GetLightType())},
+                                {properties.color, properties.intensity},
+                                {transform.GetRotation() * properties.direction, properties.range},
+                                {properties.inner_cone_angle, properties.outer_cone_angle}};
+
+                switch (scene_light->GetLightType())
+                {
+                case sg::LightType::Directional:
+                {
+                    if (m_LightingState.directional_lights.size() < light_count)
+                    {
+                        m_LightingState.directional_lights.push_back(light);
+                    }
+                    break;
+                }
+                case sg::LightType::Point:
+                {
+                    if (m_LightingState.point_lights.size() < light_count)
+                    {
+                        m_LightingState.point_lights.push_back(light);
+                    }
+                    break;
+                }
+                case sg::LightType::Spot:
+                {
+                    if (m_LightingState.spot_lights.size() < light_count)
+                    {
+                        m_LightingState.spot_lights.push_back(light);
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+            }
+
+            T light_info;
+
+            std::copy(m_LightingState.directional_lights.begin(), m_LightingState.directional_lights.end(), light_info.directional_lights);
+            std::copy(m_LightingState.point_lights.begin(), m_LightingState.point_lights.end(), light_info.point_lights);
+            std::copy(m_LightingState.spot_lights.begin(), m_LightingState.spot_lights.end(), light_info.spot_lights);
+
+            auto &render_frame = m_RenderContext.GetActiveFrame();
+            m_LightingState.light_buffer = render_frame.AllocateBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(T));
+            m_LightingState.light_buffer.Update(light_info);
+        }
+
     protected:
         RenderContext &m_RenderContext;
         VkSampleCountFlagBits m_SampleCount{VK_SAMPLE_COUNT_1_BIT};
         std::unordered_map<std::string, ShaderResourceMode> m_ResourceModeMap;
         LightingState m_LightingState{};
-
-    private:
         ShaderSource m_VertexShader;
         ShaderSource m_FragmentShader;
+
+    private:
         DepthStencilState m_DepthStencilState{};
         bool m_DisableDepthStencilAttachment{false};
         VkResolveModeFlagBits m_DepthStencilResolveMode{VK_RESOLVE_MODE_NONE};

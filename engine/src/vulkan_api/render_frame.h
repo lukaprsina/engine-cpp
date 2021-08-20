@@ -2,12 +2,20 @@
 
 #include "vulkan_api/command_pool.h"
 #include "vulkan_api/render_target.h"
+#include "vulkan_api/core/buffer_pool.h"
 #include "vulkan_api/fence_pool.h"
 #include "vulkan_api/semaphore_pool.h"
 
 namespace engine
 {
+    class Device;
     class QueueFamily;
+
+    enum BufferAllocationStrategy
+    {
+        OneAllocationPerBuffer,
+        MultipleAllocationsPerBuffer
+    };
 
     class RenderFrame
     {
@@ -17,6 +25,13 @@ namespace engine
                     size_t thread_count = 1);
         ~RenderFrame();
 
+        static constexpr uint32_t BUFFER_POOL_BLOCK_SIZE = 256;
+        const std::unordered_map<VkBufferUsageFlags, uint32_t> supported_usage_map = {
+            {VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 1},
+            {VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 2}, // x2 the size of BUFFER_POOL_BLOCK_SIZE since SSBOs are normally much larger than other types of buffers
+            {VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 1},
+            {VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 1}};
+
         void UpdateRenderTarget(std::unique_ptr<RenderTarget> &&render_target)
         {
             m_SwapchainRenderTarget = std::move(render_target);
@@ -25,6 +40,7 @@ namespace engine
         RenderTarget &GetRenderTarget() { return *m_SwapchainRenderTarget; }
 
         void Reset();
+        BufferAllocation AllocateBuffer(VkBufferUsageFlags usage, VkDeviceSize size, size_t thread_index = 0);
 
         VkFence RequestFence()
         {
@@ -63,6 +79,7 @@ namespace engine
         SemaphorePool m_SemaphorePool;
         std::unique_ptr<RenderTarget> m_SwapchainRenderTarget;
         size_t m_ThreadCount{1};
-        // std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> buffer_pools;
+        BufferAllocationStrategy m_BufferAllocationStrategy{BufferAllocationStrategy::MultipleAllocationsPerBuffer};
+        std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> m_BufferPools;
     };
 }

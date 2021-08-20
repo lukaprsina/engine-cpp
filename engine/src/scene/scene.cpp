@@ -17,12 +17,10 @@ namespace engine
     {
     }
 
-    Scene::Scene(const Scene &)
+    Entity Scene::CreateEntity()
     {
+        Entity entity{m_Registry.create(), this};
+        return entity;
     }
 
-    template <typename T>
-    void OnComponentAdded(Entity entity, T &component)
-    {
-    }
 }

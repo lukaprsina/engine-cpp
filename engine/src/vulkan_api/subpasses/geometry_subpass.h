@@ -8,6 +8,7 @@ namespace engine
     class ShaderSource;
     class Scene;
     class Camera;
+    class Scene;
 
     class GeometrySubpass : public Subpass
     {
@@ -20,5 +21,10 @@ namespace engine
 
         virtual void Prepare() override;
         virtual void Draw(CommandBuffer &command_buffer) override;
+
+    protected:
+        Scene &m_Scene;
+        uint32_t m_ThreadIndex{0};
+        RasterizationState m_BaseRasterizationState{};
     };
 }

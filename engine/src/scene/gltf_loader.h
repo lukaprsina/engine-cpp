@@ -5,17 +5,27 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #include <tiny_gltf.h>
 
-#include <filesystem>
+#include "scene/entity.h"
 
 namespace engine
 {
     class Device;
     class Scene;
-    class Light;
+
     namespace sg
     {
         class Sampler;
+        class Light;
         class Image;
+        class Texture;
+        class PBRMaterial;
+        class Mesh;
+        class Transform;
+    }
+
+    namespace core
+    {
+        class Buffer;
     }
 
     class GLTFLoader
@@ -31,28 +41,39 @@ namespace engine
         tinygltf::Model m_Model;
         std::filesystem::path m_ModelPath;
         static std::unordered_map<std::string, bool> m_SupportedExtensions;
+        std::vector<core::Buffer> m_TransientBuffers;
 
-        Scene LoadScene(int scene_index = -1);
+        void LoadScene(int scene_index = -1);
 
+        void LoadScenes(int scene_index);
         void CheckExtensions();
-        void LoadLights(Scene &scene);
-        void LoadSamplers(Scene &scene);
-        void LoadImages(Scene &scene);
-        void LoadTextures(Scene &scene);
-        void LoadMaterials(Scene &scene);
-        void LoadMeshes(Scene &scene);
-        void LoadCameras(Scene &scene);
-        void LoadAnimations(Scene &scene);
-        void LoadScenes(Scene &scene);
+        void LoadLights();
+        void LoadSamplers();
+        void LoadImages();
+        void LoadTextures();
+        void LoadMaterials();
+        void LoadMeshes();
+        void LoadCameras();
+        void LoadAnimations();
+        void LoadNodes();
 
-        std::vector<std::unique_ptr<Light>> m_Lights;
+        std::unique_ptr<Scene> m_Scene;
+
         std::vector<std::unique_ptr<sg::Sampler>> m_Samplers;
         std::vector<std::unique_ptr<sg::Image>> m_Images;
+        std::vector<std::unique_ptr<sg::Texture>> m_Textures;
+        std::vector<std::unique_ptr<sg::PBRMaterial>> m_Materials;
 
-        std::vector<std::unique_ptr<Light>> ParseKHRLightsPunctual();
+        void ParseKHRLightsPunctual();
         std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;
         std::unique_ptr<sg::Image> ParseImage(tinygltf::Image &gltf_image) const;
+        std::unique_ptr<sg::Texture> ParseTexture(const tinygltf::Texture &gltf_texture) const;
+        std::unique_ptr<sg::PBRMaterial> ParseMaterial(const tinygltf::Material &gltf_material) const;
+        Entity ParseMesh(const tinygltf::Mesh &gltf_mesh) const;
+        Entity ParseNode(tinygltf::Node &gltf_node);
 
         bool IsExtensionEnabled(const std::string &requested_extension);
+        std::unique_ptr<sg::Sampler> CreateDefaultSampler();
+        std::unique_ptr<sg::PBRMaterial> CreateDefaultMaterial();
     };
 }

@@ -5,15 +5,25 @@
 #include "scene/scene.h"
 #include "core/timer.h"
 #include "scene/components/sampler.h"
+#include "scene/entity.h"
 #include "vulkan_api/fence_pool.h"
 #include "vulkan_api/command_pool.h"
 #include "scene/components/image.h"
+#include "scene/components/texture.h"
 #include "scene/components/image/astc.h"
 #include "scene/components/light.h"
+#include "scene/components/pbr_material.h"
+#include "scene/components/mesh.h"
+#include "scene/components/submesh.h"
+#include "scene/components/transform.h"
 #include "platform/filesystem.h"
 #include "vulkan_api/core/buffer.h"
 
 #include <ThreadPool.h>
+#include "common/glm.h"
+ENG_DISABLE_WARNINGS()
+#include <glm/gtc/type_ptr.hpp>
+ENG_ENABLE_WARNINGS()
 
 #define KHR_LIGHTS_PUNCTUAL_EXTENSION "KHR_lights_punctual"
 
@@ -136,6 +146,177 @@ namespace engine
                 command_buffer.CreateImageMemoryBarrier(image.GetVkImageView(), memory_barrier);
             }
         }
+
+        inline std::vector<uint8_t> GetAttributeData(const tinygltf::Model *model, uint32_t accessorId)
+        {
+            auto &accessor = model->accessors.at(accessorId);
+            auto &bufferView = model->bufferViews.at(accessor.bufferView);
+            auto &buffer = model->buffers.at(bufferView.buffer);
+
+            size_t stride = accessor.ByteStride(bufferView);
+            size_t startByte = accessor.byteOffset + bufferView.byteOffset;
+            size_t endByte = startByte + accessor.count * stride;
+
+            return {buffer.data.begin() + startByte, buffer.data.begin() + endByte};
+        };
+
+        inline VkFormat GetAttributeFormat(const tinygltf::Model *model, uint32_t accessorId)
+        {
+            auto &accessor = model->accessors.at(accessorId);
+
+            VkFormat format;
+
+            switch (accessor.componentType)
+            {
+            case TINYGLTF_COMPONENT_TYPE_BYTE:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R8G8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R8G8B8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R8G8B8A8_SINT}};
+
+                format = mapped_format.at(accessor.type);
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R8_UINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R8G8_UINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R8G8B8_UINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R8G8B8A8_UINT}};
+
+                static const std::map<int, VkFormat> mapped_format_normalize = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R8_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC2, VK_FORMAT_R8G8_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC3, VK_FORMAT_R8G8B8_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC4, VK_FORMAT_R8G8B8A8_UNORM}};
+
+                if (accessor.normalized)
+                {
+                    format = mapped_format_normalize.at(accessor.type);
+                }
+                else
+                {
+                    format = mapped_format.at(accessor.type);
+                }
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_SHORT:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R8G8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R8G8B8_SINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R8G8B8A8_SINT}};
+
+                format = mapped_format.at(accessor.type);
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R16_UINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R16G16_UINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R16G16B16_UINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R16G16B16A16_UINT}};
+
+                static const std::map<int, VkFormat> mapped_format_normalize = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R16_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC2, VK_FORMAT_R16G16_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC3, VK_FORMAT_R16G16B16_UNORM},
+                                                                                {TINYGLTF_TYPE_VEC4, VK_FORMAT_R16G16B16A16_UNORM}};
+
+                if (accessor.normalized)
+                {
+                    format = mapped_format_normalize.at(accessor.type);
+                }
+                else
+                {
+                    format = mapped_format.at(accessor.type);
+                }
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_INT:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R32_SINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R32G32_SINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R32G32B32_SINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R32G32B32A32_SINT}};
+
+                format = mapped_format.at(accessor.type);
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R32_UINT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R32G32_UINT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R32G32B32_UINT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R32G32B32A32_UINT}};
+
+                format = mapped_format.at(accessor.type);
+
+                break;
+            }
+            case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            {
+                static const std::map<int, VkFormat> mapped_format = {{TINYGLTF_TYPE_SCALAR, VK_FORMAT_R32_SFLOAT},
+                                                                      {TINYGLTF_TYPE_VEC2, VK_FORMAT_R32G32_SFLOAT},
+                                                                      {TINYGLTF_TYPE_VEC3, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                      {TINYGLTF_TYPE_VEC4, VK_FORMAT_R32G32B32A32_SFLOAT}};
+
+                format = mapped_format.at(accessor.type);
+
+                break;
+            }
+            default:
+            {
+                format = VK_FORMAT_UNDEFINED;
+                break;
+            }
+            }
+
+            return format;
+        };
+
+        inline std::vector<uint8_t> ConvertUnderlyingDataStride(const std::vector<uint8_t> &src_data, uint32_t src_stride, uint32_t dst_stride)
+        {
+            auto elem_count = ToUint32_t(src_data.size()) / src_stride;
+
+            std::vector<uint8_t> result(elem_count * dst_stride);
+
+            for (uint32_t idxSrc = 0, idxDst = 0;
+                 idxSrc < src_data.size() && idxDst < result.size();
+                 idxSrc += src_stride, idxDst += dst_stride)
+            {
+                std::copy(src_data.begin() + idxSrc, src_data.begin() + idxSrc + src_stride, result.begin() + idxDst);
+            }
+
+            return result;
+        }
+
+        inline size_t GetAttributeSize(const tinygltf::Model *model, uint32_t accessorId)
+        {
+            return model->accessors.at(accessorId).count;
+        };
+
+        inline size_t GetAttributeStride(const tinygltf::Model *model, uint32_t accessorId)
+        {
+            auto &accessor = model->accessors.at(accessorId);
+            auto &bufferView = model->bufferViews.at(accessor.bufferView);
+
+            return accessor.ByteStride(bufferView);
+        };
+
+        inline tinygltf::Value *GetExtension(tinygltf::ExtensionMap &tinygltf_extensions, const std::string &extension)
+        {
+            auto it = tinygltf_extensions.find(extension);
+            if (it != tinygltf_extensions.end())
+                return &it->second;
+
+            else
+                return nullptr;
+        }
     }
 
     std::unordered_map<std::string, bool> GLTFLoader::m_SupportedExtensions = {
@@ -184,16 +365,19 @@ namespace engine
 
         m_ModelPath = fs::path::Get(fs::path::Type::Assets, file_name).parent_path();
 
-        return std::make_unique<Scene>(LoadScene(scene_index));
+        LoadScene(scene_index);
+        return std::move(m_Scene);
     }
 
-    Scene GLTFLoader::LoadScene(int scene_index)
+    void GLTFLoader::LoadScene(int scene_index)
     {
-        auto scene = Scene();
-        LoadLights(scene);
-        LoadSamplers(scene);
-        LoadImages(scene);
-        return scene;
+        LoadScenes(scene_index);
+        LoadLights();
+        LoadSamplers();
+        LoadImages();
+        LoadTextures();
+        LoadMaterials();
+        LoadMeshes();
     }
 
     void GLTFLoader::CheckExtensions()
@@ -218,12 +402,12 @@ namespace engine
         }
     }
 
-    void GLTFLoader::LoadLights(Scene &scene)
+    void GLTFLoader::LoadLights()
     {
-        m_Lights = ParseKHRLightsPunctual();
+        ParseKHRLightsPunctual();
     }
 
-    void GLTFLoader::LoadSamplers(Scene &scene)
+    void GLTFLoader::LoadSamplers()
     {
         m_Samplers.resize(m_Model.samplers.size());
 
@@ -234,7 +418,7 @@ namespace engine
         }
     }
 
-    void GLTFLoader::LoadImages(Scene &scene)
+    void GLTFLoader::LoadImages()
     {
         Timer timer;
         timer.Start();
@@ -269,8 +453,6 @@ namespace engine
             m_Images.push_back(fut.get());
         }
 
-        std::vector<core::Buffer> transient_buffers;
-
         auto &command_buffer = m_Device.RequestCommandBuffer();
 
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, 0);
@@ -288,7 +470,7 @@ namespace engine
 
             UploadImageToGpu(command_buffer, stage_buffer, *image);
 
-            transient_buffers.push_back(std::move(stage_buffer));
+            m_TransientBuffers.push_back(std::move(stage_buffer));
         }
 
         command_buffer.End();
@@ -302,48 +484,218 @@ namespace engine
         m_Device.GetCommandPool().ResetPool();
         m_Device.WaitIdle();
 
-        transient_buffers.clear();
+        m_TransientBuffers.clear();
 
         auto elapsed_time = timer.Stop();
 
         ENG_CORE_INFO("Time spent loading images: {} seconds across {} threads.", engine::ToString(elapsed_time), thread_count);
     }
 
-    void GLTFLoader::LoadTextures(Scene &scene)
+    void GLTFLoader::LoadTextures()
+    {
+        auto default_sampler = CreateDefaultSampler();
+
+        for (auto &gltf_texture : m_Model.textures)
+        {
+            auto texture = ParseTexture(gltf_texture);
+
+            texture->SetImage(*m_Images.at(gltf_texture.source));
+
+            if (gltf_texture.sampler >= 0 && gltf_texture.sampler < static_cast<int>(m_Samplers.size()))
+            {
+                texture->SetSampler(*m_Samplers.at(gltf_texture.sampler));
+            }
+            else
+            {
+                if (gltf_texture.name.empty())
+                {
+                    gltf_texture.name = m_Images.at(gltf_texture.source)->GetName();
+                }
+
+                texture->SetSampler(*default_sampler);
+            }
+
+            m_Textures.emplace_back(std::move(texture));
+        }
+
+        m_Samplers.emplace_back(std::move(default_sampler));
+    }
+
+    void GLTFLoader::LoadMaterials()
+    {
+        for (auto &gltf_material : m_Model.materials)
+        {
+            auto material = ParseMaterial(gltf_material);
+
+            for (auto &gltf_value : gltf_material.values)
+            {
+                if (gltf_value.first.find("Texture") != std::string::npos)
+                {
+                    std::string tex_name = ToSnakeCase(gltf_value.first);
+
+                    material->m_Textures[tex_name] = m_Textures.at(gltf_value.second.TextureIndex()).get();
+                }
+            }
+
+            for (auto &gltf_value : gltf_material.additionalValues)
+            {
+                if (gltf_value.first.find("Texture") != std::string::npos)
+                {
+                    std::string tex_name = ToSnakeCase(gltf_value.first);
+
+                    material->m_Textures[tex_name] = m_Textures.at(gltf_value.second.TextureIndex()).get();
+                }
+            }
+
+            m_Materials.emplace_back(std::move(material));
+        }
+    }
+
+    void GLTFLoader::LoadMeshes()
+    {
+        auto default_material = CreateDefaultMaterial();
+
+        for (auto &gltf_mesh : m_Model.meshes)
+        {
+            auto entity = ParseMesh(gltf_mesh);
+            auto &mesh = entity.GetComponent<sg::Mesh>();
+
+            for (auto &gltf_primitive : gltf_mesh.primitives)
+            {
+                //TODO: submesh is destroyed
+                auto submesh = std::make_unique<sg::Submesh>();
+
+                for (auto &attribute : gltf_primitive.attributes)
+                {
+                    std::string attrib_name = attribute.first;
+                    std::transform(attrib_name.begin(), attrib_name.end(), attrib_name.begin(), ::tolower);
+
+                    auto vertex_data = GetAttributeData(&m_Model, attribute.second);
+
+                    if (attrib_name == "position")
+                    {
+                        submesh->m_VerticesCount = ToUint32_t(m_Model.accessors.at(attribute.second).count);
+                    }
+
+                    core::Buffer buffer{m_Device,
+                                        vertex_data.size(),
+                                        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                        VMA_MEMORY_USAGE_GPU_TO_CPU};
+                    buffer.Update(vertex_data);
+
+                    submesh->m_VertexBuffers.insert(std::make_pair(attrib_name, std::move(buffer)));
+
+                    sg::VertexAttribute attrib;
+                    attrib.format = GetAttributeFormat(&m_Model, attribute.second);
+                    attrib.stride = ToUint32_t(GetAttributeStride(&m_Model, attribute.second));
+
+                    submesh->SetAttribute(attrib_name, attrib);
+                }
+
+                if (gltf_primitive.indices >= 0)
+                {
+                    submesh->m_VertexIndices = ToUint32_t(GetAttributeSize(&m_Model, gltf_primitive.indices));
+
+                    auto format = GetAttributeFormat(&m_Model, gltf_primitive.indices);
+
+                    auto vertex_data = GetAttributeData(&m_Model, gltf_primitive.indices);
+                    auto index_data = GetAttributeData(&m_Model, gltf_primitive.indices);
+
+                    switch (format)
+                    {
+                    case VK_FORMAT_R8_UINT:
+                        // Converts uint8 data into uint16 data, still represented by a uint8 vector
+                        index_data = ConvertUnderlyingDataStride(index_data, 1, 2);
+                        submesh->m_IndexType = VK_INDEX_TYPE_UINT16;
+                        break;
+                    case VK_FORMAT_R16_UINT:
+                        submesh->m_IndexType = VK_INDEX_TYPE_UINT16;
+                        break;
+                    case VK_FORMAT_R32_UINT:
+                        submesh->m_IndexType = VK_INDEX_TYPE_UINT32;
+                        break;
+                    default:
+                        ENG_CORE_ERROR("gltf primitive has invalid format type");
+                        break;
+                    }
+
+                    submesh->m_IndexBuffer = std::make_unique<core::Buffer>(m_Device,
+                                                                            index_data.size(),
+                                                                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                                                            VMA_MEMORY_USAGE_GPU_TO_CPU);
+
+                    submesh->m_IndexBuffer->Update(index_data);
+                }
+                else
+                {
+                    submesh->m_VerticesCount = ToUint32_t(GetAttributeSize(&m_Model, gltf_primitive.attributes.at("POSITION")));
+                }
+
+                if (gltf_primitive.material < 0)
+                {
+                    submesh->SetMaterial(*default_material);
+                }
+                else
+                {
+                    submesh->SetMaterial(*m_Materials.at(gltf_primitive.material));
+                }
+
+                mesh.AddSubmesh(*submesh);
+            }
+        }
+
+        m_Device.GetFencePool().Wait();
+        m_Device.GetFencePool().Reset();
+        m_Device.GetCommandPool().ResetPool();
+
+        m_TransientBuffers.clear();
+    }
+
+    void GLTFLoader::LoadCameras()
     {
     }
 
-    void GLTFLoader::LoadMaterials(Scene &scene)
+    void GLTFLoader::LoadAnimations()
     {
     }
 
-    void GLTFLoader::LoadMeshes(Scene &scene)
+    void GLTFLoader::LoadScenes(int scene_index)
     {
+        tinygltf::Scene *gltf_scene{nullptr};
+        if (scene_index >= 0 && scene_index < static_cast<int>(m_Model.scenes.size()))
+            gltf_scene = &m_Model.scenes[scene_index];
+
+        else if (m_Model.defaultScene >= 0 && m_Model.defaultScene < static_cast<int>(m_Model.scenes.size()))
+            gltf_scene = &m_Model.scenes[m_Model.defaultScene];
+
+        else if (m_Model.scenes.size() > 0)
+            gltf_scene = &m_Model.scenes[0];
+
+        if (!gltf_scene)
+            throw std::runtime_error("Couldn't determine which scene to load!");
+
+        m_Scene = std::make_unique<Scene>(gltf_scene->name);
     }
 
-    void GLTFLoader::LoadCameras(Scene &scene)
+    void GLTFLoader::LoadNodes()
     {
+        for (size_t node_index = 0; node_index < m_Model.nodes.size(); ++node_index)
+        {
+            auto gltf_node = m_Model.nodes[node_index];
+            auto entity = ParseNode(gltf_node);
+        }
     }
 
-    void GLTFLoader::LoadAnimations(Scene &scene)
-    {
-    }
-
-    void GLTFLoader::LoadScenes(Scene &scene)
-    {
-    }
-
-    std::vector<std::unique_ptr<Light>> GLTFLoader::ParseKHRLightsPunctual()
+    void GLTFLoader::ParseKHRLightsPunctual()
     {
         if (IsExtensionEnabled(KHR_LIGHTS_PUNCTUAL_EXTENSION))
         {
             if (m_Model.extensions.find(KHR_LIGHTS_PUNCTUAL_EXTENSION) == m_Model.extensions.end() || !m_Model.extensions.at(KHR_LIGHTS_PUNCTUAL_EXTENSION).Has("lights"))
-            {
-                return {};
-            }
+                return;
+
             auto &khr_lights = m_Model.extensions.at(KHR_LIGHTS_PUNCTUAL_EXTENSION).Get("lights");
 
-            std::vector<std::unique_ptr<Light>> light_components(khr_lights.ArrayLen());
+            std::vector<std::unique_ptr<sg::Light>> light_components(khr_lights.ArrayLen());
 
             for (size_t light_index = 0; light_index < khr_lights.ArrayLen(); ++light_index)
             {
@@ -356,24 +708,27 @@ namespace engine
                     throw std::runtime_error("Couldn't load glTF file, KHR_lights_punctual extension is invalid");
                 }
 
-                auto light = std::make_unique<Light>(khr_light.Get("name").Get<std::string>());
+                auto entity = m_Scene->CreateEntity();
+                //auto &light = m_Scene->GetRegistry().emplace<sg::Light>(entity.GetHandle(), khr_light.Get("name").Get<std::string>(), entity);
+                auto &light = entity.AddComponent<sg::Light>(khr_light.Get("name").Get<std::string>(),
+                                                             entity);
 
-                LightType type;
-                LightProperties properties;
+                sg::LightType type;
+                sg::LightProperties properties;
 
                 // Get type
                 auto &gltf_light_type = khr_light.Get("type").Get<std::string>();
                 if (gltf_light_type == "point")
                 {
-                    type = LightType::Point;
+                    type = sg::LightType::Point;
                 }
                 else if (gltf_light_type == "spot")
                 {
-                    type = LightType::Spot;
+                    type = sg::LightType::Spot;
                 }
                 else if (gltf_light_type == "directional")
                 {
-                    type = LightType::Directional;
+                    type = sg::LightType::Directional;
                 }
                 else
                 {
@@ -395,10 +750,10 @@ namespace engine
                     properties.intensity = static_cast<float>(khr_light.Get("intensity").Get<double>());
                 }
 
-                if (type != LightType::Directional)
+                if (type != sg::LightType::Directional)
                 {
                     properties.range = static_cast<float>(khr_light.Get("range").Get<double>());
-                    if (type != LightType::Point)
+                    if (type != sg::LightType::Point)
                     {
                         if (!khr_light.Has("spot"))
                         {
@@ -419,7 +774,7 @@ namespace engine
                         }
                     }
                 }
-                else if (type == LightType::Directional || type == LightType::Spot)
+                else if (type == sg::LightType::Directional || type == sg::LightType::Spot)
                 {
                     // The spec states that the light will inherit the transform of the node.
                     // The light's direction is defined as the 3-vector (0.0, 0.0, -1.0) and
@@ -427,28 +782,10 @@ namespace engine
                     properties.direction = glm::vec3(0.0f, 0.0f, -1.0f);
                 }
 
-                light->SetType(type);
-                light->SetProperties(properties);
-
-                light_components[light_index] = std::move(light);
+                light.SetType(type);
+                light.SetProperties(properties);
             }
-
-            return light_components;
         }
-        else
-        {
-            return {};
-        }
-    }
-
-    bool GLTFLoader::IsExtensionEnabled(const std::string &requested_extension)
-    {
-        auto it = m_SupportedExtensions.find(requested_extension);
-
-        if (it != m_SupportedExtensions.end())
-            return it->second;
-        else
-            return false;
     }
 
     std::unique_ptr<sg::Sampler> GLTFLoader::ParseSampler(const tinygltf::Sampler &gltf_sampler) const
@@ -515,5 +852,161 @@ namespace engine
         image->CreateVkImage(m_Device);
 
         return image;
+    }
+
+    std::unique_ptr<sg::Texture> GLTFLoader::ParseTexture(const tinygltf::Texture &gltf_texture) const
+    {
+        return std::make_unique<sg::Texture>(gltf_texture.name);
+    }
+
+    bool GLTFLoader::IsExtensionEnabled(const std::string &requested_extension)
+    {
+        auto it = m_SupportedExtensions.find(requested_extension);
+
+        if (it != m_SupportedExtensions.end())
+            return it->second;
+        else
+            return false;
+    }
+
+    std::unique_ptr<sg::PBRMaterial> GLTFLoader::ParseMaterial(const tinygltf::Material &gltf_material) const
+    {
+        auto material = std::make_unique<sg::PBRMaterial>(gltf_material.name);
+
+        for (auto &gltf_value : gltf_material.values)
+        {
+            if (gltf_value.first == "baseColorFactor")
+            {
+                const auto &color_factor = gltf_value.second.ColorFactor();
+                material->m_BaseColorFactor = glm::vec4(color_factor[0], color_factor[1], color_factor[2], color_factor[3]);
+            }
+            else if (gltf_value.first == "metallicFactor")
+            {
+                material->m_MetallicFactor = static_cast<float>(gltf_value.second.Factor());
+            }
+            else if (gltf_value.first == "roughnessFactor")
+            {
+                material->m_RoughnessFactor = static_cast<float>(gltf_value.second.Factor());
+            }
+        }
+
+        for (auto &gltf_value : gltf_material.additionalValues)
+        {
+            if (gltf_value.first == "emissiveFactor")
+            {
+                const auto &emissive_factor = gltf_value.second.number_array;
+
+                material->m_Emissive = glm::vec3(emissive_factor[0], emissive_factor[1], emissive_factor[2]);
+            }
+            else if (gltf_value.first == "alphaMode")
+            {
+                if (gltf_value.second.string_value == "BLEND")
+                {
+                    material->m_AlphaMode = sg::AlphaMode::Blend;
+                }
+                else if (gltf_value.second.string_value == "OPAQUE")
+                {
+                    material->m_AlphaMode = sg::AlphaMode::Opaque;
+                }
+                else if (gltf_value.second.string_value == "MASK")
+                {
+                    material->m_AlphaMode = sg::AlphaMode::Mask;
+                }
+            }
+            else if (gltf_value.first == "alphaCutoff")
+            {
+                material->m_AlphaCutoff = static_cast<float>(gltf_value.second.number_value);
+            }
+            else if (gltf_value.first == "doubleSided")
+            {
+                material->m_DoubleSided = gltf_value.second.bool_value;
+            }
+        }
+
+        return material;
+    }
+
+    Entity GLTFLoader::ParseMesh(const tinygltf::Mesh &gltf_mesh) const
+    {
+        auto entity = m_Scene->CreateEntity();
+        entity.AddComponent<sg::Mesh>(gltf_mesh.name);
+        return entity;
+    }
+
+    Entity GLTFLoader::ParseNode(tinygltf::Node &gltf_node)
+    {
+        auto entity = m_Scene->CreateEntity();
+        auto &transform = entity.AddComponent<sg::Transform>(entity);
+
+        if (!gltf_node.translation.empty())
+        {
+            glm::vec3 translation;
+
+            std::transform(gltf_node.translation.begin(),
+                           gltf_node.translation.end(),
+                           glm::value_ptr(translation),
+                           TypeCast<double, float>{});
+
+            transform.SetTranslation(translation);
+        }
+
+        if (!gltf_node.rotation.empty())
+        {
+            glm::quat rotation;
+
+            std::transform(gltf_node.rotation.begin(),
+                           gltf_node.rotation.end(),
+                           glm::value_ptr(rotation),
+                           TypeCast<double, float>{});
+
+            transform.SetRotation(rotation);
+        }
+
+        if (!gltf_node.scale.empty())
+        {
+            glm::vec3 scale;
+
+            std::transform(gltf_node.scale.begin(),
+                           gltf_node.scale.end(),
+                           glm::value_ptr(scale),
+                           TypeCast<double, float>{});
+
+            transform.SetScale(scale);
+        }
+
+        if (!gltf_node.matrix.empty())
+        {
+            glm::mat4 matrix;
+
+            std::transform(gltf_node.matrix.begin(),
+                           gltf_node.matrix.end(),
+                           glm::value_ptr(matrix),
+                           TypeCast<double, float>{});
+
+            transform.SetMatrix(matrix);
+        }
+
+        return entity;
+    }
+
+    std::unique_ptr<sg::Sampler> GLTFLoader::CreateDefaultSampler()
+    {
+        tinygltf::Sampler gltf_sampler;
+
+        gltf_sampler.minFilter = TINYGLTF_TEXTURE_FILTER_LINEAR;
+        gltf_sampler.magFilter = TINYGLTF_TEXTURE_FILTER_LINEAR;
+
+        gltf_sampler.wrapS = TINYGLTF_TEXTURE_WRAP_REPEAT;
+        gltf_sampler.wrapT = TINYGLTF_TEXTURE_WRAP_REPEAT;
+        //TODO: sampler wrapR
+        // gltf_sampler.wrapR = TINYGLTF_TEXTURE_WRAP_REPEAT;
+
+        return ParseSampler(gltf_sampler);
+    }
+
+    std::unique_ptr<sg::PBRMaterial> GLTFLoader::CreateDefaultMaterial()
+    {
+        tinygltf::Material gltf_material;
+        return ParseMaterial(gltf_material);
     }
 }

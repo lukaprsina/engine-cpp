@@ -83,6 +83,13 @@ namespace engine
         UpdateId();
     }
 
+    ShaderVariant::~ShaderVariant()
+    {
+        test = 65;
+        ENG_ASSERT(m_ID != 4187935634071280513);
+        ENG_CORE_TRACE("destroying preamble:\n{}", m_Preamble);
+    }
+
     void ShaderVariant::AddDefine(const std::string &definition)
     {
         m_Processes.push_back("D" + definition);

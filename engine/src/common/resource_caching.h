@@ -24,7 +24,6 @@
 #include "vulkan_api/core/pipeline.h"
 #include "vulkan_api/rendering/pipeline_state.h"
 #include "vulkan_api/render_target.h"
-#include "common/helpers.h"
 
 #include "entt/entt.hpp"
 

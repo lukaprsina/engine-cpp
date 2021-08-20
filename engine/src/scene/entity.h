@@ -9,17 +9,21 @@ namespace engine
     class Entity
     {
     public:
-        Entity() = default;
-        Entity(entt::entity handle, Scene &scene);
+        Entity(entt::entity handle, Scene *scene);
         ~Entity();
         Entity(const Entity &other) = default;
+
+        Entity &operator=(Entity other)
+        {
+            return *this = Entity(other);
+        }
 
         template <typename T, typename... Args>
         T &AddComponent(Args &&...args)
         {
             ENG_ASSERT(!HasComponent<T>() && "Entity already has component!");
-            T &component = m_Scene.GetRegistry().emplace<T>(m_Handle, std::forward<Args>(args)...);
-            m_Scene.OnComponentAdded<T>(*this, component);
+            T &component = m_Scene->GetRegistry().emplace<T>(m_Handle, std::forward<Args>(args)...);
+            // m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
 
@@ -27,20 +31,20 @@ namespace engine
         T &GetComponent()
         {
             ENG_ASSERT(HasComponent<T>() && "Entity does not have component!");
-            return m_Scene.GetRegistry().get<T>(m_Handle);
+            return m_Scene->GetRegistry().get<T>(m_Handle);
         }
 
         template <typename T>
         bool HasComponent()
         {
-            return (m_Scene.GetRegistry().get<T>(m_Handle) != entt::null);
+            return (m_Scene->GetRegistry().all_of<T>(m_Handle));
         }
 
         template <typename T>
         void RemoveComponent()
         {
             ENG_ASSERT(HasComponent<T>() && "Entity does not have component!");
-            m_Scene.GetRegistry().remove<T>(m_Handle);
+            m_Scene->GetRegistry().remove<T>(m_Handle);
         }
 
         operator bool() const { return m_Handle != entt::null; }
@@ -58,9 +62,11 @@ namespace engine
             return !(*this == other);
         }
 
+        entt::entity GetHandle() { return m_Handle; }
+
     private:
         entt::entity m_Handle{entt::null};
-        Scene &m_Scene;
+        Scene *m_Scene;
     };
 
 }

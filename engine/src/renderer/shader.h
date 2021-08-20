@@ -81,6 +81,7 @@ namespace engine
     {
     public:
         ShaderVariant() = default;
+        ~ShaderVariant();
         ShaderVariant(std::string &&preamble, std::vector<std::string> &&processes);
 
         void AddDefine(const std::string &definition);
@@ -101,6 +102,7 @@ namespace engine
         std::string m_Preamble;
         std::vector<std::string> m_Processes;
         std::unordered_map<std::string, size_t> m_RuntimeArraySizes;
+        uint32_t test{134};
 
         void UpdateId();
     };
