@@ -25,6 +25,12 @@ namespace engine
             ENG_CORE_WARN("Ignore buffer allocation update");
     }
 
+    core::Buffer &BufferAllocation::GetBuffer()
+    {
+        ENG_ASSERT(m_Buffer, "Invalid buffer pointer");
+        return *m_Buffer;
+    }
+
     BufferBlock::BufferBlock(Device &device, VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage)
         : m_Buffer{device, size, usage, memory_usage}
 

@@ -20,6 +20,7 @@ namespace engine
         class Texture;
         class PBRMaterial;
         class Mesh;
+        class Submesh;
         class Transform;
     }
 
@@ -59,12 +60,7 @@ namespace engine
 
         std::unique_ptr<Scene> m_Scene;
 
-        std::vector<std::unique_ptr<sg::Sampler>> m_Samplers;
-        std::vector<std::unique_ptr<sg::Image>> m_Images;
-        std::vector<std::unique_ptr<sg::Texture>> m_Textures;
-        std::vector<std::unique_ptr<sg::PBRMaterial>> m_Materials;
-
-        void ParseKHRLightsPunctual();
+        std::vector<std::unique_ptr<sg::Light>> ParseKHRLightsPunctual();
         std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;
         std::unique_ptr<sg::Image> ParseImage(tinygltf::Image &gltf_image) const;
         std::unique_ptr<sg::Texture> ParseTexture(const tinygltf::Texture &gltf_texture) const;

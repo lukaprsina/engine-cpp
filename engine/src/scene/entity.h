@@ -23,7 +23,6 @@ namespace engine
         {
             ENG_ASSERT(!HasComponent<T>() && "Entity already has component!");
             T &component = m_Scene->GetRegistry().emplace<T>(m_Handle, std::forward<Args>(args)...);
-            // m_Scene->OnComponentAdded<T>(*this, component);
             return component;
         }
 

@@ -80,9 +80,9 @@ namespace engine
     class ShaderVariant
     {
     public:
-        ShaderVariant() = default;
-        ~ShaderVariant();
         ShaderVariant(std::string &&preamble, std::vector<std::string> &&processes);
+        ShaderVariant();
+        ~ShaderVariant();
 
         void AddDefine(const std::string &definition);
         void AddDefine(const std::vector<std::string> &definitions);
@@ -97,12 +97,13 @@ namespace engine
         const std::vector<std::string> &GetProcesses() const { return m_Processes; }
         const std::unordered_map<std::string, size_t> &GetRuntimeArraySizes() const { return m_RuntimeArraySizes; }
 
+        static size_t m_Test;
+
     private:
         size_t m_ID;
         std::string m_Preamble;
         std::vector<std::string> m_Processes;
         std::unordered_map<std::string, size_t> m_RuntimeArraySizes;
-        uint32_t test{134};
 
         void UpdateId();
     };

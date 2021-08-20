@@ -7,6 +7,7 @@
 #include "vulkan_api/core/framebuffer.h"
 #include "vulkan_api/core/image_view.h"
 #include "vulkan_api/core/render_pass.h"
+#include "vulkan_api/subpasses/subpass.h"
 
 namespace engine
 {
@@ -190,6 +191,23 @@ namespace engine
         return m_CommandPool.GetDevice().GetResourceCache().RequestRenderPass(render_target.GetAttachments(), load_store_infos, subpass_infos);
     }
 
+    void CommandBuffer::BindBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element)
+    {
+        m_ResourceBindingState.BindBuffer(buffer, offset, range, set,
+                                          binding, array_element);
+    }
+
+    void CommandBuffer::BindLighting(LightingState &lighting_state, uint32_t set, uint32_t binding)
+    {
+        auto &buffer = lighting_state.light_buffer;
+        BindBuffer(buffer.GetBuffer(), buffer.GetOffset(),
+                   buffer.GetSize(), set, binding, 0);
+
+        SetSpecializationConstant(0, ToUint32_t(lighting_state.directional_lights.size()));
+        SetSpecializationConstant(1, ToUint32_t(lighting_state.point_lights.size()));
+        SetSpecializationConstant(2, ToUint32_t(lighting_state.spot_lights.size()));
+    }
+
     void CommandBuffer::NextSubpass()
     {
         // Increment subpass index
@@ -282,15 +300,20 @@ namespace engine
         vkCmdSetScissor(m_Handle, first_scissor, ToUint32_t(scissors.size()), scissors.data());
     }
 
-    void CommandBuffer::EndRenderPass()
-    {
-        vkCmdEndRenderPass(m_Handle);
-    }
-
     void CommandBuffer::CopyBufferToImage(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions)
     {
         vkCmdCopyBufferToImage(m_Handle, buffer.GetHandle(),
                                image.GetHandle(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                ToUint32_t(regions.size()), regions.data());
+    }
+
+    void CommandBuffer::EndRenderPass()
+    {
+        vkCmdEndRenderPass(m_Handle);
+    }
+
+    void CommandBuffer::SetSpecializationConstant(uint32_t constant_id, const std::vector<uint8_t> &data)
+    {
+        m_PipelineState.SetSpecializationConstant(constant_id, data);
     }
 }

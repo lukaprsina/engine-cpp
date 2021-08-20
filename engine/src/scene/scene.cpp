@@ -1,6 +1,12 @@
 #include "scene/scene.h"
 
 #include "scene/entity.h"
+#include "scene/components/image.h"
+#include "scene/components/light.h"
+#include "scene/components/pbr_material.h"
+#include "scene/components/sampler.h"
+#include "scene/components/submesh.h"
+#include "scene/components/texture.h"
 
 namespace engine
 {

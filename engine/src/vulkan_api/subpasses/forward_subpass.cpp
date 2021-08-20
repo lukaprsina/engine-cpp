@@ -50,6 +50,8 @@ namespace engine
 
     void ForwardSubpass::Draw(CommandBuffer &command_buffer)
     {
-        // AllocateLights<ForwardLights>()
+        AllocateLights<ForwardLights>(m_Scene.GetLights(), MAX_FORWARD_LIGHT_COUNT);
+        command_buffer.BindLighting(m_LightingState, 0, 4);
+        GeometrySubpass::Draw(command_buffer);
     }
 }

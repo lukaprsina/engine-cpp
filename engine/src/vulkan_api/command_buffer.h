@@ -13,6 +13,7 @@ namespace engine
     class RenderTarget;
     class PipelineState;
     class ResourceBindingState;
+    struct LightingState;
 
     namespace core
     {
@@ -63,9 +64,17 @@ namespace engine
         RenderPass &GetRenderPass(const RenderTarget &render_target,
                                   const std::vector<LoadStoreInfo> &load_store_infos,
                                   const std::vector<std::unique_ptr<Subpass>> &subpasses);
+
+        void BindBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element);
+        void BindLighting(LightingState &lighting_state, uint32_t set, uint32_t binding);
         void NextSubpass();
-        void EndRenderPass();
         void CopyBufferToImage(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions);
+        void EndRenderPass();
+
+        template <class T>
+        void SetSpecializationConstant(uint32_t constant_id, const T &data);
+
+        void SetSpecializationConstant(uint32_t constant_id, const std::vector<uint8_t> &data);
 
         const VkCommandBuffer &GetHandle() const { return m_Handle; }
 
@@ -93,4 +102,16 @@ namespace engine
         const CommandBuffer::RenderPassBinding &GetCurrentRenderPass() const { return m_CurrentRenderPass; }
         const uint32_t GetCurrentSubpassIndex() const { return m_PipelineState.GetSubpassIndex(); }
     };
+
+    template <class T>
+    inline void CommandBuffer::SetSpecializationConstant(uint32_t constant_id, const T &data)
+    {
+        SetSpecializationConstant(constant_id, ToBytes(data));
+    }
+
+    template <>
+    inline void CommandBuffer::SetSpecializationConstant<bool>(std::uint32_t constant_id, const bool &data)
+    {
+        SetSpecializationConstant(constant_id, ToBytes(ToUint32_t(data)));
+    }
 }

@@ -28,6 +28,10 @@ namespace engine
             Update(ToBytes(value), offset);
         }
 
+        core::Buffer &GetBuffer();
+        VkDeviceSize GetSize() const { return m_Size; }
+        VkDeviceSize GetOffset() const { return m_BaseOffset; }
+
     private:
         core::Buffer *m_Buffer{nullptr};
         VkDeviceSize m_Size{0};

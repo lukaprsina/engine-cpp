@@ -68,7 +68,7 @@ namespace engine
         LightingState &GetLightingState() { return m_LightingState; }
 
         template <typename T>
-        void AllocateLights(const std::vector<sg::Light *> &scene_lights,
+        void AllocateLights(const std::vector<std::unique_ptr<sg::Light>> &scene_lights,
                             size_t light_count)
         {
             ENG_ASSERT(scene_lights.size() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");

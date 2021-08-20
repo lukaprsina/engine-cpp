@@ -1,23 +1,23 @@
 #define TINYGLTF_IMPLEMENTATION
 #include "scene/gltf_loader.h"
 
-#include "vulkan_api/device.h"
-#include "scene/scene.h"
 #include "core/timer.h"
-#include "scene/components/sampler.h"
-#include "scene/entity.h"
-#include "vulkan_api/fence_pool.h"
-#include "vulkan_api/command_pool.h"
+#include "platform/filesystem.h"
 #include "scene/components/image.h"
-#include "scene/components/texture.h"
 #include "scene/components/image/astc.h"
 #include "scene/components/light.h"
-#include "scene/components/pbr_material.h"
 #include "scene/components/mesh.h"
+#include "scene/components/pbr_material.h"
+#include "scene/components/sampler.h"
 #include "scene/components/submesh.h"
+#include "scene/components/texture.h"
 #include "scene/components/transform.h"
-#include "platform/filesystem.h"
+#include "scene/entity.h"
+#include "scene/scene.h"
+#include "vulkan_api/command_pool.h"
 #include "vulkan_api/core/buffer.h"
+#include "vulkan_api/device.h"
+#include "vulkan_api/fence_pool.h"
 
 #include <ThreadPool.h>
 #include "common/glm.h"
@@ -371,6 +371,7 @@ namespace engine
 
     void GLTFLoader::LoadScene(int scene_index)
     {
+        CheckExtensions();
         LoadScenes(scene_index);
         LoadLights();
         LoadSamplers();
@@ -378,6 +379,8 @@ namespace engine
         LoadTextures();
         LoadMaterials();
         LoadMeshes();
+
+        // TODO: transform
     }
 
     void GLTFLoader::CheckExtensions()
@@ -404,17 +407,18 @@ namespace engine
 
     void GLTFLoader::LoadLights()
     {
-        ParseKHRLightsPunctual();
+        auto light_components = ParseKHRLightsPunctual();
+        m_Scene->GetLights() = std::move(light_components);
     }
 
     void GLTFLoader::LoadSamplers()
     {
-        m_Samplers.resize(m_Model.samplers.size());
+        m_Scene->GetSamplers().resize(m_Model.samplers.size());
 
         for (size_t sampler_index = 0; sampler_index < m_Model.samplers.size(); sampler_index++)
         {
             auto sampler = ParseSampler(m_Model.samplers.at(sampler_index));
-            m_Samplers[sampler_index] = std::move(sampler);
+            m_Scene->GetSamplers()[sampler_index] = std::move(sampler);
         }
     }
 
@@ -450,7 +454,7 @@ namespace engine
 
         for (auto &fut : image_component_futures)
         {
-            m_Images.push_back(fut.get());
+            m_Scene->GetImages().push_back(fut.get());
         }
 
         auto &command_buffer = m_Device.RequestCommandBuffer();
@@ -459,7 +463,7 @@ namespace engine
 
         for (size_t image_index = 0; image_index < image_count; image_index++)
         {
-            auto &image = m_Images.at(image_index);
+            auto &image = m_Scene->GetImages().at(image_index);
 
             core::Buffer stage_buffer{m_Device,
                                       image->GetData().size(),
@@ -499,26 +503,26 @@ namespace engine
         {
             auto texture = ParseTexture(gltf_texture);
 
-            texture->SetImage(*m_Images.at(gltf_texture.source));
+            texture->SetImage(*m_Scene->GetImages().at(gltf_texture.source));
 
-            if (gltf_texture.sampler >= 0 && gltf_texture.sampler < static_cast<int>(m_Samplers.size()))
+            if (gltf_texture.sampler >= 0 && gltf_texture.sampler < static_cast<int>(m_Scene->GetSamplers().size()))
             {
-                texture->SetSampler(*m_Samplers.at(gltf_texture.sampler));
+                texture->SetSampler(*m_Scene->GetSamplers().at(gltf_texture.sampler));
             }
             else
             {
                 if (gltf_texture.name.empty())
                 {
-                    gltf_texture.name = m_Images.at(gltf_texture.source)->GetName();
+                    gltf_texture.name = m_Scene->GetImages().at(gltf_texture.source)->GetName();
                 }
 
                 texture->SetSampler(*default_sampler);
             }
 
-            m_Textures.emplace_back(std::move(texture));
+            m_Scene->GetTextures().emplace_back(std::move(texture));
         }
 
-        m_Samplers.emplace_back(std::move(default_sampler));
+        m_Scene->GetSamplers().emplace_back(std::move(default_sampler));
     }
 
     void GLTFLoader::LoadMaterials()
@@ -533,7 +537,7 @@ namespace engine
                 {
                     std::string tex_name = ToSnakeCase(gltf_value.first);
 
-                    material->m_Textures[tex_name] = m_Textures.at(gltf_value.second.TextureIndex()).get();
+                    material->m_Textures[tex_name] = m_Scene->GetTextures().at(gltf_value.second.TextureIndex()).get();
                 }
             }
 
@@ -543,11 +547,11 @@ namespace engine
                 {
                     std::string tex_name = ToSnakeCase(gltf_value.first);
 
-                    material->m_Textures[tex_name] = m_Textures.at(gltf_value.second.TextureIndex()).get();
+                    material->m_Textures[tex_name] = m_Scene->GetTextures().at(gltf_value.second.TextureIndex()).get();
                 }
             }
 
-            m_Materials.emplace_back(std::move(material));
+            m_Scene->GetMaterials().emplace_back(std::move(material));
         }
     }
 
@@ -637,10 +641,11 @@ namespace engine
                 }
                 else
                 {
-                    submesh->SetMaterial(*m_Materials.at(gltf_primitive.material));
+                    submesh->SetMaterial(*m_Scene->GetMaterials().at(gltf_primitive.material));
                 }
 
-                mesh.AddSubmesh(*submesh);
+                m_Scene->GetSubmeshes().emplace_back(std::move(submesh));
+                mesh.AddSubmesh(*m_Scene->GetSubmeshes().back());
             }
         }
 
@@ -686,12 +691,12 @@ namespace engine
         }
     }
 
-    void GLTFLoader::ParseKHRLightsPunctual()
+    std::vector<std::unique_ptr<sg::Light>> GLTFLoader::ParseKHRLightsPunctual()
     {
         if (IsExtensionEnabled(KHR_LIGHTS_PUNCTUAL_EXTENSION))
         {
             if (m_Model.extensions.find(KHR_LIGHTS_PUNCTUAL_EXTENSION) == m_Model.extensions.end() || !m_Model.extensions.at(KHR_LIGHTS_PUNCTUAL_EXTENSION).Has("lights"))
-                return;
+                return {};
 
             auto &khr_lights = m_Model.extensions.at(KHR_LIGHTS_PUNCTUAL_EXTENSION).Get("lights");
 
@@ -709,7 +714,6 @@ namespace engine
                 }
 
                 auto entity = m_Scene->CreateEntity();
-                //auto &light = m_Scene->GetRegistry().emplace<sg::Light>(entity.GetHandle(), khr_light.Get("name").Get<std::string>(), entity);
                 auto &light = entity.AddComponent<sg::Light>(khr_light.Get("name").Get<std::string>(),
                                                              entity);
 
@@ -784,7 +788,16 @@ namespace engine
 
                 light.SetType(type);
                 light.SetProperties(properties);
+
+                light_components[light_index] = std::make_unique<sg::Light>(light);
             }
+
+            return light_components;
+        }
+
+        else
+        {
+            return {};
         }
     }
 
