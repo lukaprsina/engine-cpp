@@ -13,8 +13,7 @@ namespace engine
         class PerspectiveCamera : public Camera
         {
         public:
-            PerspectiveCamera();
-            ~PerspectiveCamera();
+            PerspectiveCamera(const std::string &name);
 
             glm::mat4 GetProjection() override
             {

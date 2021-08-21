@@ -1,6 +1,7 @@
 #include "vulkan_api/core/descriptor_set.h"
 
 #include "vulkan_api/device.h"
+#include "common/resource_caching.h"
 #include "vulkan_api/core/descriptor_set.h"
 #include "vulkan_api/core/descriptor_set_layout.h"
 
@@ -118,6 +119,71 @@ namespace engine
             {
                 ENG_CORE_ERROR("Shader layout set does not use image binding at #{}", binding_index);
             }
+        }
+    }
+
+    void DescriptorSet::Update(const std::vector<uint32_t> &bindings_to_update)
+    {
+        std::vector<VkWriteDescriptorSet> write_operations;
+        std::vector<size_t> write_operation_hashes;
+
+        // If the 'bindings_to_update' vector is empty, we want to write to all the bindings
+        // (but skipping all to-update bindings that haven't been written yet)
+        if (bindings_to_update.empty())
+        {
+            for (size_t i = 0; i < m_WriteDescriptorSets.size(); i++)
+            {
+                const auto &write_operation = m_WriteDescriptorSets[i];
+
+                size_t write_operation_hash = 0;
+                HashParam(write_operation_hash, write_operation);
+
+                auto update_pair_it = m_UpdatedBindings.find(write_operation.dstBinding);
+                if (update_pair_it == m_UpdatedBindings.end() || update_pair_it->second != write_operation_hash)
+                {
+                    write_operations.push_back(write_operation);
+                    write_operation_hashes.push_back(write_operation_hash);
+                }
+            }
+        }
+        else
+        {
+            // Otherwise we want to update the binding indices present in the 'bindings_to_update' vector.
+            // (again, skipping those to update but not updated yet)
+            for (size_t i = 0; i < m_WriteDescriptorSets.size(); i++)
+            {
+                const auto &write_operation = m_WriteDescriptorSets[i];
+
+                if (std::find(bindings_to_update.begin(), bindings_to_update.end(), write_operation.dstBinding) != bindings_to_update.end())
+                {
+                    size_t write_operation_hash = 0;
+                    HashParam(write_operation_hash, write_operation);
+
+                    auto update_pair_it = m_UpdatedBindings.find(write_operation.dstBinding);
+                    if (update_pair_it == m_UpdatedBindings.end() || update_pair_it->second != write_operation_hash)
+                    {
+                        write_operations.push_back(write_operation);
+                        write_operation_hashes.push_back(write_operation_hash);
+                    }
+                }
+            }
+        }
+
+        // Perform the Vulkan call to update the DescriptorSet by executing the write operations
+        if (!write_operations.empty())
+        {
+            vkUpdateDescriptorSets(m_Device.GetHandle(),
+                                   ToUint32_t(write_operations.size()),
+                                   write_operations.data(),
+                                   0,
+                                   nullptr);
+        }
+
+        // Store the bindings from the write operations that were executed by vkUpdateDescriptorSets (and their hash)
+        // to prevent overwriting by future calls to "update()"
+        for (size_t i = 0; i < write_operations.size(); i++)
+        {
+            m_UpdatedBindings[write_operations[i].dstBinding] = write_operation_hashes[i];
         }
     }
 }

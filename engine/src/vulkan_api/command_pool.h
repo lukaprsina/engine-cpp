@@ -22,6 +22,7 @@ namespace engine
         VkCommandPool &GetHandle() { return m_Handle; }
         size_t GetThreadIndex() const { return m_ThreadIndex; }
         CommandBuffer::ResetMode &GetResetMode() { return m_ResetMode; }
+        RenderFrame *GetRenderFrame() { return m_RenderFrame; }
 
     private:
         Device &m_Device;

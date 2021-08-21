@@ -64,6 +64,11 @@ namespace engine
             m_SemaphorePool.ReleaseOwnedSemaphore(semaphore);
         }
 
+        DescriptorSet &RequestDescriptorSet(DescriptorSetLayout &descriptor_set_layout,
+                                            const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
+                                            const BindingMap<VkDescriptorImageInfo> &image_infos,
+                                            size_t thread_index = 0);
+
         CommandBuffer &RequestCommandBuffer(const QueueFamily &queue_family,
                                             CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool,
                                             VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,

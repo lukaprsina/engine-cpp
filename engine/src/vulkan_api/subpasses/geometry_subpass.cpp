@@ -2,9 +2,12 @@
 
 #include "scene/scene.h"
 #include "scene/components/mesh.h"
-#include "scene/components/material.h"
+#include "scene/components/image.h"
+#include "scene/components/sampler.h"
+#include "scene/components/texture.h"
+#include "scene/components/pbr_material.h"
 #include "scene/components/submesh.h"
-#include "scene/components/camera.h"
+#include "scene/components/perspective_camera.h"
 #include "vulkan_api/device.h"
 
 namespace engine
@@ -42,14 +45,14 @@ namespace engine
 
     void GeometrySubpass::Draw(CommandBuffer &command_buffer)
     {
-        std::multimap<float, std::pair<Entity *, sg::Submesh *>> opaque_nodes;
-        std::multimap<float, std::pair<Entity *, sg::Submesh *>> transparent_nodes;
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes;
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes;
 
         GetSortedNodes(opaque_nodes, transparent_nodes);
 
         for (auto node_it = opaque_nodes.begin(); node_it != opaque_nodes.end(); node_it++)
         {
-            auto transform = node_it->second.first->GetComponent<sg::Transform>();
+            auto &transform = *(node_it->second.second);
             UpdateUniform(command_buffer, transform, m_ThreadIndex);
 
             // Invert the front face if the mesh was flipped
@@ -57,7 +60,7 @@ namespace engine
             bool flipped = scale.x * scale.y * scale.z < 0;
             VkFrontFace front_face = flipped ? VK_FRONT_FACE_CLOCKWISE : VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
-            DrawSubmesh(command_buffer, *node_it->second.second, front_face);
+            DrawSubmesh(command_buffer, *node_it->second.first, front_face);
         }
 
         // Enable alpha blending
@@ -82,19 +85,26 @@ namespace engine
         // Draw transparent objects in back-to-front order
         for (auto node_it = transparent_nodes.rbegin(); node_it != transparent_nodes.rend(); node_it++)
         {
-            auto transform = node_it->second.first->GetComponent<sg::Transform>();
+            auto &transform = *(node_it->second.second);
             UpdateUniform(command_buffer, transform, m_ThreadIndex);
 
-            DrawSubmesh(command_buffer, *node_it->second.second);
+            DrawSubmesh(command_buffer, *node_it->second.first);
         }
     }
 
     void GeometrySubpass::GetSortedNodes(
-        std::multimap<float, std::pair<Entity *, sg::Submesh *>> opaque_nodes,
-        std::multimap<float, std::pair<Entity *, sg::Submesh *>> transparent_nodes)
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes,
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes)
     {
         // TODO:
-        auto camera_transform = m_Scene.GetCameras().front()->GetComponent<sg::Transform>().GetWorldMatrix();
+        auto &camera = *m_Scene.GetCameras().front().get();
+        bool valid = m_Scene.GetRegistry().valid(camera.GetHandle());
+
+        auto &transform = camera.GetComponent<sg::Transform>();
+        valid = m_Scene.GetRegistry().valid(camera.GetHandle());
+
+        auto camera_transform = transform.GetWorldMatrix();
+        valid = m_Scene.GetRegistry().valid(camera.GetHandle());
 
         auto view = m_Scene.GetRegistry().view<sg::Mesh, sg::Transform>();
         for (auto &entity : view)
@@ -112,13 +122,12 @@ namespace engine
 
             for (auto &submesh : mesh.GetSubmeshes())
             {
+                auto pair = std::make_pair(submesh, &transform);
                 if (submesh->GetMaterial()->m_AlphaMode == sg::AlphaMode::Blend)
-                    transparent_nodes.emplace(distance,
-                                              std::make_pair(entity, submesh));
+                    transparent_nodes.emplace(distance, pair);
 
                 else
-                    opaque_nodes.emplace(distance,
-                                         std::make_pair(entity, submesh));
+                    opaque_nodes.emplace(distance, pair);
             }
         }
     }
@@ -126,7 +135,7 @@ namespace engine
     void GeometrySubpass::UpdateUniform(CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
     {
         GlobalUniform global_uniform;
-        auto camera = m_Scene.GetCameras().front()->GetComponent<sg::Camera>();
+        auto camera = m_Scene.GetCameras().front()->GetComponent<sg::PerspectiveCamera>();
         auto camera_transform = m_Scene.GetCameras().front()->GetComponent<sg::Transform>();
 
         global_uniform.camera_view_proj = camera.m_PreRotation *
@@ -157,8 +166,8 @@ namespace engine
         multisample_state.rasterization_samples = m_SampleCount;
         command_buffer.GetPipelineState().SetMultisampleState(multisample_state);
 
-        auto &vert_shader_module = device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, get_vertex_shader(), sub_mesh.get_shader_variant());
-        auto &frag_shader_module = device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, get_fragment_shader(), sub_mesh.get_shader_variant());
+        auto &vert_shader_module = device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, m_VertexShader, submesh.GetShaderVariant());
+        auto &frag_shader_module = device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, m_FragmentShader, submesh.GetShaderVariant());
 
         std::vector<ShaderModule *> shader_modules{&vert_shader_module, &frag_shader_module};
 
@@ -168,18 +177,19 @@ namespace engine
 
         if (pipeline_layout.GetPushConstantRangeStage(sizeof(PBRMaterialUniform)) != 0)
         {
-            PreparePushConstants(command_buffer, sub_mesh);
+            PreparePushConstants(command_buffer, submesh);
         }
 
-        DescriptorSetLayout &descriptor_set_layout = pipeline_layout.get_descriptor_set_layout(0);
+        DescriptorSetLayout &descriptor_set_layout = pipeline_layout.GetDescriptorSetLayout(0);
 
-        for (auto &texture : sub_mesh.get_material()->textures)
+        for (auto &texture : submesh.GetMaterial()->m_Textures)
         {
             if (auto layout_binding = descriptor_set_layout.GetLayoutBinding(texture.first))
             {
-                command_buffer.BindImage(texture.second->get_image()->get_vk_image_view(),
-                                         texture.second->get_sampler()->vk_sampler,
-                                         0, layout_binding->binding, 0);
+                command_buffer.GetResourceBindingState().BindImage(
+                    texture.second->GetImage()->GetVkImageView(),
+                    texture.second->GetSampler()->m_VkSampler,
+                    0, layout_binding->binding, 0);
             }
         }
 
@@ -191,7 +201,7 @@ namespace engine
         {
             sg::VertexAttribute attribute;
 
-            if (!sub_mesh.get_attribute(input_resource.name, attribute))
+            if (!submesh.GetAttribute(input_resource.name, attribute))
             {
                 continue;
             }
@@ -211,14 +221,14 @@ namespace engine
             vertex_input_state.bindings.push_back(vertex_binding);
         }
 
-        command_buffer.SetVertexInputState(vertex_input_state);
+        command_buffer.GetPipelineState().SetVertexInputState(vertex_input_state);
 
         // Find submesh vertex buffers matching the shader input attribute names
         for (auto &input_resource : vertex_input_resources)
         {
-            const auto &buffer_iter = sub_mesh.vertex_buffers.find(input_resource.name);
+            const auto &buffer_iter = submesh.m_VertexBuffers.find(input_resource.name);
 
-            if (buffer_iter != sub_mesh.vertex_buffers.end())
+            if (buffer_iter != submesh.m_VertexBuffers.end())
             {
                 std::vector<std::reference_wrapper<const core::Buffer>> buffers;
                 buffers.emplace_back(std::ref(buffer_iter->second));
@@ -228,6 +238,72 @@ namespace engine
             }
         }
 
-        DrawSubmeshCommand(command_buffer, sub_mesh);
+        DrawSubmeshCommand(command_buffer, submesh);
+    }
+
+    void GeometrySubpass::PreparePipelineState(CommandBuffer &command_buffer, VkFrontFace front_face, bool double_sided_material)
+    {
+        RasterizationState rasterization_state = m_BaseRasterizationState;
+        rasterization_state.front_face = front_face;
+
+        if (double_sided_material)
+        {
+            rasterization_state.cull_mode = VK_CULL_MODE_NONE;
+        }
+
+        command_buffer.GetPipelineState().SetRasterizationState(rasterization_state);
+
+        MultisampleState multisample_state{};
+        multisample_state.rasterization_samples = m_SampleCount;
+        command_buffer.GetPipelineState().SetMultisampleState(multisample_state);
+    }
+
+    PipelineLayout &GeometrySubpass::PreparePipelineLayout(CommandBuffer &command_buffer, const std::vector<ShaderModule *> &shader_modules)
+    {
+        // Sets any specified resource modes
+        for (auto &shader_module : shader_modules)
+        {
+            for (auto &resource_mode : m_ResourceModeMap)
+            {
+                shader_module->SetResourceMode(resource_mode.first, resource_mode.second);
+            }
+        }
+
+        return command_buffer.GetDevice().GetResourceCache().RequestPipelineLayout(shader_modules);
+    }
+
+    void GeometrySubpass::PreparePushConstants(CommandBuffer &command_buffer, sg::Submesh &submesh)
+    {
+        auto pbr_material = dynamic_cast<const sg::PBRMaterial *>(submesh.GetMaterial());
+
+        PBRMaterialUniform pbr_material_uniform{};
+        pbr_material_uniform.base_color_factor = pbr_material->m_BaseColorFactor;
+        pbr_material_uniform.metallic_factor = pbr_material->m_MetallicFactor;
+        pbr_material_uniform.roughness_factor = pbr_material->m_RoughnessFactor;
+
+        auto data = ToBytes(pbr_material_uniform);
+
+        if (!data.empty())
+        {
+            command_buffer.PushConstants(data);
+        }
+    }
+
+    void GeometrySubpass::DrawSubmeshCommand(CommandBuffer &command_buffer, sg::Submesh &submesh)
+    {
+        // Draw submesh indexed if indices exists
+        if (submesh.m_VertexIndices != 0)
+        {
+            // Bind index buffer of submesh
+            command_buffer.BindIndexBuffer(*submesh.m_IndexBuffer, submesh.m_IndexOffset, submesh.m_IndexType);
+
+            // Draw submesh using indexed data
+            command_buffer.DrawIndexed(submesh.m_VertexIndices, 1, 0, 0, 0);
+        }
+        else
+        {
+            // Draw submesh using vertices only
+            command_buffer.Draw(submesh.m_VerticesCount, 1, 0, 0);
+        }
     }
 }

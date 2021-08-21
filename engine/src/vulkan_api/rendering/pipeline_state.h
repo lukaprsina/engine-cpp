@@ -186,7 +186,11 @@ namespace engine
         const ColorBlendState &GetColorBlendState() const { return m_ColorBlendState; }
         uint32_t GetSubpassIndex() const { return m_SubpassIndex; }
 
-        bool IsDirty() const;
+        bool IsDirty() const
+        {
+            return m_Dirty || m_SpecializationConstantState.IsDirty();
+        }
+
         void ClearDirty();
 
     private:

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scene/entity.h"
+
 #include "common/glm.h"
 ENG_DISABLE_WARNINGS()
 #include <glm/gtx/quaternion.hpp>
@@ -7,8 +9,6 @@ ENG_ENABLE_WARNINGS()
 
 namespace engine
 {
-    class Entity;
-
     namespace sg
     {
         class Transform
@@ -44,7 +44,7 @@ namespace engine
             void InvalidateWorldMatrix() { m_UpdateWorldMatrix = true; }
 
         private:
-            Entity *m_Entity;
+            Entity m_Entity;
             glm::vec3 m_Translation = glm::vec3(0.0, 0.0, 0.0);
             glm::quat m_Rotation = glm::quat(1.0, 0.0, 0.0, 0.0);
             glm::vec3 m_Scale = glm::vec3(1.0, 1.0, 1.0);

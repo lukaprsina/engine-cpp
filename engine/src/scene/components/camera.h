@@ -11,11 +11,14 @@ namespace engine
         class Camera
         {
         public:
-            Camera();
+            Camera(const std::string &name);
             virtual ~Camera();
 
             virtual glm::mat4 GetProjection() = 0;
             glm::mat4 m_PreRotation{1.0f};
+
+        private:
+            std::string m_Name;
         };
     }
 }

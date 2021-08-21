@@ -380,9 +380,8 @@ namespace engine
         LoadTextures();
         LoadMaterials();
         LoadMeshes();
+        LoadCameras();
         LoadNodes();
-
-        // TODO: transform
     }
 
     void GLTFLoader::CheckExtensions()
@@ -1008,7 +1007,6 @@ namespace engine
 
     void GLTFLoader::ParseNode(tinygltf::Node &gltf_node, Entity &entity)
     {
-        auto valid = m_Scene->GetRegistry().valid(entity.GetHandle());
         auto &transform = entity.AddComponent<sg::Transform>(entity);
         if (!gltf_node.translation.empty())
         {

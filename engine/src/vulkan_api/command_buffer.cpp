@@ -117,6 +117,253 @@ namespace engine
         return VK_SUCCESS;
     }
 
+    void CommandBuffer::Flush(VkPipelineBindPoint pipeline_bind_point)
+    {
+        FlushPipelineState(pipeline_bind_point);
+
+        FlushPushConstants();
+
+        FlushDescriptorState(pipeline_bind_point);
+    }
+
+    void CommandBuffer::FlushPipelineState(VkPipelineBindPoint pipeline_bind_point)
+    {
+        // Create a new pipeline only if the graphics state changed
+        if (!m_PipelineState.IsDirty())
+        {
+            return;
+        }
+
+        m_PipelineState.ClearDirty();
+
+        // Create and bind pipeline
+        if (pipeline_bind_point == VK_PIPELINE_BIND_POINT_GRAPHICS)
+        {
+            m_PipelineState.SetRenderPass(*m_CurrentRenderPass.render_pass);
+            auto &pipeline = GetDevice().GetResourceCache().RequestGraphicsPipeline(m_PipelineState);
+
+            vkCmdBindPipeline(m_Handle,
+                              pipeline_bind_point,
+                              pipeline.GetHandle());
+        }
+        else if (pipeline_bind_point == VK_PIPELINE_BIND_POINT_COMPUTE)
+        {
+            auto &pipeline = GetDevice().GetResourceCache().RequestComputePipeline(m_PipelineState);
+
+            vkCmdBindPipeline(m_Handle,
+                              pipeline_bind_point,
+                              pipeline.GetHandle());
+        }
+        else
+        {
+            throw "Only graphics and compute pipeline bind points are supported now";
+        }
+    }
+
+    void CommandBuffer::FlushDescriptorState(VkPipelineBindPoint pipeline_bind_point)
+    {
+        ENG_ASSERT(m_CommandPool.GetRenderFrame(), "The command pool must be associated to a render frame");
+
+        const auto &pipeline_layout = m_PipelineState.GetPipelineLayout();
+
+        std::unordered_set<uint32_t> update_descriptor_sets;
+
+        // Iterate over the shader sets to check if they have already been bound
+        // If they have, add the set so that the command buffer later updates it
+        for (auto &set_it : pipeline_layout.GetShaderSets())
+        {
+            uint32_t descriptor_set_id = set_it.first;
+
+            auto descriptor_set_layout_it = m_DescriptorSetLayoutBindingState.find(descriptor_set_id);
+
+            if (descriptor_set_layout_it != m_DescriptorSetLayoutBindingState.end())
+            {
+                if (descriptor_set_layout_it->second->GetHandle() != pipeline_layout.GetDescriptorSetLayout(descriptor_set_id).GetHandle())
+                {
+                    update_descriptor_sets.emplace(descriptor_set_id);
+                }
+            }
+        }
+
+        // Validate that the bound descriptor set layouts exist in the pipeline layout
+        for (auto set_it = m_DescriptorSetLayoutBindingState.begin(); set_it != m_DescriptorSetLayoutBindingState.end();)
+        {
+            if (!pipeline_layout.HasDescriptorSetLayout(set_it->first))
+            {
+                set_it = m_DescriptorSetLayoutBindingState.erase(set_it);
+            }
+            else
+            {
+                ++set_it;
+            }
+        }
+
+        // Check if a descriptor set needs to be created
+        if (m_ResourceBindingState.IsDirty() || !update_descriptor_sets.empty())
+        {
+            m_ResourceBindingState.ClearDirty();
+
+            // Iterate over all of the resource sets bound by the command buffer
+            for (auto &resource_set_it : m_ResourceBindingState.GetResourceSets())
+            {
+                uint32_t descriptor_set_id = resource_set_it.first;
+                auto &resource_set = resource_set_it.second;
+
+                // Don't update resource set if it's not in the update list OR its state hasn't changed
+                if (!resource_set.IsDirty() && (update_descriptor_sets.find(descriptor_set_id) == update_descriptor_sets.end()))
+                {
+                    continue;
+                }
+
+                // Clear dirty flag for resource set
+                m_ResourceBindingState.ClearDirty(descriptor_set_id);
+
+                // Skip resource set if a descriptor set layout doesn't exist for it
+                if (!pipeline_layout.HasDescriptorSetLayout(descriptor_set_id))
+                {
+                    continue;
+                }
+
+                auto &descriptor_set_layout = pipeline_layout.GetDescriptorSetLayout(descriptor_set_id);
+
+                // Make descriptor set layout bound for current set
+                m_DescriptorSetLayoutBindingState[descriptor_set_id] = &descriptor_set_layout;
+
+                BindingMap<VkDescriptorBufferInfo> buffer_infos;
+                BindingMap<VkDescriptorImageInfo> image_infos;
+
+                std::vector<uint32_t> dynamic_offsets;
+
+                // The bindings we want to update before binding, if empty we update all bindings
+                std::vector<uint32_t> bindings_to_update;
+
+                // Iterate over all resource bindings
+                for (auto &binding_it : resource_set.GetResourceBindings())
+                {
+                    auto binding_index = binding_it.first;
+                    auto &binding_resources = binding_it.second;
+
+                    // Check if binding exists in the pipeline layout
+                    if (auto binding_info = descriptor_set_layout.GetLayoutBinding(binding_index))
+                    {
+                        // If update after bind is enabled, we store the binding index of each binding that need to be updated before being bound
+                        if (m_UpdateAfterBind && !(descriptor_set_layout.GetLayoutBindingFlag(binding_index) & VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT))
+                        {
+                            bindings_to_update.push_back(binding_index);
+                        }
+
+                        // Iterate over all binding resources
+                        for (auto &element_it : binding_resources)
+                        {
+                            auto array_element = element_it.first;
+                            auto &resource_info = element_it.second;
+
+                            // Pointer references
+                            auto &buffer = resource_info.buffer;
+                            auto &sampler = resource_info.sampler;
+                            auto &image_view = resource_info.image_view;
+
+                            // Get buffer info
+                            if (buffer != nullptr && IsBufferDescriptorType(binding_info->descriptorType))
+                            {
+                                VkDescriptorBufferInfo buffer_info{};
+
+                                buffer_info.buffer = resource_info.buffer->GetHandle();
+                                buffer_info.offset = resource_info.offset;
+                                buffer_info.range = resource_info.range;
+
+                                if (IsDynamicBufferDescriptorType(binding_info->descriptorType))
+                                {
+                                    dynamic_offsets.push_back(ToUint32_t(buffer_info.offset));
+
+                                    buffer_info.offset = 0;
+                                }
+
+                                buffer_infos[binding_index][array_element] = std::move(buffer_info);
+                            }
+
+                            // Get image info
+                            else if (image_view != nullptr || sampler != VK_NULL_HANDLE)
+                            {
+                                // Can be null for input attachments
+                                VkDescriptorImageInfo image_info{};
+                                image_info.sampler = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
+                                image_info.imageView = image_view->GetHandle();
+
+                                if (image_view != nullptr)
+                                {
+                                    // Add image layout info based on descriptor type
+                                    switch (binding_info->descriptorType)
+                                    {
+                                    case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                                        image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                        break;
+                                    case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+                                        if (IsDepthStencilFormat(image_view->GetFormat()))
+                                        {
+                                            image_info.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+                                        }
+                                        else
+                                        {
+                                            image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                        }
+                                        break;
+                                    case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+                                        image_info.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+                                        break;
+
+                                    default:
+                                        continue;
+                                    }
+                                }
+
+                                image_infos[binding_index][array_element] = std::move(image_info);
+                            }
+                        }
+                    }
+                }
+
+                // Request a descriptor set from the render frame, and write the buffer infos and image infos of all the specified bindings
+                auto &descriptor_set = m_CommandPool.GetRenderFrame()->RequestDescriptorSet(descriptor_set_layout, buffer_infos, image_infos, m_CommandPool.GetThreadIndex());
+                descriptor_set.Update(bindings_to_update);
+
+                VkDescriptorSet descriptor_set_handle = descriptor_set.GetHandle();
+
+                // Bind descriptor set
+                vkCmdBindDescriptorSets(m_Handle,
+                                        pipeline_bind_point,
+                                        pipeline_layout.GetHandle(),
+                                        descriptor_set_id,
+                                        1, &descriptor_set_handle,
+                                        ToUint32_t(dynamic_offsets.size()),
+                                        dynamic_offsets.data());
+            }
+        }
+    }
+
+    void CommandBuffer::FlushPushConstants()
+    {
+        if (m_StoredPushConstants.empty())
+        {
+            return;
+        }
+
+        const PipelineLayout &pipeline_layout = m_PipelineState.GetPipelineLayout();
+
+        VkShaderStageFlags shader_stage = pipeline_layout.GetPushConstantRangeStage(ToUint32_t(m_StoredPushConstants.size()));
+
+        if (shader_stage)
+        {
+            vkCmdPushConstants(m_Handle, pipeline_layout.GetHandle(), shader_stage, 0, ToUint32_t(m_StoredPushConstants.size()), m_StoredPushConstants.data());
+        }
+        else
+        {
+            ENG_CORE_WARN("Push constant range [{}, {}] not found", 0, m_StoredPushConstants.size());
+        }
+
+        m_StoredPushConstants.clear();
+    }
+
     void CommandBuffer::BeginRenderPass(const RenderTarget &render_target, const std::vector<LoadStoreInfo> &load_store_infos, const std::vector<VkClearValue> &clear_values, const std::vector<std::unique_ptr<Subpass>> &subpasses, VkSubpassContents contents)
     {
         // Reset state
@@ -191,6 +438,21 @@ namespace engine
         return m_CommandPool.GetDevice().GetResourceCache().RequestRenderPass(render_target.GetAttachments(), load_store_infos, subpass_infos);
     }
 
+    void CommandBuffer::PushConstants(const std::vector<uint8_t> &values)
+    {
+        uint32_t push_constant_size = ToUint32_t(m_StoredPushConstants.size() + values.size());
+
+        if (push_constant_size > m_MaxPushConstantsSize)
+        {
+            ENG_CORE_ERROR("Push constant limit of {} exceeded (pushing {} bytes for a total of {} bytes)", m_MaxPushConstantsSize, values.size(), push_constant_size);
+            throw std::runtime_error("Push constant limit exceeded.");
+        }
+        else
+        {
+            m_StoredPushConstants.insert(m_StoredPushConstants.end(), values.begin(), values.end());
+        }
+    }
+
     void CommandBuffer::BindBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element)
     {
         m_ResourceBindingState.BindBuffer(buffer, offset, range, set,
@@ -206,6 +468,22 @@ namespace engine
         SetSpecializationConstant(0, ToUint32_t(lighting_state.directional_lights.size()));
         SetSpecializationConstant(1, ToUint32_t(lighting_state.point_lights.size()));
         SetSpecializationConstant(2, ToUint32_t(lighting_state.spot_lights.size()));
+    }
+
+    void CommandBuffer::BindVertexBuffers(uint32_t first_binding,
+                                          const std::vector<std::reference_wrapper<const core::Buffer>> &buffers,
+                                          const std::vector<VkDeviceSize> &offsets)
+    {
+        std::vector<VkBuffer> buffer_handles(buffers.size(), VK_NULL_HANDLE);
+        std::transform(buffers.begin(), buffers.end(), buffer_handles.begin(),
+                       [](const core::Buffer &buffer)
+                       { return buffer.GetHandle(); });
+        vkCmdBindVertexBuffers(m_Handle, first_binding, ToUint32_t(buffer_handles.size()), buffer_handles.data(), offsets.data());
+    }
+
+    void CommandBuffer::BindIndexBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkIndexType index_type)
+    {
+        vkCmdBindIndexBuffer(m_Handle, buffer.GetHandle(), offset, index_type);
     }
 
     void CommandBuffer::NextSubpass()
@@ -312,8 +590,25 @@ namespace engine
         vkCmdEndRenderPass(m_Handle);
     }
 
+    void CommandBuffer::Draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance)
+    {
+        Flush(VK_PIPELINE_BIND_POINT_GRAPHICS);
+        vkCmdDraw(m_Handle, vertex_count, instance_count, first_vertex, first_instance);
+    }
+
+    void CommandBuffer::DrawIndexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance)
+    {
+        Flush(VK_PIPELINE_BIND_POINT_GRAPHICS);
+        vkCmdDrawIndexed(m_Handle, index_count, instance_count, first_index, vertex_offset, first_instance);
+    }
+
     void CommandBuffer::SetSpecializationConstant(uint32_t constant_id, const std::vector<uint8_t> &data)
     {
         m_PipelineState.SetSpecializationConstant(constant_id, data);
+    }
+
+    Device &CommandBuffer::GetDevice() const
+    {
+        return m_CommandPool.GetDevice();
     }
 }

@@ -4,7 +4,8 @@ namespace engine
 {
     namespace sg
     {
-        Camera::Camera()
+        Camera::Camera(const std::string &name)
+            : m_Name(name)
         {
         }
 

@@ -12,6 +12,7 @@ namespace engine
     {
         class Camera;
         class Submesh;
+        class Transform;
     }
 
     struct alignas(16) GlobalUniform
@@ -39,8 +40,8 @@ namespace engine
 
         virtual void Prepare() override;
         virtual void Draw(CommandBuffer &command_buffer) override;
-        void GetSortedNodes(std::multimap<float, std::pair<Entity *, sg::Submesh *>> opaque_nodes,
-                            std::multimap<float, std::pair<Entity *, sg::Submesh *>> transparent_nodes);
+        void GetSortedNodes(std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes,
+                            std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes);
 
         void UpdateUniform(CommandBuffer &command_buffer, sg::Transform &transform, size_t thread_index = 0);
 

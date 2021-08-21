@@ -18,7 +18,7 @@ namespace engine
         {
         public:
             Material(const std::string &name);
-            ~Material();
+            virtual ~Material();
             Material(Material &&other) = default;
 
             std::unordered_map<std::string, Texture *> m_Textures;

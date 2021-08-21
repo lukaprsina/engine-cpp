@@ -1,7 +1,5 @@
 #include "scene/components/transform.h"
 
-#include "scene/entity.h"
-
 ENG_DISABLE_WARNINGS()
 #include <glm/gtx/matrix_decompose.hpp>
 ENG_ENABLE_WARNINGS()
@@ -11,7 +9,7 @@ namespace engine
     namespace sg
     {
         Transform::Transform(Entity &entity)
-            : m_Entity(&entity)
+            : m_Entity(entity)
         {
         }
 
@@ -48,11 +46,10 @@ namespace engine
 
             m_WorldMatrix = GetMatrix();
 
-            if (m_Entity)
-            {
-                auto &transform = m_Entity->GetComponent<sg::Transform>();
-                m_WorldMatrix = transform.GetWorldMatrix() * m_WorldMatrix;
-            }
+            auto &scene = m_Entity.GetScene();
+
+            /* auto &transform = m_Entity.GetComponent<sg::Transform>();
+            m_WorldMatrix = transform.GetWorldMatrix() * m_WorldMatrix; */
 
             m_UpdateWorldMatrix = false;
         }

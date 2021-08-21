@@ -63,6 +63,7 @@ namespace engine
         }
 
         entt::entity GetHandle() { return m_Handle; }
+        Scene &GetScene() { return *m_Scene; }
 
     private:
         entt::entity m_Handle{entt::null};

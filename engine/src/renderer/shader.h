@@ -123,10 +123,13 @@ namespace engine
         ShaderModule &operator=(const ShaderModule &) = delete;
         ShaderModule &operator=(ShaderModule &&) = delete;
 
+        void SetResourceMode(const std::string &resource_name, const ShaderResourceMode &resource_mode);
+
         size_t GetID() const { return m_ID; }
         VkShaderStageFlagBits GetStage() const { return m_Stage; }
         const std::string &GetEntryPoint() const { return m_EntryPoint; }
         const std::vector<uint32_t> &GetBinary() const { return m_Spirv; }
+        const std::vector<ShaderResource> &GetResources() const { return m_Resources; }
 
     private:
         Device &m_Device;

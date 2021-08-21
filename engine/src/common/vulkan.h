@@ -7,15 +7,6 @@
 
 namespace engine
 {
-    bool IsDepthOnlyFormat(VkFormat format);
-    bool IsDepthStencilFormat(VkFormat format);
-
-    VkFormat GetSuitableDepthFormat(VkPhysicalDevice physical_device, bool depth_only = false,
-                                    const std::vector<VkFormat> &depth_format_priority_list = {
-                                        VK_FORMAT_D32_SFLOAT,
-                                        VK_FORMAT_D24_UNORM_S8_UINT,
-                                        VK_FORMAT_D16_UNORM});
-
     struct ImageMemoryBarrier
     {
         VkPipelineStageFlags src_stage_mask{VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT};
@@ -33,4 +24,17 @@ namespace engine
         VkAttachmentLoadOp load_op = VK_ATTACHMENT_LOAD_OP_CLEAR;
         VkAttachmentStoreOp store_op = VK_ATTACHMENT_STORE_OP_STORE;
     };
+
+    bool IsDepthOnlyFormat(VkFormat format);
+    bool IsDepthStencilFormat(VkFormat format);
+
+    VkFormat GetSuitableDepthFormat(VkPhysicalDevice physical_device, bool depth_only = false,
+                                    const std::vector<VkFormat> &depth_format_priority_list = {
+                                        VK_FORMAT_D32_SFLOAT,
+                                        VK_FORMAT_D24_UNORM_S8_UINT,
+                                        VK_FORMAT_D16_UNORM});
+
+    bool IsDynamicBufferDescriptorType(VkDescriptorType descriptor_type);
+    bool IsBufferDescriptorType(VkDescriptorType descriptor_type);
+
 }

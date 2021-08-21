@@ -4,11 +4,8 @@ namespace engine
 {
     namespace sg
     {
-        PerspectiveCamera::PerspectiveCamera()
-        {
-        }
-
-        PerspectiveCamera::~PerspectiveCamera()
+        PerspectiveCamera::PerspectiveCamera(const std::string &name)
+            : Camera(name)
         {
         }
     }

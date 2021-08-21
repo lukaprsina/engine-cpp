@@ -214,4 +214,33 @@ namespace engine
     {
         other.m_Stage = {};
     }
+
+    void ShaderModule::SetResourceMode(const std::string &resource_name, const ShaderResourceMode &resource_mode)
+    {
+        auto it = std::find_if(m_Resources.begin(), m_Resources.end(), [&resource_name](const ShaderResource &resource)
+                               { return resource.name == resource_name; });
+
+        if (it != m_Resources.end())
+        {
+            if (resource_mode == ShaderResourceMode::Dynamic)
+            {
+                if (it->type == ShaderResourceType::BufferUniform || it->type == ShaderResourceType::BufferStorage)
+                {
+                    it->mode = resource_mode;
+                }
+                else
+                {
+                    ENG_CORE_WARN("Resource `{}` does not support dynamic.", resource_name);
+                }
+            }
+            else
+            {
+                it->mode = resource_mode;
+            }
+        }
+        else
+        {
+            ENG_CORE_WARN("Resource `{}` not found for shader.", resource_name);
+        }
+    }
 }

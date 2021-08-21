@@ -4,6 +4,7 @@
 #include "vulkan_api/queue_family.h"
 #include "vulkan_api/core/descriptor_set.h"
 #include "vulkan_api/core/descriptor_pool.h"
+#include "common/resource_caching.h"
 
 namespace engine
 {
@@ -173,6 +174,14 @@ namespace engine
         command_pool_it = res_ins_it.first;
 
         return command_pool_it->second;
+    }
+
+    DescriptorSet &RenderFrame::RequestDescriptorSet(DescriptorSetLayout &descriptor_set_layout, const BindingMap<VkDescriptorBufferInfo> &buffer_infos, const BindingMap<VkDescriptorImageInfo> &image_infos, size_t thread_index)
+    {
+        ENG_ASSERT(thread_index < m_ThreadCount, "Thread index is out of bounds");
+        // TODO: request resource
+        auto &descriptor_pool = RequestResource(m_Device, nullptr, *m_DescriptorPools.at(thread_index), descriptor_set_layout);
+        return RequestResource(m_Device, nullptr, *m_DescriptorSets.at(thread_index), descriptor_set_layout, descriptor_pool, buffer_infos, image_infos);
     }
 
     CommandBuffer &RenderFrame::RequestCommandBuffer(const QueueFamily &queue_family,
