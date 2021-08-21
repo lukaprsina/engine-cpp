@@ -6,14 +6,6 @@ namespace engine
 {
     namespace sg
     {
-        Submesh::Submesh()
-        {
-        }
-
-        Submesh::~Submesh()
-        {
-        }
-
         void Submesh::SetAttribute(const std::string &attribute_name, const VertexAttribute &attribute)
         {
             m_VertexAttributes[attribute_name] = attribute;

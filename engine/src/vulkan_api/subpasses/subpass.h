@@ -8,6 +8,7 @@
 #include "vulkan_api/render_context.h"
 #include "renderer/shader.h"
 #include "scene/entity.h"
+#include "scene/scene.h"
 #include "common/glm.h"
 
 namespace engine
@@ -69,21 +70,22 @@ namespace engine
         LightingState &GetLightingState() { return m_LightingState; }
 
         template <typename T>
-        void AllocateLights(const std::vector<std::unique_ptr<Entity>> &scene_entities,
-                            size_t light_count)
+        void AllocateLights(Scene &scene, size_t light_count)
         {
-            ENG_ASSERT(scene_entities.size() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");
+            auto view = scene.GetRegistry().view<sg::Light, sg::Transform>();
+
+            // TODO: size hint
+            // ENG_ASSERT(view.s() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");
 
             m_LightingState.directional_lights.clear();
             m_LightingState.point_lights.clear();
             m_LightingState.spot_lights.clear();
 
-            for (auto &scene_entity : scene_entities)
+            for (auto &entity : view)
             {
-                // TODO: optimize with entt
-                auto &scene_light = scene_entity->GetComponent<sg::Light>();
+                auto [scene_light, transform] = view.get<sg::Light, sg::Transform>(entity);
+
                 const auto &properties = scene_light.GetLightProperties();
-                auto &transform = scene_entity->GetComponent<sg::Transform>();
 
                 LightInfo light{{transform.GetTranslation(), static_cast<float>(scene_light.GetLightType())},
                                 {properties.color, properties.intensity},

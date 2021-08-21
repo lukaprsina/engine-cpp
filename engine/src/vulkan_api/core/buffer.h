@@ -15,7 +15,10 @@ namespace engine
                    VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_MAPPED_BIT);
             ~Buffer();
 
+            Buffer(const Buffer &) = delete;
             Buffer(Buffer &&other);
+            Buffer &operator=(const Buffer &) = delete;
+            Buffer &operator=(Buffer &&) = delete;
 
             void Update(const uint8_t *data, size_t size, size_t offset = 0);
             void Update(void *data, size_t size, size_t offset = 0);

@@ -13,7 +13,7 @@ namespace engine
     ForwardSubpass::ForwardSubpass(RenderContext &render_context,
                                    ShaderSource &&vertex_shader,
                                    ShaderSource &&fragment_shader,
-                                   Scene &scene, Camera &camera)
+                                   Scene &scene, sg::Camera &camera)
         : GeometrySubpass(render_context,
                           std::move(vertex_shader),
                           std::move(fragment_shader),
@@ -51,7 +51,8 @@ namespace engine
 
     void ForwardSubpass::Draw(CommandBuffer &command_buffer)
     {
-        AllocateLights<ForwardLights>(m_Scene.GetLights(), MAX_FORWARD_LIGHT_COUNT);
+        AllocateLights<ForwardLights>(m_Scene, MAX_FORWARD_LIGHT_COUNT);
+
         command_buffer.BindLighting(m_LightingState, 0, 4);
         GeometrySubpass::Draw(command_buffer);
     }

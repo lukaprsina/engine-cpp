@@ -12,6 +12,7 @@
 #include "scene/components/submesh.h"
 #include "scene/components/texture.h"
 #include "scene/components/transform.h"
+#include "scene/components/perspective_camera.h"
 #include "scene/entity.h"
 #include "scene/scene.h"
 #include "vulkan_api/command_pool.h"
@@ -660,6 +661,11 @@ namespace engine
 
     void GLTFLoader::LoadCameras()
     {
+        for (auto &gltf_camera : m_Model.cameras)
+        {
+            auto entity = ParseCamera(gltf_camera);
+            m_Scene->GetCameras().emplace_back(std::make_unique<Entity>(entity));
+        }
     }
 
     void GLTFLoader::LoadAnimations()
@@ -701,8 +707,8 @@ namespace engine
 
             if (gltf_node.camera >= 0)
             {
-                // entity = *m_Scene->GetCameras().at(gltf_node.camera);
-                // identified = true;
+                entity = *m_Scene->GetCameras().at(gltf_node.camera);
+                identified = true;
             }
 
             if (auto extension = GetExtension(gltf_node.extensions, KHR_LIGHTS_PUNCTUAL_EXTENSION))
@@ -978,6 +984,25 @@ namespace engine
     {
         auto entity = m_Scene->CreateEntity();
         entity.AddComponent<sg::Mesh>(gltf_mesh.name);
+        return entity;
+    }
+
+    Entity GLTFLoader::ParseCamera(const tinygltf::Camera &gltf_camera) const
+    {
+        auto entity = m_Scene->CreateEntity();
+        if (gltf_camera.type == "perspective")
+        {
+            auto &camera = entity.AddComponent<sg::PerspectiveCamera>(gltf_camera.name);
+
+            camera.m_AspectRatio = static_cast<float>(gltf_camera.perspective.aspectRatio);
+            camera.m_Fov = static_cast<float>(gltf_camera.perspective.yfov);
+            camera.m_NearPlane = static_cast<float>(gltf_camera.perspective.znear);
+            camera.m_FarPlane = static_cast<float>(gltf_camera.perspective.zfar);
+        }
+
+        else
+            ENG_CORE_WARN("Camera type not supported");
+
         return entity;
     }
 

@@ -42,6 +42,20 @@ namespace engine
             }
         }
 
+        void AABB::Transform(glm::mat4 &transform)
+        {
+            m_Min = m_Max = glm::vec4(m_Min, 1.0f) * transform;
+
+            // Update bounding box for the remaining 7 corners of the box
+            Update(glm::vec4(m_Min.x, m_Min.y, m_Max.z, 1.0f) * transform);
+            Update(glm::vec4(m_Min.x, m_Max.y, m_Min.z, 1.0f) * transform);
+            Update(glm::vec4(m_Min.x, m_Max.y, m_Max.z, 1.0f) * transform);
+            Update(glm::vec4(m_Max.x, m_Min.y, m_Min.z, 1.0f) * transform);
+            Update(glm::vec4(m_Max.x, m_Min.y, m_Max.z, 1.0f) * transform);
+            Update(glm::vec4(m_Max.x, m_Max.y, m_Min.z, 1.0f) * transform);
+            Update(glm::vec4(m_Max, 1.0f) * transform);
+        }
+
         void AABB::Reset()
         {
             m_Min = std::numeric_limits<glm::vec3>::max();

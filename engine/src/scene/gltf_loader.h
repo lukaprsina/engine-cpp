@@ -21,6 +21,7 @@ namespace engine
         class PBRMaterial;
         class Mesh;
         class Submesh;
+        class Camera;
         class Transform;
     }
 
@@ -66,6 +67,7 @@ namespace engine
         std::unique_ptr<sg::Texture> ParseTexture(const tinygltf::Texture &gltf_texture) const;
         std::unique_ptr<sg::PBRMaterial> ParseMaterial(const tinygltf::Material &gltf_material) const;
         Entity ParseMesh(const tinygltf::Mesh &gltf_mesh) const;
+        Entity ParseCamera(const tinygltf::Camera &gltf_camera) const;
         void ParseNode(tinygltf::Node &gltf_node, Entity &entity);
 
         bool IsExtensionEnabled(const std::string &requested_extension);

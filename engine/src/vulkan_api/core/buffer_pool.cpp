@@ -11,10 +11,6 @@ namespace engine
     {
     }
 
-    BufferAllocation::~BufferAllocation()
-    {
-    }
-
     void BufferAllocation::Update(const std::vector<uint8_t> &data, uint32_t offset)
     {
         ENG_ASSERT(m_Buffer, "Invalid buffer pointer");
@@ -51,10 +47,6 @@ namespace engine
             throw std::runtime_error("Usage not recognised");
     }
 
-    BufferBlock::~BufferBlock()
-    {
-    }
-
     BufferAllocation BufferBlock::Allocate(const uint32_t allocate_size)
     {
         ENG_ASSERT(allocate_size > 0, "Allocation size must be greater than zero");
@@ -73,10 +65,6 @@ namespace engine
           m_BlockSize{block_size},
           m_Usage{usage},
           m_MemoryUsage{memory_usage}
-    {
-    }
-
-    BufferPool::~BufferPool()
     {
     }
 

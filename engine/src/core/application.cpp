@@ -12,7 +12,7 @@
 #include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/subpasses/forward_subpass.h"
 #include "renderer/shader.h"
-#include "renderer/camera.h"
+#include "scene/components/camera.h"
 #include "scene/scene.h"
 #include "scene/gltf_loader.h"
 
@@ -107,7 +107,7 @@ namespace engine
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
 
-        auto camera = std::make_unique<Camera>();
+        auto camera = std::make_unique<sg::Camera>();
         LoadScene("scenes/sponza/Sponza01.gltf");
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),

@@ -19,9 +19,6 @@ namespace engine
         class Submesh
         {
         public:
-            Submesh();
-            ~Submesh();
-
             void SetAttribute(const std::string &attribute_name, const VertexAttribute &attribute);
             bool GetAttribute(const std::string &attribute_name, VertexAttribute &attribute) const;
 

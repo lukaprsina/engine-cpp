@@ -19,7 +19,7 @@ namespace engine
         ForwardSubpass(RenderContext &render_context,
                        ShaderSource &&vertex_shader,
                        ShaderSource &&fragment_shader,
-                       Scene &scene, Camera &camera);
+                       Scene &scene, sg::Camera &camera);
         ~ForwardSubpass();
 
         virtual void Prepare() override;

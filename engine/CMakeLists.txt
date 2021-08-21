@@ -80,7 +80,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.h
     src/vulkan_api/subpasses/forward_subpass.h
     src/scene/scene.h
-    src/renderer/camera.h
+    src/scene/components/camera.h
     src/vulkan_api/core/pipeline_layout.h
     src/vulkan_api/core/descriptor_set_layout.h
     src/vulkan_api/core/descriptor_pool.h
@@ -112,6 +112,7 @@ set(VULKAN_API_FILES
     src/scene/components/aabb.h
     src/scene/components/submesh.h
     src/scene/components/transform.h
+    src/scene/components/perspective_camera.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -136,7 +137,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.cpp
     src/vulkan_api/subpasses/forward_subpass.cpp
     src/scene/scene.cpp
-    src/renderer/camera.cpp
+    src/scene/components/camera.cpp
     src/vulkan_api/core/pipeline_layout.cpp
     src/vulkan_api/core/descriptor_set_layout.cpp
     src/vulkan_api/core/descriptor_pool.cpp
@@ -167,7 +168,8 @@ set(VULKAN_API_FILES
     src/scene/components/mesh.cpp
     src/scene/components/aabb.cpp
     src/scene/components/submesh.cpp
-    src/scene/components/transform.cpp)
+    src/scene/components/transform.cpp
+    src/scene/components/perspective_camera.cpp)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})

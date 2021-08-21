@@ -13,7 +13,6 @@ namespace engine
         BufferAllocation(BufferAllocation &&) = default;
         BufferAllocation &operator=(const BufferAllocation &) = delete;
         BufferAllocation &operator=(BufferAllocation &&) = default;
-        ~BufferAllocation();
 
         void Update(const std::vector<uint8_t> &data, uint32_t offset = 0);
 
@@ -42,7 +41,6 @@ namespace engine
     {
     public:
         BufferBlock(Device &device, VkDeviceSize size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage);
-        ~BufferBlock();
 
         BufferAllocation Allocate(uint32_t size);
         void Reset() { m_Offset = 0; }
@@ -59,7 +57,6 @@ namespace engine
     {
     public:
         BufferPool(Device &device, VkDeviceSize block_size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage = VMA_MEMORY_USAGE_CPU_TO_GPU);
-        ~BufferPool();
 
         BufferBlock &RequestBufferBlock(VkDeviceSize minimum_size);
         void Reset();

@@ -76,7 +76,9 @@ namespace engine
 
         void SetSpecializationConstant(uint32_t constant_id, const std::vector<uint8_t> &data);
 
+        Device &GetDevice() const { return m_CommandPool.GetDevice(); }
         const VkCommandBuffer &GetHandle() const { return m_Handle; }
+        PipelineState &GetPipelineState() { return m_PipelineState; }
 
         const VkCommandBufferLevel m_Level;
 
