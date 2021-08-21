@@ -26,8 +26,8 @@ namespace engine
 
         DescriptorSet &operator=(DescriptorSet &&) = delete;
 
-        void Reset(const BindingMap<VkDescriptorBufferInfo> &new_buffer_infos = {},
-                   const BindingMap<VkDescriptorImageInfo> &new_image_infos = {});
+        /* void Reset(const BindingMap<VkDescriptorBufferInfo> &new_buffer_infos = {},
+                   const BindingMap<VkDescriptorImageInfo> &new_image_infos = {}); */
 
         void Update(const std::vector<uint32_t> &bindings_to_update = {});
 

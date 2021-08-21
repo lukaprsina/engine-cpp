@@ -16,6 +16,8 @@ namespace engine
         Pipeline &operator=(const Pipeline &) = delete;
         Pipeline &operator=(Pipeline &&) = delete;
 
+        VkPipeline GetHandle() const { return m_Handle; }
+
     protected:
         PipelineState m_State;
         VkPipeline m_Handle = VK_NULL_HANDLE;

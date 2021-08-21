@@ -28,4 +28,24 @@ namespace engine
     const std::string ToString(VkBlendOp operation);
 
     std::vector<std::string> Split(const std::string &input, char delim);
+
+    template <typename T>
+    inline const std::string ToString(uint32_t bitmask, const std::map<T, const char *> string_map)
+    {
+        std::stringstream result;
+        bool append = false;
+        for (const auto &s : string_map)
+        {
+            if (bitmask & s.first)
+            {
+                if (append)
+                {
+                    result << " / ";
+                }
+                result << s.second;
+                append = true;
+            }
+        }
+        return result.str();
+    }
 }

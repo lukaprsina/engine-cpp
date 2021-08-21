@@ -22,6 +22,7 @@ namespace engine
             void SetImage(Image &image) { m_Image = &image; }
             const Image &GetImage() const;
             VkImageSubresourceRange GetSubresourceRange() const { return m_SubresourceRange; }
+            VkImageSubresourceLayers GetSubresourceLayers() const;
             VkFormat GetFormat() const { return m_Format; }
             VkImageView GetHandle() const { return m_Handle; }
 

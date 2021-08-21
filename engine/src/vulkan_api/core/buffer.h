@@ -15,9 +15,21 @@ namespace engine
                    VmaAllocationCreateFlags flags = VMA_ALLOCATION_CREATE_MAPPED_BIT);
             ~Buffer();
 
+            Buffer(const Buffer &) = delete;
             Buffer(Buffer &&other);
+            Buffer &operator=(const Buffer &) = delete;
+            Buffer &operator=(Buffer &&) = delete;
 
+            void Update(const uint8_t *data, size_t size, size_t offset = 0);
+            void Update(void *data, size_t size, size_t offset = 0);
+            void Update(const std::vector<uint8_t> &data, size_t offset = 0);
+
+            uint8_t *Map();
             void Unmap();
+            void Flush() const;
+
+            VkBuffer GetHandle() const { return m_Handle; }
+            VkDeviceSize GetSize() const { return m_Size; }
 
         private:
             Device &m_Device;

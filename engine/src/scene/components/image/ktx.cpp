@@ -134,14 +134,14 @@ namespace engine
 					for (uint32_t level = 0; level < texture->numLevels; level++)
 					{
 						ktx_size_t offset;
-						KTX_error_code result;
+
 						if (cubemap)
 						{
-							result = ktxTexture_GetImageOffset(texture, level, 0, layer, &offset);
+							ktxTexture_GetImageOffset(texture, level, 0, layer, &offset);
 						}
 						else
 						{
-							result = ktxTexture_GetImageOffset(texture, level, layer, 0, &offset);
+							ktxTexture_GetImageOffset(texture, level, layer, 0, &offset);
 						}
 						layer_offsets.push_back(static_cast<VkDeviceSize>(offset));
 					}

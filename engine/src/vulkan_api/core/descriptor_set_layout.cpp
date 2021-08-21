@@ -200,4 +200,27 @@ namespace engine
         return std::make_unique<VkDescriptorSetLayoutBinding>(it->second);
     }
 
+    std::unique_ptr<VkDescriptorSetLayoutBinding> DescriptorSetLayout::GetLayoutBinding(const std::string &name) const
+    {
+        auto it = m_ResourcesLookup.find(name);
+
+        if (it == m_ResourcesLookup.end())
+        {
+            return nullptr;
+        }
+
+        return GetLayoutBinding(it->second);
+    }
+
+    VkDescriptorBindingFlagsEXT DescriptorSetLayout::GetLayoutBindingFlag(const uint32_t binding_index) const
+    {
+        auto it = m_BindingFlagsLookup.find(binding_index);
+
+        if (it == m_BindingFlagsLookup.end())
+        {
+            return 0;
+        }
+
+        return it->second;
+    }
 }

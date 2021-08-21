@@ -13,6 +13,7 @@ namespace engine
     class RenderTarget;
     class PipelineState;
     class ResourceBindingState;
+    struct LightingState;
 
     namespace core
     {
@@ -50,6 +51,10 @@ namespace engine
         VkResult Begin(VkCommandBufferUsageFlags flags, CommandBuffer *primary_cmd_buf = nullptr);
         VkResult Begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass, const Framebuffer *framebuffer, uint32_t subpass_index);
         VkResult End();
+        void Flush(VkPipelineBindPoint pipeline_bind_point);
+        void FlushPipelineState(VkPipelineBindPoint pipeline_bind_point);
+        void FlushDescriptorState(VkPipelineBindPoint pipeline_bind_point);
+        void FlushPushConstants();
 
         bool IsRecording() const { return (m_State == State::Recording); }
         VkResult Reset(ResetMode reset_mode);
@@ -63,10 +68,34 @@ namespace engine
         RenderPass &GetRenderPass(const RenderTarget &render_target,
                                   const std::vector<LoadStoreInfo> &load_store_infos,
                                   const std::vector<std::unique_ptr<Subpass>> &subpasses);
+
+        void PushConstants(const std::vector<uint8_t> &values);
+
+        void BindBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element);
+        void BindLighting(LightingState &lighting_state, uint32_t set, uint32_t binding);
+
+        void BindVertexBuffers(uint32_t first_binding,
+                               const std::vector<std::reference_wrapper<const core::Buffer>> &buffers,
+                               const std::vector<VkDeviceSize> &offsets);
+
+        void BindIndexBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkIndexType index_type);
+
         void NextSubpass();
+        void CopyBufferToImage(const core::Buffer &buffer, const core::Image &image, const std::vector<VkBufferImageCopy> &regions);
         void EndRenderPass();
 
+        void Draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance);
+        void DrawIndexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance);
+
+        template <class T>
+        void SetSpecializationConstant(uint32_t constant_id, const T &data);
+
+        void SetSpecializationConstant(uint32_t constant_id, const std::vector<uint8_t> &data);
+
+        Device &GetDevice() const;
         const VkCommandBuffer &GetHandle() const { return m_Handle; }
+        PipelineState &GetPipelineState() { return m_PipelineState; }
+        ResourceBindingState &GetResourceBindingState() { return m_ResourceBindingState; }
 
         const VkCommandBufferLevel m_Level;
 
@@ -92,4 +121,16 @@ namespace engine
         const CommandBuffer::RenderPassBinding &GetCurrentRenderPass() const { return m_CurrentRenderPass; }
         const uint32_t GetCurrentSubpassIndex() const { return m_PipelineState.GetSubpassIndex(); }
     };
+
+    template <class T>
+    inline void CommandBuffer::SetSpecializationConstant(uint32_t constant_id, const T &data)
+    {
+        SetSpecializationConstant(constant_id, ToBytes(data));
+    }
+
+    template <>
+    inline void CommandBuffer::SetSpecializationConstant<bool>(std::uint32_t constant_id, const bool &data)
+    {
+        SetSpecializationConstant(constant_id, ToBytes(ToUint32_t(data)));
+    }
 }

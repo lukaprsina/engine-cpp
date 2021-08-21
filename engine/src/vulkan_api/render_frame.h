@@ -2,12 +2,22 @@
 
 #include "vulkan_api/command_pool.h"
 #include "vulkan_api/render_target.h"
+#include "vulkan_api/core/buffer_pool.h"
 #include "vulkan_api/fence_pool.h"
 #include "vulkan_api/semaphore_pool.h"
 
 namespace engine
 {
+    class Device;
     class QueueFamily;
+    class DescriptorPool;
+    class DescriptorSet;
+
+    enum BufferAllocationStrategy
+    {
+        OneAllocationPerBuffer,
+        MultipleAllocationsPerBuffer
+    };
 
     class RenderFrame
     {
@@ -17,6 +27,13 @@ namespace engine
                     size_t thread_count = 1);
         ~RenderFrame();
 
+        static constexpr uint32_t BUFFER_POOL_BLOCK_SIZE = 256;
+        const std::unordered_map<VkBufferUsageFlags, uint32_t> supported_usage_map = {
+            {VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 1},
+            {VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, 2}, // x2 the size of BUFFER_POOL_BLOCK_SIZE since SSBOs are normally much larger than other types of buffers
+            {VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 1},
+            {VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 1}};
+
         void UpdateRenderTarget(std::unique_ptr<RenderTarget> &&render_target)
         {
             m_SwapchainRenderTarget = std::move(render_target);
@@ -25,6 +42,7 @@ namespace engine
         RenderTarget &GetRenderTarget() { return *m_SwapchainRenderTarget; }
 
         void Reset();
+        BufferAllocation AllocateBuffer(VkBufferUsageFlags usage, VkDeviceSize size, size_t thread_index = 0);
 
         VkFence RequestFence()
         {
@@ -46,6 +64,11 @@ namespace engine
             m_SemaphorePool.ReleaseOwnedSemaphore(semaphore);
         }
 
+        DescriptorSet &RequestDescriptorSet(DescriptorSetLayout &descriptor_set_layout,
+                                            const BindingMap<VkDescriptorBufferInfo> &buffer_infos,
+                                            const BindingMap<VkDescriptorImageInfo> &image_infos,
+                                            size_t thread_index = 0);
+
         CommandBuffer &RequestCommandBuffer(const QueueFamily &queue_family,
                                             CommandBuffer::ResetMode reset_mode = CommandBuffer::ResetMode::ResetPool,
                                             VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -59,10 +82,13 @@ namespace engine
         std::vector<std::unique_ptr<CommandPool>> &GetCommandPools(const QueueFamily &queue_family, CommandBuffer::ResetMode reset_mode);
 
         std::map<uint32_t, std::vector<std::unique_ptr<CommandPool>>> m_CommandPools{};
+        std::vector<std::unique_ptr<std::unordered_map<std::size_t, DescriptorPool>>> m_DescriptorPools;
+        std::vector<std::unique_ptr<std::unordered_map<std::size_t, DescriptorSet>>> m_DescriptorSets;
         FencePool m_FencePool;
         SemaphorePool m_SemaphorePool;
         std::unique_ptr<RenderTarget> m_SwapchainRenderTarget;
         size_t m_ThreadCount{1};
-        // std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> buffer_pools;
+        BufferAllocationStrategy m_BufferAllocationStrategy{BufferAllocationStrategy::MultipleAllocationsPerBuffer};
+        std::map<VkBufferUsageFlags, std::vector<std::pair<BufferPool, BufferBlock *>>> m_BufferPools;
     };
 }

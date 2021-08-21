@@ -24,8 +24,6 @@
 #include "renderer/shader.h"
 #include "vulkan_api/resource_cache.h"
 
-#include "common/helpers.h"
-
 namespace engine
 {
     namespace

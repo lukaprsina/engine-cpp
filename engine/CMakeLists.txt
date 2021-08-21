@@ -1,10 +1,10 @@
 set(CORE_FILES
-    # Header Files    
+    # Header Files
     src/core/application.h
     src/core/options.h
     src/core/log.h
     src/core/timer.h
-    # Source Files    
+    # Source Files
     src/core/application.cpp
     src/core/options.cpp
     src/core/log.cpp
@@ -12,23 +12,19 @@ set(CORE_FILES
 
 set(COMMON_FILES
     # Header Files
-    src/common/base.h    
+    src/common/base.h
     src/common/error.h
     src/common/vulkan.h
     src/common/strings.h
     src/common/resource_caching.h
-    src/common/helpers.h
-    #Source files
+    # Source files
+    src/common/base.cpp
     src/common/error.cpp
     src/common/vulkan.cpp
-    src/common/strings.cpp
-    )
+    src/common/strings.cpp)
 
-set(EVENT_FILES
-    # Header Files
-    src/events/application_event.h    
-    src/events/event.h
-    src/events/key_event.h    
+set(EVENT_FILES # Header Files
+    src/events/application_event.h src/events/event.h src/events/key_event.h
     src/events/mouse_event.h)
 
 set(WINDOW_FILES
@@ -45,8 +41,7 @@ set(PLATFORM_FILES
     # Header Files
     src/platform/platform.h
     # Source Files
-    src/entrypoint.cpp
-    src/platform/platform.cpp)
+    src/entrypoint.cpp src/platform/platform.cpp)
 
 set(WINDOWS_FILES
     # Header Files
@@ -61,7 +56,7 @@ set(UNIX_FILES
     src/platform/unix_platform.cpp)
 
 set(VULKAN_API_FILES
-    #Header files
+    # Header files
     src/vulkan_api/instance.h
     src/vulkan_api/physical_device.h
     src/vulkan_api/device.h
@@ -85,7 +80,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.h
     src/vulkan_api/subpasses/forward_subpass.h
     src/scene/scene.h
-    src/renderer/camera.h
+    src/scene/components/camera.h
     src/vulkan_api/core/pipeline_layout.h
     src/vulkan_api/core/descriptor_set_layout.h
     src/vulkan_api/core/descriptor_pool.h
@@ -109,8 +104,16 @@ set(VULKAN_API_FILES
     src/scene/components/image.h
     src/scene/components/image/ktx.h
     src/scene/components/image/stb.h
-
-    #Source files
+    src/scene/components/image/astc.h
+    src/scene/components/texture.h
+    src/scene/components/material.h
+    src/scene/components/pbr_material.h
+    src/scene/components/mesh.h
+    src/scene/components/aabb.h
+    src/scene/components/submesh.h
+    src/scene/components/transform.h
+    src/scene/components/perspective_camera.h
+    # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
     src/vulkan_api/device.cpp
@@ -120,7 +123,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/fence_pool.cpp
     src/vulkan_api/render_context.cpp
     src/vulkan_api/swapchain.cpp
-    src/vulkan_api/command_buffer.cpp    
+    src/vulkan_api/command_buffer.cpp
     src/vulkan_api/core/image.cpp
     src/vulkan_api/core/image_view.cpp
     src/vulkan_api/render_target.cpp
@@ -134,9 +137,9 @@ set(VULKAN_API_FILES
     src/vulkan_api/subpasses/geometry_subpass.cpp
     src/vulkan_api/subpasses/forward_subpass.cpp
     src/scene/scene.cpp
-    src/renderer/camera.cpp
-    src/vulkan_api/core/pipeline_layout.cpp 
-    src/vulkan_api/core/descriptor_set_layout.cpp   
+    src/scene/components/camera.cpp
+    src/vulkan_api/core/pipeline_layout.cpp
+    src/vulkan_api/core/descriptor_set_layout.cpp
     src/vulkan_api/core/descriptor_pool.cpp
     src/vulkan_api/core/render_pass.cpp
     src/vulkan_api/core/descriptor_set.cpp
@@ -158,46 +161,47 @@ set(VULKAN_API_FILES
     src/scene/components/image.cpp
     src/scene/components/image/ktx.cpp
     src/scene/components/image/stb.cpp
-    )
-    
-set(PROJECT_FILES
-    ${CORE_FILES}
-    ${COMMON_FILES}
-    ${WINDOW_FILES}
-    ${PLATFORM_FILES}
-    ${VULKAN_API_FILES}
-    )
+    src/scene/components/image/astc.cpp
+    src/scene/components/texture.cpp
+    src/scene/components/material.cpp
+    src/scene/components/pbr_material.cpp
+    src/scene/components/mesh.cpp
+    src/scene/components/aabb.cpp
+    src/scene/components/submesh.cpp
+    src/scene/components/transform.cpp
+    src/scene/components/perspective_camera.cpp)
+
+set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
+                  ${PLATFORM_FILES} ${VULKAN_API_FILES})
 
 if(ANDROID)
-    set(ENG_PLATFORM VK_USE_PLATFORM_ANDROID_KHR)
+  set(ENG_PLATFORM VK_USE_PLATFORM_ANDROID_KHR)
 elseif(WIN32)
-    list(APPEND PROJECT_FILES ${WINDOWS_FILES})
-    set(ENG_PLATFORM VK_USE_PLATFORM_WIN32_KHR)
+  list(APPEND PROJECT_FILES ${WINDOWS_FILES})
+  set(ENG_PLATFORM VK_USE_PLATFORM_WIN32_KHR)
 elseif(APPLE)
-    set(ENG_PLATFORM VK_USE_PLATFORM_MACOS_MVK)
+  set(ENG_PLATFORM VK_USE_PLATFORM_MACOS_MVK)
 elseif(UNIX)
-    list(APPEND PROJECT_FILES ${UNIX_FILES})
-    set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
+  list(APPEND PROJECT_FILES ${UNIX_FILES})
+  set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
 endif()
 
 add_executable(Engine WIN32 ${PROJECT_FILES})
 
-target_include_directories(Engine
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-    )
+target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
-target_compile_definitions(Engine
-    PRIVATE ENG_PLATFORM
-    PRIVATE ENG_VALIDATION_LAYERS
-    PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED
-    )
+target_compile_definitions(
+  Engine
+  PRIVATE ENG_PLATFORM
+  PRIVATE ENG_VALIDATION_LAYERS
+  PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED)
 
 if(MSVC)
   target_compile_options(Engine PRIVATE /W3 /WX)
 else()
-  target_compile_options(Engine PRIVATE -Wall)# -Weffc++)
+  target_compile_options(Engine PRIVATE -Wall) # -Weffc++)
 endif()
 
 add_subdirectory("vendor")

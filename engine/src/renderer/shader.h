@@ -80,8 +80,9 @@ namespace engine
     class ShaderVariant
     {
     public:
-        ShaderVariant() = default;
         ShaderVariant(std::string &&preamble, std::vector<std::string> &&processes);
+        ShaderVariant();
+        ~ShaderVariant();
 
         void AddDefine(const std::string &definition);
         void AddDefine(const std::vector<std::string> &definitions);
@@ -95,6 +96,8 @@ namespace engine
         const std::string &GetPreamble() const { return m_Preamble; }
         const std::vector<std::string> &GetProcesses() const { return m_Processes; }
         const std::unordered_map<std::string, size_t> &GetRuntimeArraySizes() const { return m_RuntimeArraySizes; }
+
+        static size_t m_Test;
 
     private:
         size_t m_ID;
@@ -120,10 +123,13 @@ namespace engine
         ShaderModule &operator=(const ShaderModule &) = delete;
         ShaderModule &operator=(ShaderModule &&) = delete;
 
+        void SetResourceMode(const std::string &resource_name, const ShaderResourceMode &resource_mode);
+
         size_t GetID() const { return m_ID; }
         VkShaderStageFlagBits GetStage() const { return m_Stage; }
         const std::string &GetEntryPoint() const { return m_EntryPoint; }
         const std::vector<uint32_t> &GetBinary() const { return m_Spirv; }
+        const std::vector<ShaderResource> &GetResources() const { return m_Resources; }
 
     private:
         Device &m_Device;

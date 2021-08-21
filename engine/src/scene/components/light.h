@@ -6,39 +6,47 @@ ENG_ENABLE_WARNINGS()
 
 namespace engine
 {
-    enum class LightType
+    class Entity;
+
+    namespace sg
     {
-        Directional,
-        Point,
-        Spot,
-        // Insert new lightype here
-        Max
-    };
+        enum LightType
+        {
+            Directional = 0,
+            Point = 1,
+            Spot = 2,
+            Max
+        };
 
-    struct LightProperties
-    {
-        glm::vec3 direction{0.0f, 0.0f, -1.0f};
-        glm::vec3 color{1.0f, 1.0f, 1.0f};
-        float intensity{1.0f};
-        float range{0.0f};
-        float inner_cone_angle{0.0f};
-        float outer_cone_angle{0.0f};
-    };
+        struct LightProperties
+        {
+            glm::vec3 direction{0.0f, 0.0f, -1.0f};
+            glm::vec3 color{1.0f, 1.0f, 1.0f};
+            float intensity{1.0f};
+            float range{0.0f};
+            float inner_cone_angle{0.0f};
+            float outer_cone_angle{0.0f};
+        };
 
-    class Light
-    {
-    public:
-        Light(const std::string &name);
-        ~Light();
+        class Light
+        {
+        public:
+            Light(const std::string &name, Entity entity);
+            ~Light();
+            Light(const Light &) = default;
 
-        void SetType(const LightType &type) { m_Type = type; }
-        const LightType &GetLightType() const { return m_Type; }
-        void SetProperties(const LightProperties &properties) { m_Properties = properties; }
-        const LightProperties &GetLightProperties() const { return m_Properties; }
+            void SetType(const LightType &type) { m_Type = type; }
+            const LightType &GetLightType() const { return m_Type; }
+            void SetProperties(const LightProperties &properties) { m_Properties = properties; }
+            const LightProperties &GetLightProperties() const { return m_Properties; }
 
-    private:
-        std::string m_Name{"Light"};
-        LightType m_Type;
-        LightProperties m_Properties;
-    };
+            Entity &GetEntity() { return *m_Entity; }
+
+        private:
+            std::string m_Name{"Light"};
+            Entity *m_Entity;
+            LightType m_Type;
+            LightProperties m_Properties;
+        };
+    }
 }

@@ -12,9 +12,10 @@ namespace engine
             Sampler(const std::string &name, core::Sampler &&vk_sampler);
             ~Sampler();
 
+            core::Sampler m_VkSampler;
+
         private:
             std::string m_Name;
-            core::Sampler m_Sampler;
         };
     }
 }

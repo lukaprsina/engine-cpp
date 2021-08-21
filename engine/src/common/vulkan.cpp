@@ -48,4 +48,16 @@ namespace engine
         throw std::runtime_error("No suitable depth format could be determined");
     }
 
+    bool IsDynamicBufferDescriptorType(VkDescriptorType descriptor_type)
+    {
+        return descriptor_type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC ||
+               descriptor_type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    }
+
+    bool IsBufferDescriptorType(VkDescriptorType descriptor_type)
+    {
+        return descriptor_type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
+               descriptor_type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ||
+               IsDynamicBufferDescriptorType(descriptor_type);
+    }
 }

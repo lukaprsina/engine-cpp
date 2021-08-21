@@ -7,9 +7,17 @@
 namespace engine
 {
     const std::vector<std::string> light_type_definitions = {
-        "DIRECTIONAL_LIGHT " + std::to_string(static_cast<float>(LightType::Directional)),
-        "POINT_LIGHT " + std::to_string(static_cast<float>(LightType::Point)),
-        "SPOT_LIGHT " + std::to_string(static_cast<float>(LightType::Spot))};
+        "DIRECTIONAL_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Directional)),
+        "POINT_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Point)),
+        "SPOT_LIGHT " + std::to_string(static_cast<float>(sg::LightType::Spot))};
+
+    glm::mat4 VulkanStyleProjection(const glm::mat4 &proj)
+    {
+        glm::mat4 mat = proj;
+        mat[1][1] *= -1;
+
+        return mat;
+    }
 
     Subpass::Subpass(RenderContext &render_context,
                      ShaderSource &&vertex_shader,
