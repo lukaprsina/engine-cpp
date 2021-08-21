@@ -2,6 +2,8 @@
 
 #include "vulkan_api/device.h"
 #include "vulkan_api/queue_family.h"
+#include "vulkan_api/core/descriptor_set.h"
+#include "vulkan_api/core/descriptor_pool.h"
 
 namespace engine
 {
@@ -37,6 +39,27 @@ namespace engine
           m_SwapchainRenderTarget(std::move(render_target)),
           m_ThreadCount(thread_count)
     {
+        for (auto &usage_it : supported_usage_map)
+        {
+            std::vector<std::pair<BufferPool, BufferBlock *>> usage_buffer_pools;
+            for (size_t i = 0; i < thread_count; ++i)
+            {
+                usage_buffer_pools.push_back(std::make_pair(BufferPool{device, BUFFER_POOL_BLOCK_SIZE * 1024 * usage_it.second, usage_it.first}, nullptr));
+            }
+
+            auto res_ins_it = m_BufferPools.emplace(usage_it.first, std::move(usage_buffer_pools));
+
+            if (!res_ins_it.second)
+            {
+                throw std::runtime_error("Failed to insert buffer pool");
+            }
+        }
+
+        for (size_t i = 0; i < thread_count; ++i)
+        {
+            m_DescriptorPools.push_back(std::make_unique<std::unordered_map<std::size_t, DescriptorPool>>());
+            m_DescriptorSets.push_back(std::make_unique<std::unordered_map<std::size_t, DescriptorSet>>());
+        }
     }
 
     RenderFrame::~RenderFrame()

@@ -46,8 +46,8 @@ namespace engine
 
         void LoadScene(int scene_index = -1);
 
-        void LoadScenes(int scene_index);
         void CheckExtensions();
+        void LoadScenes(int scene_index);
         void LoadLights();
         void LoadSamplers();
         void LoadImages();
@@ -60,13 +60,13 @@ namespace engine
 
         std::unique_ptr<Scene> m_Scene;
 
-        std::vector<std::unique_ptr<sg::Light>> ParseKHRLightsPunctual();
+        std::vector<std::unique_ptr<Entity>> ParseKHRLightsPunctual();
         std::unique_ptr<sg::Sampler> ParseSampler(const tinygltf::Sampler &gltf_sampler) const;
         std::unique_ptr<sg::Image> ParseImage(tinygltf::Image &gltf_image) const;
         std::unique_ptr<sg::Texture> ParseTexture(const tinygltf::Texture &gltf_texture) const;
         std::unique_ptr<sg::PBRMaterial> ParseMaterial(const tinygltf::Material &gltf_material) const;
         Entity ParseMesh(const tinygltf::Mesh &gltf_mesh) const;
-        Entity ParseNode(tinygltf::Node &gltf_node);
+        void ParseNode(tinygltf::Node &gltf_node, Entity &entity);
 
         bool IsExtensionEnabled(const std::string &requested_extension);
         std::unique_ptr<sg::Sampler> CreateDefaultSampler();

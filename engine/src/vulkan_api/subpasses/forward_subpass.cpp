@@ -5,6 +5,7 @@
 #include "scene/components/submesh.h"
 #include "scene/components/mesh.h"
 #include "scene/scene.h"
+#include "scene/entity.h"
 #include "renderer/shader.h"
 
 namespace engine

@@ -11,7 +11,7 @@ namespace engine
     namespace sg
     {
         Transform::Transform(Entity &entity)
-        // : m_Entity(entity)
+            : m_Entity(&entity)
         {
         }
 
@@ -48,11 +48,11 @@ namespace engine
 
             m_WorldMatrix = GetMatrix();
 
-            /* if (m_Entity)
+            if (m_Entity)
             {
-                auto &transform = m_Entity.GetComponent<Transform>();
+                auto &transform = m_Entity->GetComponent<sg::Transform>();
                 m_WorldMatrix = transform.GetWorldMatrix() * m_WorldMatrix;
-            } */
+            }
 
             m_UpdateWorldMatrix = false;
         }

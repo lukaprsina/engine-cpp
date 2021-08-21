@@ -16,6 +16,7 @@ namespace engine
     class ShaderSource;
     class RenderContext;
     class RenderTarget;
+    class Entity;
 
     struct alignas(16) LightInfo
     {
@@ -68,26 +69,28 @@ namespace engine
         LightingState &GetLightingState() { return m_LightingState; }
 
         template <typename T>
-        void AllocateLights(const std::vector<std::unique_ptr<sg::Light>> &scene_lights,
+        void AllocateLights(const std::vector<std::unique_ptr<Entity>> &scene_entities,
                             size_t light_count)
         {
-            ENG_ASSERT(scene_lights.size() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");
+            ENG_ASSERT(scene_entities.size() <= (light_count * sg::LightType::Max), "Exceeding Max Light Capacity");
 
             m_LightingState.directional_lights.clear();
             m_LightingState.point_lights.clear();
             m_LightingState.spot_lights.clear();
 
-            for (auto &scene_light : scene_lights)
+            for (auto &scene_entity : scene_entities)
             {
-                const auto &properties = scene_light->GetLightProperties();
-                auto &transform = scene_light->GetEntity().GetComponent<sg::Transform>();
+                // TODO: optimize with entt
+                auto &scene_light = scene_entity->GetComponent<sg::Light>();
+                const auto &properties = scene_light.GetLightProperties();
+                auto &transform = scene_entity->GetComponent<sg::Transform>();
 
-                LightInfo light{{transform.GetTranslation(), static_cast<float>(scene_light->GetLightType())},
+                LightInfo light{{transform.GetTranslation(), static_cast<float>(scene_light.GetLightType())},
                                 {properties.color, properties.intensity},
                                 {transform.GetRotation() * properties.direction, properties.range},
                                 {properties.inner_cone_angle, properties.outer_cone_angle}};
 
-                switch (scene_light->GetLightType())
+                switch (scene_light.GetLightType())
                 {
                 case sg::LightType::Directional:
                 {

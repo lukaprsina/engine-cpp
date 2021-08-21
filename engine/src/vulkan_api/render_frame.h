@@ -10,6 +10,8 @@ namespace engine
 {
     class Device;
     class QueueFamily;
+    class DescriptorPool;
+    class DescriptorSet;
 
     enum BufferAllocationStrategy
     {
@@ -75,6 +77,8 @@ namespace engine
         std::vector<std::unique_ptr<CommandPool>> &GetCommandPools(const QueueFamily &queue_family, CommandBuffer::ResetMode reset_mode);
 
         std::map<uint32_t, std::vector<std::unique_ptr<CommandPool>>> m_CommandPools{};
+        std::vector<std::unique_ptr<std::unordered_map<std::size_t, DescriptorPool>>> m_DescriptorPools;
+        std::vector<std::unique_ptr<std::unordered_map<std::size_t, DescriptorSet>>> m_DescriptorSets;
         FencePool m_FencePool;
         SemaphorePool m_SemaphorePool;
         std::unique_ptr<RenderTarget> m_SwapchainRenderTarget;

@@ -9,14 +9,15 @@ namespace engine
     class Entity
     {
     public:
+        Entity();
         Entity(entt::entity handle, Scene *scene);
         ~Entity();
-        Entity(const Entity &other) = default;
 
-        Entity &operator=(Entity other)
-        {
-            return *this = Entity(other);
-        }
+        Entity(const Entity &other);
+        // Entity(Entity &&other) = default;
+
+        // Entity &operator=(const Entity &other);
+        // Entity &operator=(Entity &&other) = default;
 
         template <typename T, typename... Args>
         T &AddComponent(Args &&...args)

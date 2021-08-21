@@ -379,6 +379,7 @@ namespace engine
         LoadTextures();
         LoadMaterials();
         LoadMeshes();
+        LoadNodes();
 
         // TODO: transform
     }
@@ -562,11 +563,12 @@ namespace engine
         for (auto &gltf_mesh : m_Model.meshes)
         {
             auto entity = ParseMesh(gltf_mesh);
+            m_Scene->GetMeshes().emplace_back(std::make_unique<Entity>(entity));
+
             auto &mesh = entity.GetComponent<sg::Mesh>();
 
             for (auto &gltf_primitive : gltf_mesh.primitives)
             {
-                //TODO: submesh is destroyed
                 auto submesh = std::make_unique<sg::Submesh>();
 
                 for (auto &attribute : gltf_primitive.attributes)
@@ -687,11 +689,41 @@ namespace engine
         for (size_t node_index = 0; node_index < m_Model.nodes.size(); ++node_index)
         {
             auto gltf_node = m_Model.nodes[node_index];
-            auto entity = ParseNode(gltf_node);
+
+            Entity entity;
+            bool identified = false;
+
+            if (gltf_node.mesh >= 0)
+            {
+                entity = *m_Scene->GetMeshes().at(gltf_node.mesh);
+                identified = true;
+            }
+
+            if (gltf_node.camera >= 0)
+            {
+                // entity = *m_Scene->GetCameras().at(gltf_node.camera);
+                // identified = true;
+            }
+
+            if (auto extension = GetExtension(gltf_node.extensions, KHR_LIGHTS_PUNCTUAL_EXTENSION))
+            {
+                auto index = extension->Get("light").Get<int>();
+                entity = *m_Scene->GetLights().at(index).get();
+                identified = true;
+            }
+
+            if (!identified)
+            {
+                entity = m_Scene->CreateEntity();
+            }
+
+            ParseNode(gltf_node, entity);
+
+            ENG_ASSERT(entity.HasComponent<sg::Transform>());
         }
     }
 
-    std::vector<std::unique_ptr<sg::Light>> GLTFLoader::ParseKHRLightsPunctual()
+    std::vector<std::unique_ptr<Entity>> GLTFLoader::ParseKHRLightsPunctual()
     {
         if (IsExtensionEnabled(KHR_LIGHTS_PUNCTUAL_EXTENSION))
         {
@@ -700,7 +732,7 @@ namespace engine
 
             auto &khr_lights = m_Model.extensions.at(KHR_LIGHTS_PUNCTUAL_EXTENSION).Get("lights");
 
-            std::vector<std::unique_ptr<sg::Light>> light_components(khr_lights.ArrayLen());
+            std::vector<std::unique_ptr<Entity>> light_components(khr_lights.ArrayLen());
 
             for (size_t light_index = 0; light_index < khr_lights.ArrayLen(); ++light_index)
             {
@@ -713,7 +745,12 @@ namespace engine
                     throw std::runtime_error("Couldn't load glTF file, KHR_lights_punctual extension is invalid");
                 }
 
-                auto entity = m_Scene->CreateEntity();
+                // TODO: entity moves
+                light_components[light_index] = std::make_unique<Entity>(
+                    m_Scene->CreateEntity());
+
+                auto &entity = *light_components[light_index].get();
+
                 auto &light = entity.AddComponent<sg::Light>(khr_light.Get("name").Get<std::string>(),
                                                              entity);
 
@@ -788,8 +825,6 @@ namespace engine
 
                 light.SetType(type);
                 light.SetProperties(properties);
-
-                light_components[light_index] = std::make_unique<sg::Light>(light);
             }
 
             return light_components;
@@ -946,11 +981,10 @@ namespace engine
         return entity;
     }
 
-    Entity GLTFLoader::ParseNode(tinygltf::Node &gltf_node)
+    void GLTFLoader::ParseNode(tinygltf::Node &gltf_node, Entity &entity)
     {
-        auto entity = m_Scene->CreateEntity();
+        auto valid = m_Scene->GetRegistry().valid(entity.GetHandle());
         auto &transform = entity.AddComponent<sg::Transform>(entity);
-
         if (!gltf_node.translation.empty())
         {
             glm::vec3 translation;
@@ -998,8 +1032,6 @@ namespace engine
 
             transform.SetMatrix(matrix);
         }
-
-        return entity;
     }
 
     std::unique_ptr<sg::Sampler> GLTFLoader::CreateDefaultSampler()

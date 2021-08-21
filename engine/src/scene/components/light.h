@@ -33,6 +33,7 @@ namespace engine
         public:
             Light(const std::string &name, Entity entity);
             ~Light();
+            Light(const Light &) = default;
 
             void SetType(const LightType &type) { m_Type = type; }
             const LightType &GetLightType() const { return m_Type; }
