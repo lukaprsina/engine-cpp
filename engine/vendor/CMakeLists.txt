@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.19)
 
+# vulkan-headers
+add_subdirectory(vulkan-headers)
+target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-headers/include)
+target_link_libraries(Engine PRIVATE Vulkan-Headers)
+install(TARGETS Vulkan-Headers)
+
 # stb TODO
 target_compile_definitions(Engine PUBLIC STBI_NO_SIMD)
 add_library(stb INTERFACE)

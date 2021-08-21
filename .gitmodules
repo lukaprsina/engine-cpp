@@ -46,3 +46,6 @@
 [submodule "engine/vendor/astc-encoder"]
 	path = engine/vendor/astc-encoder
 	url = https://github.com/ARM-software/astc-encoder
+[submodule ".\\engine\\vendor\\vulkan-headers"]
+	path = .\\engine\\vendor\\vulkan-headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
