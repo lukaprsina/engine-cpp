@@ -46,9 +46,9 @@ namespace engine
 
             m_WorldMatrix = GetMatrix();
 
-            auto &scene = m_Entity.GetScene();
+            /* auto &scene = m_Entity.GetScene();
 
-            /* auto &transform = m_Entity.GetComponent<sg::Transform>();
+            auto &transform = m_Entity.GetComponent<sg::Transform>();
             m_WorldMatrix = transform.GetWorldMatrix() * m_WorldMatrix; */
 
             m_UpdateWorldMatrix = false;

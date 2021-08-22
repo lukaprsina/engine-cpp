@@ -194,7 +194,7 @@ target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
 target_compile_definitions(
   Engine
-  PRIVATE ENG_PLATFORM
+  PRIVATE ${ENG_PLATFORM}
   PRIVATE ENG_VALIDATION_LAYERS
   PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED)
 

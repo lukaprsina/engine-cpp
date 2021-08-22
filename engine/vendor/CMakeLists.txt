@@ -2,9 +2,19 @@ cmake_minimum_required(VERSION 3.19)
 
 # vulkan-headers
 add_subdirectory(vulkan-headers)
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-headers/include)
-target_link_libraries(Engine PRIVATE Vulkan-Headers)
+target_include_directories(
+  Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-headers/include)
+target_link_libraries(Engine PUBLIC Vulkan-Headers)
 install(TARGETS Vulkan-Headers)
+
+# volk
+option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
+option(VOLK_INSTALL "Create installation targets" OFF)
+
+set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
+add_subdirectory(volk)
+target_link_libraries(Engine PRIVATE volk)
+install(TARGETS volk)
 
 # stb TODO
 target_compile_definitions(Engine PUBLIC STBI_NO_SIMD)
@@ -74,15 +84,6 @@ option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
 add_subdirectory(vma)
 target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
-
-# volk
-option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
-option(VOLK_INSTALL "Create installation targets" OFF)
-
-set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
-add_subdirectory(volk)
-target_link_libraries(Engine PRIVATE volk)
-install(TARGETS volk)
 
 # entt
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)

@@ -98,13 +98,8 @@ namespace engine
     {
         // TODO:
         auto &camera = *m_Scene.GetCameras().front().get();
-        bool valid = m_Scene.GetRegistry().valid(camera.GetHandle());
-
         auto &transform = camera.GetComponent<sg::Transform>();
-        valid = m_Scene.GetRegistry().valid(camera.GetHandle());
-
         auto camera_transform = transform.GetWorldMatrix();
-        valid = m_Scene.GetRegistry().valid(camera.GetHandle());
 
         auto view = m_Scene.GetRegistry().view<sg::Mesh, sg::Transform>();
         for (auto &entity : view)
