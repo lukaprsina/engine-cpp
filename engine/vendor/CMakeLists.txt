@@ -13,7 +13,8 @@ option(VOLK_INSTALL "Create installation targets" OFF)
 
 set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
 add_subdirectory(volk)
-target_link_libraries(Engine PRIVATE volk)
+target_link_libraries(volk PUBLIC Vulkan-Headers)
+target_link_libraries(Engine PUBLIC volk)
 install(TARGETS volk)
 
 # stb TODO
@@ -131,6 +132,8 @@ target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
 # thread_pool
+target_compile_definitions(Engine PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
+# 'std::result_of<engine::GLTFLoader::LoadImages::<lambda_290143bf62d359265eaa393944e725e9> (void)>': warning STL4014: std::result_of and std::result_of_t are deprecated in C++17. They are superseded by std::invoke_result and std::invoke_result_t. You can define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received this warning. [D:\dev\c++\engine\build\engine\Engine.vcxproj]
 target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
 

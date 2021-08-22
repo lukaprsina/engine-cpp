@@ -343,7 +343,7 @@ namespace engine
 
         std::filesystem::path gltf_file = fs::path::Get(fs::path::Type::Assets, file_name);
 
-        bool importResult = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.c_str());
+        bool importResult = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
 
         if (!importResult)
         {

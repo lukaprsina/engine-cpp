@@ -13,8 +13,8 @@ namespace engine
     class ShaderSource;
     class ShaderVariant;
     class Attachment;
-    class LoadStoreInfo;
-    class SubpassInfo;
+    struct LoadStoreInfo;
+    struct SubpassInfo;
     class PipelineState;
 
     enum class ResourceType

@@ -7,8 +7,7 @@ namespace engine
     class WindowsPlatform : public Platform
     {
     public:
-        WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                        PSTR lpCmdLine, INT nCmdShow);
+        WindowsPlatform(int argc, char *argv[]);
         virtual ~WindowsPlatform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app) override;
