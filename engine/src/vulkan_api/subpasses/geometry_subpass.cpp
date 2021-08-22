@@ -93,8 +93,8 @@ namespace engine
     }
 
     void GeometrySubpass::GetSortedNodes(
-        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes,
-        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes)
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes)
     {
         // TODO:
         auto &camera = *m_Scene.GetCameras().front().get();
@@ -134,9 +134,10 @@ namespace engine
         auto camera_transform = m_Scene.GetCameras().front()->GetComponent<sg::Transform>();
 
         global_uniform.camera_view_proj = camera.m_PreRotation *
-                                          VulkanStyleProjection(
-                                              camera.GetProjection()) *
-                                          camera_transform.GetWorldMatrix();
+                                          VulkanStyleProjection(camera.GetProjection()) *
+                                          glm::inverse(camera_transform.GetWorldMatrix());
+
+        // ENG_CORE_INFO("{}", glm::to_string(global_uniform.camera_view_proj));
 
         auto &render_frame = m_RenderContext.GetActiveFrame();
 
@@ -145,8 +146,8 @@ namespace engine
                                                       sizeof(GlobalUniform), thread_index);
 
         global_uniform.model = submesh_transform.GetWorldMatrix();
-        global_uniform.camera_position = glm::vec3(glm::inverse(
-            camera_transform.GetWorldMatrix())[3]);
+        global_uniform.camera_position = glm::vec3(
+            camera_transform.GetWorldMatrix()[3]);
 
         allocation.Update(global_uniform);
         command_buffer.BindBuffer(allocation.GetBuffer(), allocation.GetOffset(), allocation.GetSize(), 0, 1, 0);

@@ -40,8 +40,8 @@ namespace engine
 
         virtual void Prepare() override;
         virtual void Draw(CommandBuffer &command_buffer) override;
-        void GetSortedNodes(std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes,
-                            std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes);
+        void GetSortedNodes(std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
+                            std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes);
 
         void UpdateUniform(CommandBuffer &command_buffer, sg::Transform &transform, size_t thread_index = 0);
 
