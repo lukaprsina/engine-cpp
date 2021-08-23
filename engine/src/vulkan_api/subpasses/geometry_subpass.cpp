@@ -109,6 +109,8 @@ namespace engine
             auto world_matrix = transform.GetWorldMatrix();
             auto &mesh_bounds = mesh.GetBounds();
 
+            ENG_CORE_TRACE(mesh.GetName());
+
             sg::AABB world_bounds{mesh_bounds.GetMin(), mesh_bounds.GetMax()};
             world_bounds.Transform(world_matrix);
 
@@ -136,8 +138,6 @@ namespace engine
         global_uniform.camera_view_proj = camera.m_PreRotation *
                                           VulkanStyleProjection(camera.GetProjection()) *
                                           glm::inverse(camera_transform.GetWorldMatrix());
-
-        // ENG_CORE_INFO("{}", glm::to_string(global_uniform.camera_view_proj));
 
         auto &render_frame = m_RenderContext.GetActiveFrame();
 

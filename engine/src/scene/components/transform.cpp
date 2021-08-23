@@ -28,13 +28,20 @@ namespace engine
 
         glm::mat4 Transform::GetMatrix() const
         {
-            return glm::translate(glm::mat4(1.0), m_Translation) *
-                   glm::mat4_cast(m_Rotation) *
-                   glm::scale(glm::mat4(1.0), m_Scale);
+            auto test = glm::translate(glm::mat4(1.0), m_Translation) *
+                        glm::mat4_cast(m_Rotation) *
+                        glm::scale(glm::mat4(1.0), m_Scale);
+
+            ENG_CORE_TRACE(glm::to_string(m_Translation));
+            ENG_CORE_TRACE(glm::to_string(m_Rotation));
+            ENG_CORE_TRACE(glm::to_string(m_Scale));
+            ENG_CORE_TRACE(glm::to_string(test));
+            return test;
         }
 
         glm::mat4 Transform::GetWorldMatrix()
         {
+            ENG_CORE_TRACE(glm::to_string(m_WorldMatrix));
             UpdateWorldTransform();
             return m_WorldMatrix;
         }

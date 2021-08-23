@@ -92,6 +92,7 @@ namespace engine
                                 {transform.GetRotation() * properties.direction, properties.range},
                                 {properties.inner_cone_angle, properties.outer_cone_angle}};
 
+                // TODO: light direction wrong
                 switch (scene_light.GetLightType())
                 {
                 case sg::LightType::Directional:
