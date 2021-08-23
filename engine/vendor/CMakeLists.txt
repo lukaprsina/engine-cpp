@@ -85,9 +85,13 @@ option(VMA_BUILD_SAMPLE_SHADERS
        "Build VulkanMemoryAllocator sample application's shaders" OFF)
 option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
 
-add_subdirectory(vma)
-target_include_directories(Engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
+add_library(vma INTERFACE)
+set(VMA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vma/src)
+target_sources(vma INTERFACE ${VMA_DIR}/vk_mem_alloc.h)
+target_include_directories(vma INTERFACE ${VMA_DIR})
+target_link_libraries(vma INTERFACE vulkan)
+target_link_libraries(Engine INTERFACE vma)
+target_include_directories(Engine PUBLIC ${VMA_DIR})
 
 # entt
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)
@@ -130,7 +134,7 @@ target_link_libraries(Engine PRIVATE spirv-cross-reflect)
 target_link_libraries(Engine PRIVATE spirv-cross-msl)
 target_link_libraries(Engine PRIVATE spirv-cross-hlsl)
 target_link_libraries(Engine PRIVATE spirv-cross-util)
-target_link_libraries(Engine PRIVATE spirv-cross-c)
+# target_link_libraries(Engine PRIVATE spirv-cross-c)
 target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
@@ -193,21 +197,9 @@ target_compile_definitions(astc PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
 target_link_libraries(Engine PRIVATE astc)
 
 # tinygltf
-option(TINYGLTF_BUILD_LOADER_EXAMPLE
-       "Build loader_example(load glTF and dump infos)" OFF)
-option(TINYGLTF_BUILD_GL_EXAMPLES
-       "Build GL exampels(requires glfw, OpenGL, etc)" OFF)
-option(TINYGLTF_BUILD_VALIDATOR_EXAMPLE "Build validator exampe" OFF)
-option(TINYGLTF_BUILD_BUILDER_EXAMPLE "Build glTF builder example" OFF)
-option(
-  TINYGLTF_HEADER_ONLY
-  "On: header-only mode. Off: create tinygltf library(No TINYGLTF_IMPLEMENTATION required in your project)"
-  OFF)
-option(
-  TINYGLTF_INSTALL
-  "Install tinygltf files during install step. Usually set to OFF if you include tinygltf through add_subdirectory()"
-  OFF)
-
-add_subdirectory(tinygltf)
+add_library(tinygltf INTERFACE)
+set(TINYGLTF_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tinygltf)
+target_sources(tinygltf INTERFACE ${TINYGLTF_DIR}/tiny_gltf.h
+                                  ${TINYGLTF_DIR}/json.hpp)
+target_include_directories(tinygltf INTERFACE ${TINYGLTF_DIR})
 target_link_libraries(Engine PRIVATE tinygltf)
-install(TARGETS tinygltf)
