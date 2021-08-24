@@ -20,6 +20,12 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 texcoord_0;
 layout(location = 2) in vec3 normal;
 
+vec2 positions[3] = vec2[](
+    vec2(500.0, 10.0),
+    vec2(1000.0, 1000.0),
+    vec2(10.0, 1000.0)
+);
+
 layout(set = 0, binding = 1) uniform GlobalUniform {
     mat4 model;
     mat4 view_proj;
@@ -38,5 +44,6 @@ void main(void)
 
     o_normal = mat3(global_uniform.model) * normal;
 
-    gl_Position = global_uniform.view_proj * o_pos;
+    // gl_Position = global_uniform.view_proj * o_pos;
+    gl_Position = vec4(positions[gl_VertexIndex], 0.6, 1.0);
 }
