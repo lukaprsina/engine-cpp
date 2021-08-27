@@ -17,9 +17,12 @@ namespace engine
 
             glm::mat4 GetProjection() override
             {
-                // Note: Using Revsered depth-buffer for increased precision, so Znear and Zfar are flipped
-                return glm::perspective(m_Fov, m_AspectRatio,
-                                        m_FarPlane, m_NearPlane);
+                // not using reversed z buffer
+                auto test = glm::perspective(m_Fov, m_AspectRatio,
+                                             m_FarPlane, m_NearPlane);
+
+                ENG_CORE_INFO(glm::to_string(test));
+                return test;
             }
 
             float m_AspectRatio{1.0f};

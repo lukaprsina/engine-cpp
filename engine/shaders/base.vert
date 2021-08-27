@@ -44,6 +44,6 @@ void main(void)
 
     o_normal = mat3(global_uniform.model) * normal;
 
-    // gl_Position = global_uniform.view_proj * o_pos;
-    gl_Position = vec4(positions[gl_VertexIndex], 0.6, 1.0);
+    gl_Position = global_uniform.view_proj * o_pos;
+    // gl_Position = vec4(positions[gl_VertexIndex], 0.6, 1.0);
 }
