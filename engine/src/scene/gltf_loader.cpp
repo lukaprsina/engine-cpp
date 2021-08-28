@@ -23,6 +23,7 @@
 #include <ThreadPool.h>
 #include "common/glm.h"
 ENG_DISABLE_WARNINGS()
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 ENG_ENABLE_WARNINGS()
 
@@ -700,6 +701,8 @@ namespace engine
 
             if (gltf_node.mesh >= 0)
             {
+                if (gltf_node.mesh == 361)
+                    ENG_CORE_ERROR("fuck");
                 entity = *m_Scene->GetMeshes().at(gltf_node.mesh);
                 identified = true;
             }
@@ -1007,6 +1010,9 @@ namespace engine
 
     void GLTFLoader::ParseNode(tinygltf::Node &gltf_node, Entity &entity)
     {
+        if (entity.HasComponent<sg::Transform>())
+            return;
+
         auto &transform = entity.AddComponent<sg::Transform>(entity);
         if (!gltf_node.translation.empty())
         {
@@ -1016,6 +1022,8 @@ namespace engine
                            gltf_node.translation.end(),
                            glm::value_ptr(translation),
                            TypeCast<double, float>{});
+
+            ENG_CORE_INFO(glm::to_string(translation));
 
             transform.SetTranslation(translation);
         }
@@ -1029,6 +1037,8 @@ namespace engine
                            glm::value_ptr(rotation),
                            TypeCast<double, float>{});
 
+            ENG_CORE_INFO(glm::to_string(rotation));
+
             transform.SetRotation(rotation);
         }
 
@@ -1041,6 +1051,8 @@ namespace engine
                            glm::value_ptr(scale),
                            TypeCast<double, float>{});
 
+            ENG_CORE_INFO(glm::to_string(scale));
+
             transform.SetScale(scale);
         }
 
@@ -1052,6 +1064,8 @@ namespace engine
                            gltf_node.matrix.end(),
                            glm::value_ptr(matrix),
                            TypeCast<double, float>{});
+
+            ENG_CORE_INFO(glm::to_string(matrix));
 
             transform.SetMatrix(matrix);
         }

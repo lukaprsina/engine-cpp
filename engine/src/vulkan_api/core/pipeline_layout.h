@@ -13,6 +13,10 @@ namespace engine
     public:
         PipelineLayout(Device &device, const std::vector<ShaderModule *> &shader_modules);
         ~PipelineLayout();
+        PipelineLayout(const PipelineLayout &) = delete;
+        PipelineLayout(PipelineLayout &&other);
+        PipelineLayout &operator=(const PipelineLayout &) = delete;
+        PipelineLayout &operator=(PipelineLayout &&) = delete;
 
         bool HasDescriptorSetLayout(const uint32_t set_index) const
         {

@@ -32,6 +32,10 @@ namespace engine
 
     DescriptorPool::~DescriptorPool()
     {
+        for (auto pool : m_Pools)
+        {
+            vkDestroyDescriptorPool(m_Device.GetHandle(), pool, nullptr);
+        }
     }
 
     VkDescriptorSet DescriptorPool::Allocate()

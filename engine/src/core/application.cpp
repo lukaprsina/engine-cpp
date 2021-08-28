@@ -48,6 +48,8 @@ namespace engine
         if (m_Device)
             m_Device->WaitIdle();
 
+        m_Scene.reset();
+
         m_RenderContext.reset();
         m_Device.reset();
 
@@ -108,6 +110,7 @@ namespace engine
         ShaderSource frag_shader("base.frag");
 
         auto camera = std::make_unique<sg::PerspectiveCamera>("Camera");
+        // LoadScene("scenes/bonza/Bonza.gltf");
         LoadScene("scenes/sponza/Sponza01.gltf");
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),

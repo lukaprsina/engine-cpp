@@ -2,6 +2,7 @@
 
 ENG_DISABLE_WARNINGS()
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/string_cast.hpp>
 ENG_ENABLE_WARNINGS()
 
 namespace engine
@@ -31,12 +32,24 @@ namespace engine
             auto test = glm::translate(glm::mat4(1.0), m_Translation) *
                         glm::mat4_cast(m_Rotation) *
                         glm::scale(glm::mat4(1.0), m_Scale);
+
+            ENG_CORE_INFO(glm::to_string(glm::translate(glm::mat4(1.0), m_Translation)));
+            ENG_CORE_INFO(glm::to_string(m_Rotation));
+            ENG_CORE_INFO(glm::to_string(glm::mat4_cast(m_Rotation)));
+            ENG_CORE_INFO(glm::to_string(glm::scale(glm::mat4(1.0), m_Scale)));
+            ENG_CORE_INFO(glm::to_string(test));
+
             return test;
         }
 
         glm::mat4 Transform::GetWorldMatrix()
         {
             UpdateWorldTransform();
+            ENG_CORE_INFO(glm::to_string(m_Translation));
+            ENG_CORE_INFO(glm::to_string(m_Rotation));
+            ENG_CORE_INFO(glm::to_string(m_Scale));
+
+            ENG_CORE_INFO(glm::to_string(m_WorldMatrix));
             return m_WorldMatrix;
         }
 

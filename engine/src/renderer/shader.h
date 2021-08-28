@@ -97,8 +97,6 @@ namespace engine
         const std::vector<std::string> &GetProcesses() const { return m_Processes; }
         const std::unordered_map<std::string, size_t> &GetRuntimeArraySizes() const { return m_RuntimeArraySizes; }
 
-        static size_t m_Test;
-
     private:
         size_t m_ID;
         std::string m_Preamble;

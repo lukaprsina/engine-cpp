@@ -17,12 +17,10 @@ namespace engine
 
             glm::mat4 GetProjection() override
             {
+                m_AspectRatio = 1.77777779;
                 // not using reversed z buffer
-                auto test = glm::perspective(m_Fov, m_AspectRatio,
-                                             m_FarPlane, m_NearPlane);
-
-                ENG_CORE_INFO(glm::to_string(test));
-                return test;
+                return glm::perspective(m_Fov, m_AspectRatio, m_FarPlane, m_NearPlane);
+                // return glm::perspective(m_Fov, m_AspectRatio, m_NearPlane, m_FarPlane);
             }
 
             float m_AspectRatio{1.0f};

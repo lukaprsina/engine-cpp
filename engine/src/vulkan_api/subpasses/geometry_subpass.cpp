@@ -10,6 +10,8 @@
 #include "scene/components/perspective_camera.h"
 #include "vulkan_api/device.h"
 
+#include <glm/gtx/string_cast.hpp>
+
 namespace engine
 {
     GeometrySubpass::GeometrySubpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene, sg::Camera &camera)
@@ -96,10 +98,8 @@ namespace engine
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes)
     {
-        // TODO:
         auto &camera = *m_Scene.GetCameras().front().get();
-        auto &transform = camera.GetComponent<sg::Transform>();
-        auto camera_transform = transform.GetWorldMatrix();
+        auto camera_transform = camera.GetComponent<sg::Transform>().GetWorldMatrix();
 
         auto view = m_Scene.GetRegistry().view<sg::Mesh, sg::Transform>();
         for (auto &entity : view)
@@ -136,6 +136,12 @@ namespace engine
         global_uniform.camera_view_proj = camera.m_PreRotation *
                                           VulkanStyleProjection(camera.GetProjection()) *
                                           glm::inverse(camera_transform.GetWorldMatrix());
+
+        ENG_CORE_INFO(glm::to_string(camera.m_PreRotation));
+        ENG_CORE_INFO(glm::to_string(camera.GetProjection()));
+        ENG_CORE_INFO(glm::to_string(VulkanStyleProjection(camera.GetProjection())));
+        ENG_CORE_INFO(glm::to_string(glm::inverse(camera_transform.GetWorldMatrix())));
+        ENG_CORE_INFO(glm::to_string(global_uniform.camera_view_proj));
 
         auto &render_frame = m_RenderContext.GetActiveFrame();
 

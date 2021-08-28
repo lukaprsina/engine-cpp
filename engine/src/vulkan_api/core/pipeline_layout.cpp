@@ -102,6 +102,19 @@ namespace engine
 
     PipelineLayout::~PipelineLayout()
     {
+        if (m_Handle != VK_NULL_HANDLE)
+            vkDestroyPipelineLayout(m_Device.GetHandle(), m_Handle, nullptr);
+    }
+
+    PipelineLayout::PipelineLayout(PipelineLayout &&other)
+        : m_Device{other.m_Device},
+          m_Handle{other.m_Handle},
+          m_ShaderModules{std::move(other.m_ShaderModules)},
+          m_ShaderResources{std::move(other.m_ShaderResources)},
+          m_ShaderSets{std::move(other.m_ShaderSets)},
+          m_DescriptorSetLayouts{std::move(other.m_DescriptorSetLayouts)}
+    {
+        other.m_Handle = VK_NULL_HANDLE;
     }
 
     const std::vector<ShaderResource> PipelineLayout::GetResources(const ShaderResourceType &type, VkShaderStageFlagBits stage) const

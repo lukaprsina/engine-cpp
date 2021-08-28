@@ -75,8 +75,6 @@ namespace engine
         m_ID = hasher(std::string{m_FileContent.cbegin(), m_FileContent.cend()});
     }
 
-    size_t ShaderVariant::m_Test = 42;
-
     ShaderVariant::ShaderVariant()
     {
     }
@@ -87,14 +85,10 @@ namespace engine
           m_Processes{std::move(processes)}
     {
         UpdateId();
-        ShaderVariant::m_Test = m_ID;
     }
 
     ShaderVariant::~ShaderVariant()
     {
-        ShaderVariant::m_Test = 65;
-        ENG_ASSERT(m_ID != 4187935634071280513);
-        ENG_CORE_TRACE("destroying preamble:\n{}", m_Preamble);
     }
 
     void ShaderVariant::AddDefine(const std::string &definition)
@@ -155,7 +149,6 @@ namespace engine
     {
         std::hash<std::string> hasher{};
         m_ID = hasher(m_Preamble);
-        ShaderVariant::m_Test = m_ID;
     }
 
     ShaderModule::ShaderModule(Device &device,
