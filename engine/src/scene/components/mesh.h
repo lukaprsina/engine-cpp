@@ -21,6 +21,7 @@ namespace engine
 
             const std::vector<Submesh *> &GetSubmeshes() const { return m_Submeshes; }
             const AABB &GetBounds() const { return m_Bounds; };
+            const std::string &GetName() const { return m_Name; }
 
         private:
             std::string m_Name;

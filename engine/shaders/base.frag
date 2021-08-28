@@ -92,4 +92,5 @@ void main(void)
 	vec3 ambient_color = vec3(0.2) * base_color.xyz;
 
 	o_color = vec4(ambient_color + light_contribution * base_color.xyz, base_color.w);
+	// o_color = vec4(1.0, 0.0, 0.0, 1.0);
 }

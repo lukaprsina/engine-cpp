@@ -49,7 +49,7 @@ namespace engine
                                                                    const std::vector<ShaderModule *> &shader_modules,
                                                                    const std::vector<ShaderResource> &set_resources)
     {
-        return RequestResource(m_Device, m_Recorder, m_Mutexes.pipeline_layout, m_State.descriptor_set_layouts, set_index, shader_modules, set_resources);
+        return RequestResource(m_Device, m_Recorder, m_Mutexes.descriptor_set_layout, m_State.descriptor_set_layouts, set_index, shader_modules, set_resources);
     }
 
     GraphicsPipeline &ResourceCache::RequestGraphicsPipeline(PipelineState &pipeline_state)

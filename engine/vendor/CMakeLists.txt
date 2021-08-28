@@ -52,7 +52,11 @@ add_subdirectory(glm)
 
 target_compile_definitions(
   glm INTERFACE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
-                GLM_ENABLE_EXPERIMENTAL)
+                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
+
+target_compile_definitions(
+  Engine PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
+                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
 target_link_libraries(Engine PRIVATE glm)

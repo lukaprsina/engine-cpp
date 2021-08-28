@@ -28,9 +28,10 @@ namespace engine
 
         glm::mat4 Transform::GetMatrix() const
         {
-            return glm::translate(glm::mat4(1.0), m_Translation) *
-                   glm::mat4_cast(m_Rotation) *
-                   glm::scale(glm::mat4(1.0), m_Scale);
+            auto test = glm::translate(glm::mat4(1.0), m_Translation) *
+                        glm::mat4_cast(m_Rotation) *
+                        glm::scale(glm::mat4(1.0), m_Scale);
+            return test;
         }
 
         glm::mat4 Transform::GetWorldMatrix()
@@ -45,11 +46,6 @@ namespace engine
                 return;
 
             m_WorldMatrix = GetMatrix();
-
-            /* auto &scene = m_Entity.GetScene();
-
-            auto &transform = m_Entity.GetComponent<sg::Transform>();
-            m_WorldMatrix = transform.GetWorldMatrix() * m_WorldMatrix; */
 
             m_UpdateWorldMatrix = false;
         }
