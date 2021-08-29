@@ -77,8 +77,7 @@
         "*.inc": "cpp",
         "any": "cpp",
         "netfwd": "cpp",
-        "cfenv": "cpp",
-        "span": "cpp"
+        "cfenv": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
     "C_Cpp.errorSquiggles": "Enabled"

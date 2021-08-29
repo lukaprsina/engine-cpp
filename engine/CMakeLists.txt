@@ -186,7 +186,7 @@ elseif(UNIX)
   set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
 endif()
 
-add_executable(Engine WIN32 ${PROJECT_FILES})
+add_executable(Engine ${PROJECT_FILES})
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -199,7 +199,7 @@ target_compile_definitions(
   PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED)
 
 if(MSVC)
-  target_compile_options(Engine PRIVATE /W3 /WX)
+  # target_compile_options(Engine PRIVATE /W3 /WX)
 else()
   target_compile_options(Engine PRIVATE -Wall) # -Weffc++)
 endif()

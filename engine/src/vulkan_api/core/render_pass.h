@@ -2,7 +2,7 @@
 
 namespace engine
 {
-    struct Attachment;
+    class Attachment;
     class Device;
     struct SubpassInfo
     {

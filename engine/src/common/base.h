@@ -27,6 +27,8 @@ ENG_DISABLE_WARNINGS()
 ENG_ENABLE_WARNINGS()
 
 #include <set>
+#include <ostream>
+#include <sstream>
 
 namespace engine
 {

@@ -63,7 +63,7 @@ namespace engine
         {
             std::unique_ptr<Image> image{};
 
-            auto data = fs::ReadBinaryFile(fs::path::Get(fs::path::Type::Assets, path));
+            auto data = fs::ReadBinaryFile(fs::path::Get(fs::path::Type::Assets, path.generic_string()));
             auto extension = path.extension().generic_string();
 
             if (extension == ".png" || extension == ".jpg")
