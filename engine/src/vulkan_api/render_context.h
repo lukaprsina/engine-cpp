@@ -62,6 +62,7 @@ namespace engine
         void ReleaseOwnedSemaphore(VkSemaphore semaphore);
 
         Device &GetDevice() { return m_Device; }
+        VkExtent2D &GetSurfaceExtent() { return m_SurfaceExtent; }
 
     private:
         Device &m_Device;

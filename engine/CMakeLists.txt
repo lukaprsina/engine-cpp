@@ -113,6 +113,8 @@ set(VULKAN_API_FILES
     src/scene/components/submesh.h
     src/scene/components/transform.h
     src/scene/components/perspective_camera.h
+    src/scene/script.h
+    src/scene/scripts/free_camera.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -169,7 +171,9 @@ set(VULKAN_API_FILES
     src/scene/components/aabb.cpp
     src/scene/components/submesh.cpp
     src/scene/components/transform.cpp
-    src/scene/components/perspective_camera.cpp)
+    src/scene/components/perspective_camera.cpp
+    src/scene/script.cpp
+    src/scene/scripts/free_camera.cpp)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})

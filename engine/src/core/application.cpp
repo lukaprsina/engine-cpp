@@ -14,6 +14,7 @@
 #include "renderer/shader.h"
 #include "scene/components/perspective_camera.h"
 #include "scene/scene.h"
+#include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
@@ -88,9 +89,9 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
 
-        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_MAILBOX_KHR,
+        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                              VK_PRESENT_MODE_FIFO_KHR,
-                                                             VK_PRESENT_MODE_IMMEDIATE_KHR});
+                                                             VK_PRESENT_MODE_MAILBOX_KHR});
 
         std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
@@ -109,14 +110,16 @@ namespace engine
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
 
-        auto camera = std::make_unique<sg::PerspectiveCamera>("Camera");
         // LoadScene("scenes/bonza/Bonza.gltf");
         LoadScene("scenes/sponza/Sponza01.gltf");
+        // LoadScene("scenes/blender.gltf");
+        // auto &camera = m_Scene->GetDefaultCamera();
+        auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
-                                                              *m_Scene, *camera);
+                                                              *m_Scene, camera);
 
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
@@ -146,6 +149,13 @@ namespace engine
 
     void Application::UpdateScene(float delta_time)
     {
+        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+
+        for (auto &entity : view)
+        {
+            auto &camera = view.get<sg::FreeCamera>(entity);
+            camera.Update(delta_time);
+        }
     }
 
     void Application::Draw(CommandBuffer &command_buffer)

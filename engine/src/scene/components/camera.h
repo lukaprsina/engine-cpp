@@ -17,7 +17,7 @@ namespace engine
             virtual glm::mat4 GetProjection() = 0;
             glm::mat4 m_PreRotation{1.0f};
 
-        private:
+        protected:
             std::string m_Name;
         };
     }
