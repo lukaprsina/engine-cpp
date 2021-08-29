@@ -130,18 +130,18 @@ namespace engine
     void GeometrySubpass::UpdateUniform(CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
     {
         GlobalUniform global_uniform;
-        auto camera = m_Scene.GetCameras().front()->GetComponent<sg::PerspectiveCamera>();
+        auto &camera = m_Scene.GetCameras().front()->GetComponent<sg::PerspectiveCamera>();
         auto camera_transform = m_Scene.GetCameras().front()->GetComponent<sg::Transform>();
 
         global_uniform.camera_view_proj = camera.m_PreRotation *
                                           VulkanStyleProjection(camera.GetProjection()) *
                                           glm::inverse(camera_transform.GetWorldMatrix());
 
-        ENG_CORE_INFO(glm::to_string(camera.m_PreRotation));
+        /* ENG_CORE_INFO(glm::to_string(camera.m_PreRotation));
         ENG_CORE_INFO(glm::to_string(camera.GetProjection()));
         ENG_CORE_INFO(glm::to_string(VulkanStyleProjection(camera.GetProjection())));
         ENG_CORE_INFO(glm::to_string(glm::inverse(camera_transform.GetWorldMatrix())));
-        ENG_CORE_INFO(glm::to_string(global_uniform.camera_view_proj));
+        ENG_CORE_INFO(glm::to_string(global_uniform.camera_view_proj)); */
 
         auto &render_frame = m_RenderContext.GetActiveFrame();
 

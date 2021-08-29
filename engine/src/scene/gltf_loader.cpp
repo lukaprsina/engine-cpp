@@ -346,12 +346,8 @@ namespace engine
 
         bool importResult = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
 
-        if (!importResult)
-        {
+        if (!import_result)
             ENG_CORE_ERROR("Failed to load gltf file {}.", gltf_file.generic_string());
-
-            return nullptr;
-        }
 
         if (!err.empty())
         {
@@ -365,10 +361,15 @@ namespace engine
             ENG_CORE_WARN("{}", warn.c_str());
         }
 
-        m_ModelPath = fs::path::Get(fs::path::Type::Assets, file_name).parent_path();
+        if (import_result)
+        {
+            m_ModelPath = fs::path::Get(fs::path::Type::Assets, file_name).parent_path();
 
-        LoadScene(scene_index);
-        return std::move(m_Scene);
+            LoadScene(scene_index);
+            return std::move(m_Scene);
+        }
+
+        return nullptr;
     }
 
     void GLTFLoader::LoadScene(int scene_index)
@@ -1023,7 +1024,7 @@ namespace engine
                            glm::value_ptr(translation),
                            TypeCast<double, float>{});
 
-            ENG_CORE_INFO(glm::to_string(translation));
+            // ENG_CORE_INFO(glm::to_string(translation));
 
             transform.SetTranslation(translation);
         }
@@ -1037,7 +1038,7 @@ namespace engine
                            glm::value_ptr(rotation),
                            TypeCast<double, float>{});
 
-            ENG_CORE_INFO(glm::to_string(rotation));
+            // ENG_CORE_INFO(glm::to_string(rotation));
 
             transform.SetRotation(rotation);
         }
@@ -1051,7 +1052,7 @@ namespace engine
                            glm::value_ptr(scale),
                            TypeCast<double, float>{});
 
-            ENG_CORE_INFO(glm::to_string(scale));
+            // ENG_CORE_INFO(glm::to_string(scale));
 
             transform.SetScale(scale);
         }
@@ -1065,7 +1066,7 @@ namespace engine
                            glm::value_ptr(matrix),
                            TypeCast<double, float>{});
 
-            ENG_CORE_INFO(glm::to_string(matrix));
+            // ENG_CORE_INFO(glm::to_string(matrix));
 
             transform.SetMatrix(matrix);
         }

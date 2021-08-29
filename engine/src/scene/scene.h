@@ -14,6 +14,7 @@ namespace engine
         class Texture;
         class PBRMaterial;
         class Submesh;
+        class PerspectiveCamera;
     }
 
     class Scene
@@ -24,6 +25,8 @@ namespace engine
         ~Scene();
 
         Entity CreateEntity();
+
+        sg::PerspectiveCamera &AddFreeCamera(VkExtent2D extent);
 
         entt::registry &GetRegistry() { return m_Registry; }
 
@@ -48,5 +51,7 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> m_Meshes;
         std::vector<std::unique_ptr<Entity>> m_Cameras;
         std::vector<std::unique_ptr<sg::Submesh>> m_Submeshes;
+
+        sg::PerspectiveCamera &GetDefaultCamera();
     };
 }
