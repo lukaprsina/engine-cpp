@@ -13,12 +13,13 @@ namespace engine
         GlfwWindow(Platform &platform,
                    WindowSettings &settings);
 
-        virtual ~GlfwWindow();
+        ~GlfwWindow();
 
-        virtual void ProcessEvents() override;
-        virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
-        virtual bool ShouldClose() const override;
-        virtual void Close() override;
+        void ProcessEvents() override;
+        VkSurfaceKHR CreateSurface(Instance &instance) override;
+        bool ShouldClose() const override;
+        void Close() override;
+        void *GetNativeWindow() override { return reinterpret_cast<void *>(m_Handle); }
 
     private:
         GLFWwindow *m_Handle{nullptr};

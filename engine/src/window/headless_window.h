@@ -10,11 +10,12 @@ namespace engine
         HeadlessWindow(Platform &platform,
                        WindowSettings &settings);
 
-        virtual ~HeadlessWindow();
+        ~HeadlessWindow();
 
-        virtual VkSurfaceKHR CreateSurface(Instance &instance) override;
-        virtual bool ShouldClose() const override;
-        virtual void Close() override;
+        VkSurfaceKHR CreateSurface(Instance &instance) override;
+        bool ShouldClose() const override;
+        void Close() override;
+        void *GetNativeWindow() override { return nullptr; }
 
     private:
         bool m_Closed{false};

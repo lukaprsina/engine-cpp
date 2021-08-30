@@ -51,16 +51,13 @@ install(TARGETS glfw)
 add_subdirectory(glm)
 
 target_compile_definitions(
-  glm
-  INTERFACE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
-            GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
-            GLM_FORCE_QUAT_DATA_XYZW)
+  glm INTERFACE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
+                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
+)# GLM_FORCE_QUAT_DATA_XYZW)
 
-target_compile_definitions(
-  Engine
-  PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
-         GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
-         GLM_FORCE_QUAT_DATA_XYZW)
+# target_compile_definitions( Engine PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS
+# GLM_FORCE_CTOR_INIT GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
+# GLM_FORCE_QUAT_DATA_XYZW)
 
 target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
 target_link_libraries(Engine PRIVATE glm)
@@ -140,8 +137,14 @@ target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
 # thread_pool
-target_compile_definitions(Engine PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
-# 'std::result_of<engine::GLTFLoader::LoadImages::<lambda_290143bf62d359265eaa393944e725e9> (void)>': warning STL4014: std::result_of and std::result_of_t are deprecated in C++17. They are superseded by std::invoke_result and std::invoke_result_t. You can define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received this warning. [D:\dev\c++\engine\build\engine\Engine.vcxproj]
+target_compile_definitions(Engine
+                           PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
+# 'std::result_of<engine::GLTFLoader::LoadImages::<lambda_290143bf62d359265eaa393944e725e9>
+# (void)>': warning STL4014: std::result_of and std::result_of_t are deprecated
+# in C++17. They are superseded by std::invoke_result and std::invoke_result_t.
+# You can define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING or
+# _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received
+# this warning. [D:\dev\c++\engine\build\engine\Engine.vcxproj]
 target_include_directories(Engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
 

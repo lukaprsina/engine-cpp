@@ -344,7 +344,7 @@ namespace engine
 
         std::filesystem::path gltf_file = fs::path::Get(fs::path::Type::Assets, file_name);
 
-        bool importResult = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
+        bool import_result = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
 
         if (!import_result)
             ENG_CORE_ERROR("Failed to load gltf file {}.", gltf_file.generic_string());
@@ -1031,14 +1031,17 @@ namespace engine
 
         if (!gltf_node.rotation.empty())
         {
-            glm::quat rotation;
+            glm::quat rotation{static_cast<float>(gltf_node.rotation[3]),
+                               static_cast<float>(gltf_node.rotation[0]),
+                               static_cast<float>(gltf_node.rotation[1]),
+                               static_cast<float>(gltf_node.rotation[2])};
 
-            std::transform(gltf_node.rotation.begin(),
+            /* std::transform(gltf_node.rotation.begin(),
                            gltf_node.rotation.end(),
                            glm::value_ptr(rotation),
-                           TypeCast<double, float>{});
+                           TypeCast<double, float>{}); */
 
-            // ENG_CORE_INFO(glm::to_string(rotation));
+            ENG_CORE_INFO(glm::to_string(rotation));
 
             transform.SetRotation(rotation);
         }

@@ -2,6 +2,7 @@
 
 #include "events/event.h"
 #include "core/application.h"
+#include "window/input.h"
 
 #include <filesystem>
 
@@ -45,6 +46,8 @@ namespace engine
             throw std::runtime_error("Can't create window!");
         else
             ENG_CORE_INFO("Window created!");
+
+        Input::m_WindowPointer = m_Window->GetNativeWindow();
 
         m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 

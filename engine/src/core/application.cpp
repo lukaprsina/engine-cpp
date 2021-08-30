@@ -110,10 +110,10 @@ namespace engine
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
 
-        // LoadScene("scenes/bonza/Bonza.gltf");
-        LoadScene("scenes/sponza/Sponza01.gltf");
+        LoadScene("scenes/bonza/Bonza.gltf");
+        // LoadScene("scenes/sponza/Sponza01.gltf");
         // LoadScene("scenes/blender.gltf");
-        // auto &camera = m_Scene->GetDefaultCamera();
+
         auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),

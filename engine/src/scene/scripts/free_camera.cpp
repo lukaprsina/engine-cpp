@@ -3,6 +3,7 @@
 #include "scene/components/perspective_camera.h"
 #include "scene/components/transform.h"
 #include "scene/scene.h"
+#include "window/input.h"
 
 #include "common/glm.h"
 ENG_DISABLE_WARNINGS()
@@ -42,19 +43,46 @@ namespace engine
 
             float mul_translation = m_SpeedMultiplier;
 
-            delta_translation.z -= 50.0f;
+            if (Input::IsKeyPressed(Key::W))
+                delta_translation.z -= 50.0f;
+
+            if (Input::IsKeyPressed(Key::S))
+                delta_translation.z += 50.0f;
+
+            if (Input::IsKeyPressed(Key::A))
+                delta_translation.x -= 50.0f;
+
+            if (Input::IsKeyPressed(Key::D))
+                delta_translation.x += 50.0f;
+
+            if (Input::IsKeyPressed(Key::Up))
+                delta_rotation.x -= 0.5f;
+
+            if (Input::IsKeyPressed(Key::Down))
+                delta_rotation.x += 0.5f;
+
+            if (Input::IsKeyPressed(Key::Left))
+                delta_rotation.y += 0.5f;
+
+            if (Input::IsKeyPressed(Key::Right))
+                delta_rotation.y -= 0.5f;
+
+            if (Input::IsKeyPressed(Key::LeftShift))
+                mul_translation /= 2;
+
+            if (Input::IsKeyPressed(Key::LeftControl))
+                mul_translation *= 2;
 
             delta_translation *= mul_translation * delta_time;
             delta_rotation *= delta_time;
 
-            // Only re-calculate the transform if it's changed
             if (delta_rotation != glm::vec3(0.0f, 0.0f, 0.0f) || delta_translation != glm::vec3(0.0f, 0.0f, 0.0f))
             {
                 auto view = m_Scene.GetRegistry().view<sg::PerspectiveCamera, sg::Transform>();
 
                 for (auto &entity : view)
                 {
-                    auto transform = view.get<sg::Transform>(entity);
+                    auto &transform = view.get<sg::Transform>(entity);
 
                     glm::quat qx = glm::angleAxis(delta_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
                     glm::quat qy = glm::angleAxis(delta_rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -63,10 +91,10 @@ namespace engine
 
                     transform.SetTranslation(transform.GetTranslation() + delta_translation * glm::conjugate(orientation));
                     transform.SetRotation(orientation);
-
-                    ENG_CORE_TRACE(glm::to_string(transform.GetTranslation()));
                 }
             }
+
+            m_MouseMoveDelta = {};
         }
     }
 }

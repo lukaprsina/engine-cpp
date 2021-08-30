@@ -27,6 +27,7 @@ namespace engine
         virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
+        virtual void *GetNativeWindow() = 0;
 
         void SetSettings(WindowSettings &settings) { m_Settings = settings; }
         WindowSettings GetSettings() { return m_Settings; }

@@ -47,13 +47,13 @@ set(WINDOWS_FILES
     # Header Files
     src/platform/windows_platform.h
     # Source Files
-    src/platform/windows_platform.cpp)
+    src/platform/windows_platform.cpp src/window/glfw_input.cpp)
 
 set(UNIX_FILES
     # Header Files
     src/platform/unix_platform.h
     # Source Files
-    src/platform/unix_platform.cpp)
+    src/platform/unix_platform.cpp src/window/glfw_input.cpp)
 
 set(VULKAN_API_FILES
     # Header files
@@ -115,6 +115,7 @@ set(VULKAN_API_FILES
     src/scene/components/perspective_camera.h
     src/scene/script.h
     src/scene/scripts/free_camera.h
+    src/window/input.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
