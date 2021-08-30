@@ -28,8 +28,7 @@ namespace engine
         private:
             PerspectiveCamera &m_PerspectiveCamera;
             Scene &m_Scene;
-            // float m_SpeedMultiplier{0.05f};
-            float m_SpeedMultiplier{1.00f};
+            float m_SpeedMultiplier{3.0f};
             glm::vec2 m_MouseMoveDelta{};
         };
     }

@@ -56,22 +56,22 @@ namespace engine
                 delta_translation.x += 50.0f;
 
             if (Input::IsKeyPressed(Key::Up))
-                delta_rotation.x -= 0.5f;
+                delta_rotation.x -= 2.0f;
 
             if (Input::IsKeyPressed(Key::Down))
-                delta_rotation.x += 0.5f;
+                delta_rotation.x += 2.0f;
 
             if (Input::IsKeyPressed(Key::Left))
-                delta_rotation.y += 0.5f;
+                delta_rotation.y += 2.0f;
 
             if (Input::IsKeyPressed(Key::Right))
-                delta_rotation.y -= 0.5f;
+                delta_rotation.y -= 2.0f;
 
             if (Input::IsKeyPressed(Key::LeftShift))
-                mul_translation /= 2;
+                mul_translation /= 4;
 
             if (Input::IsKeyPressed(Key::LeftControl))
-                mul_translation *= 2;
+                mul_translation *= 4;
 
             delta_translation *= mul_translation * delta_time;
             delta_rotation *= delta_time;

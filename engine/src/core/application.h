@@ -72,7 +72,11 @@ namespace engine
         std::string m_Usage{};
         Options m_Options{};
         bool m_Headless{false};
+
+        float m_Fps{0.0f};
+        float m_FrameTime{0.0f};
         uint32_t m_FrameCount{0};
+        uint32_t m_LastFrameCount{0};
         Timer m_Timer{};
 
         std::unique_ptr<Instance> m_Instance{};

@@ -1,6 +1,7 @@
 #include "core/application.h"
 
 #include "core/log.h"
+#include "core/timer.h"
 #include "events/application_event.h"
 #include "vulkan_api/command_buffer.h"
 #include "vulkan_api/device.h"
@@ -68,6 +69,7 @@ namespace engine
 
     bool Application::Prepare()
     {
+        m_Timer.Start();
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
 
@@ -89,8 +91,8 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
 
-        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
-                                                             VK_PRESENT_MODE_FIFO_KHR,
+        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
+                                                             VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                              VK_PRESENT_MODE_MAILBOX_KHR});
 
         std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
@@ -110,9 +112,9 @@ namespace engine
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
 
-        LoadScene("scenes/bonza/Bonza.gltf");
-        // LoadScene("scenes/sponza/Sponza01.gltf");
-        // LoadScene("scenes/blender.gltf");
+        // LoadScene("scenes/bonza/Bonza.gltf");
+        LoadScene("scenes/sponza/Sponza01.gltf");
+        // LoadScene("scenes/blender_no.gltf");
 
         auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
@@ -135,6 +137,21 @@ namespace engine
             delta_time = 0.01667f;
 
         Update(delta_time);
+
+        auto elapsed_time = static_cast<float>(m_Timer.Elapsed<Timer::Seconds>());
+
+        if (elapsed_time > 0.5f)
+        {
+            m_Fps = (m_FrameCount - m_LastFrameCount) / elapsed_time;
+            m_FrameTime = delta_time * 1000.0f;
+
+            ENG_CORE_TRACE("FPS: {:.1f}", m_Fps);
+
+            m_LastFrameCount = m_FrameCount;
+            m_Timer.Lap();
+        }
+
+        m_FrameCount++;
     }
 
     void Application::Update(float delta_time)
@@ -216,7 +233,8 @@ namespace engine
 
     void Application::Finish()
     {
-        ENG_CORE_INFO("Closing Application.");
+        auto execution_time = m_Timer.Stop();
+        ENG_CORE_INFO("Closing Application. (Runtime: {:.1f})", execution_time);
     }
 
     void Application::OnEvent(Event &event)
