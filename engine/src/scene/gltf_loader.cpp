@@ -333,7 +333,7 @@ namespace engine
     {
     }
 
-    std::unique_ptr<Scene> GLTFLoader::ReadSceneFromFile(const std::string &file_name, bool binary, int scene_index)
+    std::unique_ptr<Scene> GLTFLoader::ReadSceneFromFile(const std::string &file_name, int scene_index)
     {
         std::string err;
         std::string warn;
@@ -343,6 +343,8 @@ namespace engine
         gltf_loader.SetImageLoader(LoadImageData, this);
 
         std::filesystem::path gltf_file = fs::path::Get(fs::path::Type::Assets, file_name);
+
+        bool binary = gltf_file.extension() == ".glb";
 
         bool import_result = false;
         if (binary)
@@ -706,8 +708,8 @@ namespace engine
 
             if (gltf_node.mesh >= 0)
             {
-                if (gltf_node.mesh == 361)
-                    ENG_CORE_ERROR("fuck");
+                /* if (gltf_node.mesh == 361)
+                    ENG_CORE_ERROR("loaded the same node"); */
                 entity = *m_Scene->GetMeshes().at(gltf_node.mesh);
                 identified = true;
             }

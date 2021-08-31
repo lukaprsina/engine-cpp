@@ -36,7 +36,7 @@ namespace engine
         void Draw(CommandBuffer &command_buffer);
         void Finish();
 
-        void LoadScene(const std::string &path, bool binary = false);
+        void LoadScene(const std::string &path);
 
         void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
 
