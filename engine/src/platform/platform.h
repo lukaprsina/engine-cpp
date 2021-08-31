@@ -18,7 +18,7 @@ namespace engine
     class Platform
     {
     public:
-        Platform(const std::string name, const std::vector<std::string> &arguments);
+        Platform(const std::vector<std::string> &arguments);
         virtual ~Platform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app);
