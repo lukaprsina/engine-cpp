@@ -113,8 +113,9 @@ namespace engine
         ShaderSource frag_shader("base.frag");
 
         // LoadScene("scenes/bonza/Bonza.gltf");
-        LoadScene("scenes/sponza/Sponza01.gltf");
+        // LoadScene("scenes/sponza/Sponza01.gltf");
         // LoadScene("scenes/blender_no.gltf");
+        LoadScene("scenes/win.glb", true);
 
         auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
@@ -248,10 +249,11 @@ namespace engine
         m_Options.ParseOptions(m_Usage, arguments);
     }
 
-    void Application::LoadScene(const std::string &path)
+    void Application::LoadScene(const std::string &path, bool binary)
     {
         GLTFLoader loader(*m_Device);
-        m_Scene = loader.ReadSceneFromFile(path);
+        
+        m_Scene = loader.ReadSceneFromFile(path, binary);
 
         if (!m_Scene)
             throw std::runtime_error("Cannot load scene: " + path);

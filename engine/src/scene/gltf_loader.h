@@ -36,7 +36,7 @@ namespace engine
         GLTFLoader(Device &device);
         ~GLTFLoader();
 
-        std::unique_ptr<Scene> ReadSceneFromFile(const std::string &file_name, int scene_index = -1);
+        std::unique_ptr<Scene> ReadSceneFromFile(const std::string &file_name, bool binary, int scene_index = -1);
 
     private:
         Device &m_Device;

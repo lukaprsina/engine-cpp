@@ -333,7 +333,7 @@ namespace engine
     {
     }
 
-    std::unique_ptr<Scene> GLTFLoader::ReadSceneFromFile(const std::string &file_name, int scene_index)
+    std::unique_ptr<Scene> GLTFLoader::ReadSceneFromFile(const std::string &file_name, bool binary, int scene_index)
     {
         std::string err;
         std::string warn;
@@ -344,7 +344,11 @@ namespace engine
 
         std::filesystem::path gltf_file = fs::path::Get(fs::path::Type::Assets, file_name);
 
-        bool import_result = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
+        bool import_result = false;
+        if (binary)
+            import_result = gltf_loader.LoadBinaryFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
+        else
+            import_result = gltf_loader.LoadASCIIFromFile(&m_Model, &err, &warn, gltf_file.generic_string());
 
         if (!import_result)
             ENG_CORE_ERROR("Failed to load gltf file {}.", gltf_file.generic_string());
