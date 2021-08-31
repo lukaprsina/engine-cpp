@@ -191,7 +191,7 @@ elseif(UNIX)
   set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
 endif()
 
-add_executable(Engine ${PROJECT_FILES})
+add_executable(Engine WIN32 ${PROJECT_FILES})
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

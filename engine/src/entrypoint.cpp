@@ -1,8 +1,10 @@
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
 #include "platform/windows_platform.h"
-int main(int argc, char *argv[])
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+    PSTR lpCmdLine, INT nCmdShow)
 {
-    engine::WindowsPlatform platform{argc, argv};
+    engine::WindowsPlatform platform{ hInstance, hPrevInstance,
+                                     lpCmdLine, nCmdShow };
 #else
 #include "platform/unix_platform.h"
 int main(int argc, char *argv[])
