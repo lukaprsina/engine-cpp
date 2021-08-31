@@ -47,7 +47,7 @@ namespace engine
             WideCharToMultiByte(CP_UTF8, 0, &wstr[0], wstr_len, &str[0], str_len, NULL, NULL);
 
             return str;
-        }        
+        }
 
         inline std::vector<std::string> GetArgs()
         {
@@ -65,15 +65,10 @@ namespace engine
                 args.push_back(wstr_to_str(arg));
             }
 
-            return args;
-        }
+            TCHAR szExeFileName[MAX_PATH];
+            GetModuleFileName(NULL, szExeFileName, MAX_PATH);
 
-        inline std::string GetName()
-        {
-            TCHAR szFileName[MAX_PATH];
-            GetModuleFileName(NULL, szFileName, MAX_PATH);
-            
-            return std::string{ szFileName };
+            return args;
         }
 
         inline std::filesystem::path GetRootFolder()
@@ -83,12 +78,10 @@ namespace engine
         }
     }
 
-    WindowsPlatform::WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-        PSTR lpCmdLine, INT nCmdShow)
-        : Platform(GetName(), GetArgs())
+    WindowsPlatform::WindowsPlatform(int argc, char *argv[])
+        : Platform(std::vector<std::string>(argv, argv + argc))
     {
-        auto args = GetArgs();
-        if (!AllocConsole())
+        /* if (!AllocConsole())
         {
             throw std::runtime_error{"AllocConsole error"};
         }
@@ -96,7 +89,7 @@ namespace engine
         FILE *fp;
         freopen_s(&fp, "conin$", "r", stdin);
         freopen_s(&fp, "conout$", "w", stdout);
-        freopen_s(&fp, "conout$", "w", stderr);
+        freopen_s(&fp, "conout$", "w", stderr); */
 
         // TODO: search for build
         Platform::SetTempDirectory(GetTempPathFromEnvironment());

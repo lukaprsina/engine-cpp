@@ -35,7 +35,7 @@ namespace engine
     }
 
     UnixPlatform::UnixPlatform(const UnixType &type, int argc, char *argv[])
-        : Platform(argv[0], std::vector<std::string>(argv+1, argv + argc)),
+        : Platform(std::vector<std::string>(argv, argv + argc)),
           m_Type(type)
     {
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
