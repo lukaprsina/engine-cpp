@@ -13,23 +13,32 @@ namespace engine
     std::filesystem::path Platform::s_ExternalStorageDirectory = {};
     std::filesystem::path Platform::s_TempDirectory = {};
 
-    Platform::Platform(const std::vector<std::string> &arguments)
+    Platform::Platform(const std::string name, const std::vector<std::string> &arguments)
     {
-        auto program_name = std::filesystem::path(arguments[0]);
+        auto program_name = std::filesystem::path(name);
 
         if (!program_name.is_absolute())
             program_name = std::filesystem::current_path() / program_name;
 
         program_name = std::filesystem::canonical(program_name);
+        std::filesystem::current_path(program_name.parent_path());
 
-        std::filesystem::current_path(program_name.parent_path().parent_path().parent_path());
+        std::filesystem::path engine_directory;
 
-        Platform::SetSourceDirectory(std::filesystem::current_path() / m_EngineName);
+        // TODO: improve
+        for (auto &folder : program_name)
+        {
+            engine_directory = engine_directory / folder;            
 
-        std::vector<std::string> args = arguments;
-        args.erase(args.begin());
+            if (folder == m_EngineName)
+                break;
+        }
 
-        Platform::SetArguments(args);
+        auto source_directory = std::filesystem::canonical(engine_directory / m_EngineName);
+
+        Platform::SetSourceDirectory(source_directory);
+
+        Platform::SetArguments(arguments);
     }
 
     bool Platform::Initialize(std::unique_ptr<Application> &&app)
