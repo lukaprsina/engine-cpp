@@ -33,6 +33,7 @@ namespace engine
             R"(Engine
     Usage:
         Engine [--headless]
+        Engine <scene> [--headless]
         Engine --help
     Options:
         --help                    Show this screen.
@@ -115,7 +116,16 @@ namespace engine
         // LoadScene("scenes/bonza/Bonza.gltf");
         // LoadScene("scenes/sponza/Sponza01.gltf");
         // LoadScene("scenes/blender_no.gltf");
-        LoadScene("scenes/win.glb", true);
+        // LoadScene("scenes/win.glb");
+        std::string scene{};
+
+        if (m_Options.Contains("<scene>"))
+            scene = m_Options.GetString("<scene>");
+
+        if (scene.empty())
+            LoadScene("scenes/win.glb");
+        else
+            LoadScene(scene);
 
         auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
@@ -249,11 +259,11 @@ namespace engine
         m_Options.ParseOptions(m_Usage, arguments);
     }
 
-    void Application::LoadScene(const std::string &path, bool binary)
+    void Application::LoadScene(const std::string &path)
     {
         GLTFLoader loader(*m_Device);
         
-        m_Scene = loader.ReadSceneFromFile(path, binary);
+        m_Scene = loader.ReadSceneFromFile(path);
 
         if (!m_Scene)
             throw std::runtime_error("Cannot load scene: " + path);

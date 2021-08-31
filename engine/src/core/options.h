@@ -14,6 +14,7 @@ namespace engine
         bool Contains(const std::string &argument) const;
 
         int32_t GetInt(const std::string &argument) const;
+        const std::string GetString(const std::string& argument) const;
 
     private:
         std::string m_Usage{};

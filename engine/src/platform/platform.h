@@ -33,7 +33,7 @@ namespace engine
         virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
-        std::vector<std::string> &GetArguments() { return s_Arguments; };
+        static std::vector<std::string> &GetArguments() { return s_Arguments; };
 
         static void SetSourceDirectory(const std::filesystem::path &directory) { s_SourceDirectory = directory; };
         static const std::filesystem::path &GetSourceDirectory() { return s_SourceDirectory; };
