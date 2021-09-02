@@ -54,7 +54,7 @@ namespace engine
         void HandleSurfaceChanges();
         RenderFrame &GetActiveFrame();
 
-        void BeginFrame();
+        VkSemaphore BeginFrame();
         void WaitFrame();
         void EndFrame(VkSemaphore semaphore);
         void Recreate();

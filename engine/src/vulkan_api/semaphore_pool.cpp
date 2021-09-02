@@ -76,9 +76,9 @@ namespace engine
     {
         m_ActiveSemaphoreCount = 0;
 
-        for (auto &semaphore : m_ReleasedSemaphores)
+        /* for (auto& semaphore : m_ReleasedSemaphores)
             m_Semaphores.push_back(semaphore);
 
-        m_ReleasedSemaphores.clear();
+        m_ReleasedSemaphores.clear(); */
     }
 }

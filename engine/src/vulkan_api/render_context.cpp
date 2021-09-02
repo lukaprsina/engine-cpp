@@ -88,8 +88,7 @@ namespace engine
     {
         assert(m_Prepared && "RenderContext not prepared for rendering, call prepare()");
 
-        if (!m_FrameActive)
-            BeginFrame();
+        m_AcquiredSemaphore = BeginFrame();
 
         if (m_AcquiredSemaphore == VK_NULL_HANDLE)
             throw std::runtime_error("Couldn't begin frame!");
@@ -172,14 +171,14 @@ namespace engine
         queue.Submit({submit_info}, fence);
     }
 
-    void RenderContext::BeginFrame()
+    VkSemaphore RenderContext::BeginFrame()
     {
         if (m_Swapchain)
             HandleSurfaceChanges();
 
         assert(!m_FrameActive && "Frame is still active, please call end_frame");
         auto &prev_frame = *m_Frames.at(m_ActiveFrameIndex);
-        m_AcquiredSemaphore = prev_frame.RequestSemaphoreWithOwnership();
+        auto m_AcquiredSemaphore = prev_frame.RequestSemaphoreWithOwnership();
 
         if (m_Swapchain)
         {
@@ -195,12 +194,13 @@ namespace engine
             if (result != VK_SUCCESS)
             {
                 prev_frame.Reset();
-                return;
+                return VK_NULL_HANDLE;
             }
         }
 
         m_FrameActive = true;
         WaitFrame();
+        return m_AcquiredSemaphore;
     }
 
     void RenderContext::WaitFrame()
