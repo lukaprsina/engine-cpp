@@ -14,11 +14,11 @@
 
 namespace engine
 {
-    GeometrySubpass::GeometrySubpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene, sg::Camera &camera)
+    GeometrySubpass::GeometrySubpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene)
         : Subpass(render_context,
                   std::move(vertex_shader),
                   std::move(fragment_shader)),
-          m_Scene(scene) // , m_Camera(camera)
+          m_Scene(scene)
     {
     }
 
@@ -98,8 +98,8 @@ namespace engine
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes)
     {
-        auto &camera = *m_Scene.GetCameras().front().get();
-        auto camera_transform = camera.GetComponent<sg::Transform>().GetWorldMatrix();
+        auto &camera = m_Scene.GetDefaultCamera();
+        auto camera_matrix = camera.GetComponent<sg::Transform>().GetWorldMatrix();
 
         auto view = m_Scene.GetRegistry().view<sg::Mesh, sg::Transform>();
         for (auto &entity : view)
@@ -112,7 +112,7 @@ namespace engine
             sg::AABB world_bounds{mesh_bounds.GetMin(), mesh_bounds.GetMax()};
             world_bounds.Transform(world_matrix);
 
-            float distance = glm::length(glm::vec3(camera_transform[3]) -
+            float distance = glm::length(glm::vec3(camera_matrix[3]) -
                                          world_bounds.GetCenter());
 
             for (auto &submesh : mesh.GetSubmeshes())
@@ -130,11 +130,14 @@ namespace engine
     void GeometrySubpass::UpdateUniform(CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
     {
         GlobalUniform global_uniform;
-        auto &camera = m_Scene.GetCameras().front()->GetComponent<sg::PerspectiveCamera>();
-        auto camera_transform = m_Scene.GetCameras().front()->GetComponent<sg::Transform>();
+        auto &camera = m_Scene.GetDefaultCamera();
+        auto &perspective_camera = camera.GetComponent<sg::PerspectiveCamera>();
+        auto &camera_transform = camera.GetComponent<sg::Transform>();
 
-        global_uniform.camera_view_proj = camera.m_PreRotation *
-                                          VulkanStyleProjection(camera.GetProjection()) *
+        ENG_CORE_WARN(perspective_camera.m_AspectRatio);
+
+        global_uniform.camera_view_proj = perspective_camera.m_PreRotation *
+                                          VulkanStyleProjection(perspective_camera.GetProjection()) *
                                           glm::inverse(camera_transform.GetWorldMatrix());
 
         /* ENG_CORE_INFO(glm::to_string(camera.m_PreRotation));
@@ -176,9 +179,7 @@ namespace engine
         command_buffer.GetPipelineState().SetPipelineLayout(pipeline_layout);
 
         if (pipeline_layout.GetPushConstantRangeStage(sizeof(PBRMaterialUniform)) != 0)
-        {
             PreparePushConstants(command_buffer, submesh);
-        }
 
         DescriptorSetLayout &descriptor_set_layout = pipeline_layout.GetDescriptorSetLayout(0);
 

@@ -73,7 +73,7 @@ namespace engine
 
     const DescriptorSetLayout &DescriptorPool::GetDescriptorSetLayout() const
     {
-        assert(m_DescriptorSetLayout && "Descriptor set layout is invalid");
+        ENG_ASSERT(m_DescriptorSetLayout, "Descriptor set layout is invalid");
         return *m_DescriptorSetLayout;
     }
 

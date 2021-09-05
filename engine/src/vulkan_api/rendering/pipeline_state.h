@@ -172,7 +172,7 @@ namespace engine
 
         const PipelineLayout &GetPipelineLayout() const
         {
-            assert(m_PipelineLayout && "Graphics state Pipeline layout is not set");
+            ENG_ASSERT(m_PipelineLayout, "Graphics state Pipeline layout is not set");
             return *m_PipelineLayout;
         }
         const RenderPass *GetRenderPass() const { return m_RenderPass; }

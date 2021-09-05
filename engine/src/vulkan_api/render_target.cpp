@@ -41,7 +41,7 @@ namespace engine
         : m_Device(images.back().GetDevice()),
           m_Images(std::move(images))
     {
-        assert(!m_Images.empty() && "Render target should have at least one image");
+        ENG_ASSERT(!m_Images.empty(), "Render target should have at least one image");
 
         auto CompareExtend2D = [](const VkExtent2D &lhs, const VkExtent2D &rhs)
         {

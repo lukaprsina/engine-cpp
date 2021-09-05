@@ -10,7 +10,9 @@
       "request": "launch",
       // Resolved by CMake Tools:
       "program": "${command:cmake.launchTargetPath}",
-      "args": [],
+      "args": [
+        "scenes/sponza/Sponza01.gltf"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [

@@ -16,8 +16,8 @@ namespace engine
 {
     namespace sg
     {
-        FreeCamera::FreeCamera(PerspectiveCamera &perspective_camera, Scene &scene)
-            : m_PerspectiveCamera(perspective_camera), m_Scene(scene)
+        FreeCamera::FreeCamera(Scene &scene)
+            : m_Scene(scene)
         {
         }
 
@@ -26,8 +26,7 @@ namespace engine
         }
 
         FreeCamera::FreeCamera(FreeCamera &&other)
-            : m_PerspectiveCamera(other.m_PerspectiveCamera),
-              m_Scene(other.m_Scene)
+            : m_Scene(other.m_Scene)
         {
         }
 
@@ -95,6 +94,12 @@ namespace engine
             }
 
             m_MouseMoveDelta = {};
+        }
+
+        void FreeCamera::Resize(uint32_t width, uint32_t height)
+        {
+            auto &camera = m_Scene.GetDefaultCamera().GetComponent<sg::PerspectiveCamera>();
+            camera.m_AspectRatio = static_cast<float>(width) / height;
         }
     }
 }

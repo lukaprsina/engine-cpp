@@ -29,14 +29,13 @@ namespace engine
 
         VkSemaphore semaphore{VK_NULL_HANDLE};
 
-        VkSemaphoreCreateInfo create_info{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+        VkSemaphoreCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
         VkResult result = vkCreateSemaphore(m_Device.GetHandle(), &create_info, nullptr, &semaphore);
 
         if (result != VK_SUCCESS)
-        {
             throw std::runtime_error("Failed to create semaphore.");
-        }
 
         m_Semaphores.push_back(semaphore);
 
@@ -68,7 +67,6 @@ namespace engine
 
     void SemaphorePool::ReleaseOwnedSemaphore(VkSemaphore semaphore)
     {
-        // We cannot reuse this semaphore until ::reset().
         m_ReleasedSemaphores.push_back(semaphore);
     }
 
@@ -76,9 +74,9 @@ namespace engine
     {
         m_ActiveSemaphoreCount = 0;
 
-        /* for (auto& semaphore : m_ReleasedSemaphores)
+        for (auto &semaphore : m_ReleasedSemaphores)
             m_Semaphores.push_back(semaphore);
 
-        m_ReleasedSemaphores.clear(); */
+        m_ReleasedSemaphores.clear();
     }
 }

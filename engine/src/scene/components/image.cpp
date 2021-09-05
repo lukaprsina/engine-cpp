@@ -84,7 +84,7 @@ namespace engine
 
         void Image::GenerateMipmaps()
         {
-            assert(m_Mipmaps.size() == 1 && "Mipmaps already present");
+            ENG_ASSERT(m_Mipmaps.size() == 1, "Mipmaps already present");
 
             if (m_Mipmaps.size() > 1)
                 return;
@@ -129,7 +129,7 @@ namespace engine
 
         void Image::CreateVkImage(Device &device, VkImageViewType image_view_type, VkImageCreateFlags flags)
         {
-            assert(!m_VkImage && !m_VkImageView && "Vulkan image already constructed");
+            ENG_ASSERT(!m_VkImage && !m_VkImageView, "Vulkan image already constructed");
 
             m_VkImage = std::make_unique<core::Image>(device,
                                                       GetExtent(),

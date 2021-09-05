@@ -71,8 +71,8 @@ namespace engine
               m_Tiling(tiling),
               m_ArrayLayerCount(array_layers)
         {
-            assert(mip_levels > 0 && "Image should have at least one level");
-            assert(array_layers > 0 && "Image should have at least one layer");
+            ENG_ASSERT(mip_levels > 0, "Image should have at least one level");
+            ENG_ASSERT(array_layers > 0, "Image should have at least one layer");
 
             m_Subresource.mipLevel = mip_levels;
             m_Subresource.arrayLayer = array_layers;

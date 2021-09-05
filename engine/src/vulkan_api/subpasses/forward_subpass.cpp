@@ -13,11 +13,11 @@ namespace engine
     ForwardSubpass::ForwardSubpass(RenderContext &render_context,
                                    ShaderSource &&vertex_shader,
                                    ShaderSource &&fragment_shader,
-                                   Scene &scene, sg::Camera &camera)
+                                   Scene &scene)
         : GeometrySubpass(render_context,
                           std::move(vertex_shader),
                           std::move(fragment_shader),
-                          scene, camera)
+                          scene)
     {
     }
 

@@ -7,6 +7,7 @@ namespace engine
     class RenderContext;
     class ShaderSource;
     class Scene;
+    class Entity;
 
     namespace sg
     {
@@ -35,7 +36,7 @@ namespace engine
         GeometrySubpass(RenderContext &render_context,
                         ShaderSource &&vertex_shader,
                         ShaderSource &&fragment_shader,
-                        Scene &scene, sg::Camera &camera);
+                        Scene &scene);
         virtual ~GeometrySubpass();
 
         virtual void Prepare() override;
@@ -56,7 +57,6 @@ namespace engine
 
     protected:
         Scene &m_Scene;
-        // sg::Camera &m_Camera;
         uint32_t m_ThreadIndex{0};
         RasterizationState m_BaseRasterizationState{};
     };

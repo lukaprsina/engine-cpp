@@ -7,6 +7,7 @@ namespace engine
 {
     class Platform;
     class WindowCloseEvent;
+    class WindowResizeEvent;
     class Event;
     class Instance;
     class Device;
@@ -29,6 +30,7 @@ namespace engine
 
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
+        bool OnResize(WindowResizeEvent &event);
         bool Prepare();
         void Step();
         void Update(float delta_time);
@@ -57,7 +59,7 @@ namespace engine
 
         RenderContext &GetRenderContext()
         {
-            assert(m_RenderContext && "Render context is not valid");
+            ENG_ASSERT(m_RenderContext, "Render context is not valid");
             return *m_RenderContext;
         }
 

@@ -30,7 +30,7 @@ namespace engine
 
     void RenderPipeline::Draw(CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents)
     {
-        assert(!m_Subpasses.empty() && "Render pipeline should contain at least one sub-pass");
+        ENG_ASSERT(!m_Subpasses.empty(), "Render pipeline should contain at least one sub-pass");
 
         // Pad clear values if they're less than render target attachments
         while (m_ClearValue.size() < render_target.GetAttachments().size())

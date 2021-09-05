@@ -188,8 +188,7 @@ namespace engine
                                                      CommandBuffer::ResetMode reset_mode,
                                                      VkCommandBufferLevel level, size_t thread_index)
     {
-        assert(thread_index < m_ThreadCount && "Thread index is out of bounds");
-
+        ENG_ASSERT(thread_index < m_ThreadCount, "Thread index is out of bounds");
         auto &command_pools = GetCommandPools(queue_family, reset_mode);
 
         auto command_pool_it = std::find_if(command_pools.begin(), command_pools.end(), [&thread_index](std::unique_ptr<CommandPool> &cmd_pool)

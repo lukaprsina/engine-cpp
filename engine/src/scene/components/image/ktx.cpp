@@ -43,7 +43,7 @@ namespace engine
 		{
 			// Get mipmaps
 			auto &mipmaps = *reinterpret_cast<std::vector<Mipmap> *>(user_data);
-			assert(static_cast<size_t>(mip_level) < mipmaps.size() && "Not enough space in the mipmap vector");
+			ENG_ASSERT(static_cast<size_t>(mip_level) < mipmaps.size(), "Not enough space in the mipmap vector");
 
 			auto &mipmap = mipmaps.at(mip_level);
 			mipmap.level = mip_level;

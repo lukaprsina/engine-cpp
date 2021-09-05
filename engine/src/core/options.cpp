@@ -19,12 +19,10 @@ namespace engine
     {
         if (m_ParseResult.count(argument) != 0)
         {
-            if (const auto& result = m_ParseResult.at(argument))
+            if (const auto &result = m_ParseResult.at(argument))
             {
                 if (result.isBool())
-                {
                     return result.asBool();
-                }
 
                 return true;
             }
@@ -38,19 +36,19 @@ namespace engine
         if (Contains(argument))
         {
             auto result = m_ParseResult.at(argument);
-            if (result.isString())            
+            if (result.isString())
                 return std::stoi(result.asString());
-            
-            else if (result.isLong())            
+
+            else if (result.isLong())
                 return static_cast<int32_t>(result.asLong());
-            
+
             throw std::runtime_error("Argument option is not int type");
         }
 
         throw std::runtime_error("Couldn't find argument option");
     }
 
-    const std::string Options::GetString(const std::string& argument) const
+    const std::string Options::GetString(const std::string &argument) const
     {
         if (Contains(argument))
         {

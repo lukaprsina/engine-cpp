@@ -69,7 +69,7 @@ namespace engine
 
         const Image &ImageView::GetImage() const
         {
-            assert(m_Image && "Image view is referring an invalid image");
+            ENG_ASSERT(m_Image, "Image view is referring an invalid image");
             return *m_Image;
         }
 

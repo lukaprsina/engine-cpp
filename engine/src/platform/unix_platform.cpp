@@ -35,7 +35,7 @@ namespace engine
     }
 
     UnixPlatform::UnixPlatform(const UnixType &type, int argc, char *argv[])
-        : Platform(argv[0], std::vector<std::string>(argv+1, argv + argc)),
+        : Platform(argv[0], std::vector<std::string>(argv + 1, argv + argc)),
           m_Type(type)
     {
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
@@ -52,13 +52,10 @@ namespace engine
         WindowSettings settings;
 
         if (m_App->IsHeadless())
-        {
             m_Window = std::make_unique<HeadlessWindow>(*this, settings);
-        }
+
         else
-        {
             m_Window = std::make_unique<GlfwWindow>(*this, settings);
-        }
     }
 
     const char *UnixPlatform::GetSurfaceExtension()

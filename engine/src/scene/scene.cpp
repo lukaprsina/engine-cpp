@@ -32,32 +32,11 @@ namespace engine
         return entity;
     }
 
-    sg::PerspectiveCamera &Scene::AddFreeCamera(VkExtent2D extent)
+    void Scene::AddFreeCamera(VkExtent2D extent)
     {
-        auto &camera = GetDefaultCamera();
-
-        auto entity = CreateEntity();
-        auto free_camera_script = entity.AddComponent<sg::FreeCamera>(camera, *this);
+        m_DefaultCamera = m_Cameras[0].get();
+        auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this);
         free_camera_script.Resize(extent.width, extent.height);
-
-        return camera;
-    }
-
-    sg::PerspectiveCamera &Scene::GetDefaultCamera()
-    {
-        auto view = m_Registry.view<sg::PerspectiveCamera>();
-
-        for (auto &entity : view)
-        {
-            auto &entity_camera = view.get<sg::PerspectiveCamera>(entity);
-            return entity_camera;
-        }
-
-        auto entity = CreateEntity();
-        auto &camera = entity.AddComponent<sg::PerspectiveCamera>("main_camera");
-        entity.AddComponent<sg::Transform>(entity);
-        m_Cameras.emplace_back(std::make_unique<Entity>(entity));
-
-        return camera;
+        ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());
     }
 }
