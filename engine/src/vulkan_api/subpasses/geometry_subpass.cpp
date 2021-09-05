@@ -132,9 +132,7 @@ namespace engine
         GlobalUniform global_uniform;
         auto &camera = m_Scene.GetDefaultCamera();
         auto &perspective_camera = camera.GetComponent<sg::PerspectiveCamera>();
-        auto &camera_transform = camera.GetComponent<sg::Transform>();
-
-        ENG_CORE_WARN(perspective_camera.m_AspectRatio);
+        auto &camera_transform = camera.GetComponent<sg::Transform>();        
 
         global_uniform.camera_view_proj = perspective_camera.m_PreRotation *
                                           VulkanStyleProjection(perspective_camera.GetProjection()) *

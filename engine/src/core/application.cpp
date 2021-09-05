@@ -26,7 +26,7 @@ namespace engine
         : m_Platform(platform)
     {
         Log::Init();
-        Log::GetCoreLogger()->set_level(spdlog::level::warn);
+        // Log::GetCoreLogger()->set_level(spdlog::level::warn);
 
         ENG_CORE_INFO("Logger initialized.");
 
