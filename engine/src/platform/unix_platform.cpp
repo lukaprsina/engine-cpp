@@ -64,9 +64,17 @@ namespace engine
     const char *UnixPlatform::GetSurfaceExtension()
     {
         if (m_Type == UnixType::Mac)
-            return VK_MVK_MACOS_SURFACE_EXTENSION_NAME;
+            return VK_EXT_METAL_SURFACE_EXTENSION_NAME;
 
-        else
-            return VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+#if defined(VK_USE_PLATFORM_XCB_KHR)
+        return VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+#elif defined(VK_USE_PLATFORM_XLIB_KHR)
+        return VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+        return VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME;
+#else
+        ENG_ASSERT(surface_extesion, "Platform not supported, no surface extension available");
+        return "";
+#endif
     }
 }
