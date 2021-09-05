@@ -26,6 +26,7 @@ namespace engine
         : m_Platform(platform)
     {
         Log::Init();
+        Log::GetCoreLogger()->set_level(spdlog::level::warn);
 
         ENG_CORE_INFO("Logger initialized.");
 
@@ -60,12 +61,6 @@ namespace engine
             vkDestroySurfaceKHR(m_Instance->GetHandle(), m_Surface, nullptr);
 
         m_Instance.reset();
-    }
-
-    bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
-    {
-        m_Platform->Close();
-        return true;
     }
 
     bool Application::Prepare()
@@ -113,26 +108,22 @@ namespace engine
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
 
-        // LoadScene("scenes/bonza/Bonza.gltf");
-        // LoadScene("scenes/sponza/Sponza01.gltf");
-        // LoadScene("scenes/blender_no.gltf");
-        // LoadScene("scenes/win.glb");
-        std::string scene{};
+        std::string scene;
 
         if (m_Options.Contains("<scene>"))
             scene = m_Options.GetString("<scene>");
 
         if (scene.empty())
-            LoadScene("scenes/win.glb");
+            LoadScene("scenes/sponza/Sponza01.gltf");
         else
             LoadScene(scene);
 
-        auto &camera = m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
+        m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
-                                                              *m_Scene, camera);
+                                                              *m_Scene);
 
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
@@ -252,6 +243,25 @@ namespace engine
     {
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnResize));
+    }
+
+    bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
+    {
+        m_Platform->Close();
+        return true;
+    }
+
+    bool Application::OnResize(WindowResizeEvent &event)
+    {
+        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+        for (auto &entity : view)
+        {
+            auto &free_camera = view.get<sg::FreeCamera>(entity);
+            free_camera.Resize(event.GetWidth(), event.GetHeight());
+        }
+
+        return true;
     }
 
     void Application::ParseOptions(std::vector<std::string> &arguments)
@@ -262,7 +272,7 @@ namespace engine
     void Application::LoadScene(const std::string &path)
     {
         GLTFLoader loader(*m_Device);
-        
+
         m_Scene = loader.ReadSceneFromFile(path);
 
         if (!m_Scene)

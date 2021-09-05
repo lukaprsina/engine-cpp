@@ -54,7 +54,7 @@ namespace engine
     {
         if (m_Level == VK_COMMAND_BUFFER_LEVEL_SECONDARY)
         {
-            assert(primary_cmd_buf && "A primary command buffer pointer must be provided when calling begin from a secondary one");
+            ENG_ASSERT(primary_cmd_buf, "A primary command buffer pointer must be provided when calling begin from a secondary one");
             auto render_pass_binding = primary_cmd_buf->GetCurrentRenderPass();
 
             return Begin(flags, render_pass_binding.render_pass, render_pass_binding.framebuffer, primary_cmd_buf->GetCurrentSubpassIndex());
@@ -65,7 +65,7 @@ namespace engine
 
     VkResult CommandBuffer::Begin(VkCommandBufferUsageFlags flags, const RenderPass *render_pass, const Framebuffer *framebuffer, uint32_t subpass_index)
     {
-        assert(!IsRecording() && "Command buffer is already recording, please call end before beginning again");
+        ENG_ASSERT(!IsRecording(), "Command buffer is already recording, please call end before beginning again");
 
         if (IsRecording())
         {
@@ -86,7 +86,7 @@ namespace engine
 
         if (m_Level == VK_COMMAND_BUFFER_LEVEL_SECONDARY)
         {
-            assert((render_pass && framebuffer) && "Render pass and framebuffer must be provided when calling begin from a secondary one");
+            ENG_ASSERT((render_pass && framebuffer), "Render pass and framebuffer must be provided when calling begin from a secondary one");
 
             m_CurrentRenderPass.render_pass = render_pass;
             m_CurrentRenderPass.framebuffer = framebuffer;
@@ -103,7 +103,7 @@ namespace engine
 
     VkResult CommandBuffer::End()
     {
-        assert(IsRecording() && "Command buffer is not recording, please call begin before end");
+        ENG_ASSERT(IsRecording(), "Command buffer is not recording, please call begin before end");
 
         if (!IsRecording())
         {
@@ -419,7 +419,7 @@ namespace engine
                                              const std::vector<std::unique_ptr<Subpass>> &subpasses)
     {
         // Create render pass
-        assert(subpasses.size() > 0 && "Cannot create a render pass without any subpass");
+        ENG_ASSERT(subpasses.size() > 0, "Cannot create a render pass without any subpass");
 
         std::vector<SubpassInfo> subpass_infos(subpasses.size());
         auto subpass_info_it = subpass_infos.begin();
@@ -510,7 +510,7 @@ namespace engine
     {
         VkResult result = VK_SUCCESS;
 
-        assert(reset_mode == m_CommandPool.GetResetMode() && "Command buffer reset mode must match the one used by the pool to allocate it");
+        ENG_ASSERT(reset_mode == m_CommandPool.GetResetMode(), "Command buffer reset mode must match the one used by the pool to allocate it");
 
         m_State = State::Initial;
 

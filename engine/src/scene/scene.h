@@ -26,9 +26,10 @@ namespace engine
 
         Entity CreateEntity();
 
-        sg::PerspectiveCamera &AddFreeCamera(VkExtent2D extent);
+        void AddFreeCamera(VkExtent2D extent);
 
         entt::registry &GetRegistry() { return m_Registry; }
+        Entity &GetDefaultCamera() { return *m_DefaultCamera; }
 
         std::vector<std::unique_ptr<Entity>> &GetLights() { return m_Lights; }
         std::vector<std::unique_ptr<sg::Sampler>> &GetSamplers() { return m_Samplers; }
@@ -52,6 +53,6 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> m_Cameras;
         std::vector<std::unique_ptr<sg::Submesh>> m_Submeshes;
 
-        sg::PerspectiveCamera &GetDefaultCamera();
+        Entity *m_DefaultCamera;
     };
 }

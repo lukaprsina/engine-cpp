@@ -142,7 +142,7 @@ namespace engine
         if (settings.title.empty())
             settings.title = platform.GetApp().GetName();
 
-        Window::SetSettings(settings);
+        SetSettings(settings);
 
         m_Handle = glfwCreateWindow(settings.width,
                                     settings.height,

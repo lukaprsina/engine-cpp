@@ -86,7 +86,7 @@ namespace engine
 
     CommandBuffer &RenderContext::Begin(CommandBuffer::ResetMode reset_mode)
     {
-        assert(m_Prepared && "RenderContext not prepared for rendering, call prepare()");
+        ENG_ASSERT(m_Prepared, "RenderContext not prepared for rendering, call prepare()");
 
         m_AcquiredSemaphore = BeginFrame();
 
@@ -104,13 +104,13 @@ namespace engine
 
     void RenderContext::Submit(const std::vector<CommandBuffer *> &command_buffers)
     {
-        assert(m_FrameActive && "RenderContext is inactive, cannot submit command buffer. Please call begin()");
+        ENG_ASSERT(m_FrameActive, "RenderContext is inactive, cannot submit command buffer. Please call begin()");
 
         VkSemaphore render_semaphore = VK_NULL_HANDLE;
 
         if (m_Swapchain)
         {
-            assert(m_AcquiredSemaphore && "We do not have acquired_semaphore, it was probably consumed?\n");
+            ENG_ASSERT(m_AcquiredSemaphore, "We do not have acquired_semaphore, it was probably consumed?\n");
             render_semaphore = Submit(m_QueueFamily.GetQueues()[0], command_buffers, m_AcquiredSemaphore, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
         }
         else
@@ -176,9 +176,9 @@ namespace engine
         if (m_Swapchain)
             HandleSurfaceChanges();
 
-        assert(!m_FrameActive && "Frame is still active, please call end_frame");
+        ENG_ASSERT(!m_FrameActive, "Frame is still active, please call end_frame");
         auto &prev_frame = *m_Frames.at(m_ActiveFrameIndex);
-        auto m_AcquiredSemaphore = prev_frame.RequestSemaphoreWithOwnership();
+        m_AcquiredSemaphore = prev_frame.RequestSemaphoreWithOwnership();
 
         if (m_Swapchain)
         {
@@ -211,7 +211,7 @@ namespace engine
 
     void RenderContext::EndFrame(VkSemaphore semaphore)
     {
-        assert(m_FrameActive && "Frame is not active, please call begin_frame");
+        ENG_ASSERT(m_FrameActive, "Frame is not active, please call begin_frame");
 
         if (m_Swapchain)
         {
@@ -242,7 +242,7 @@ namespace engine
 
     RenderFrame &RenderContext::GetActiveFrame()
     {
-        assert(m_FrameActive && "Frame is not active, please call begin_frame");
+        ENG_ASSERT(m_FrameActive, "Frame is not active, please call begin_frame");
         return *m_Frames.at(m_ActiveFrameIndex);
     }
 

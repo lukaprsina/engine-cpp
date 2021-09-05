@@ -1047,7 +1047,7 @@ namespace engine
                            glm::value_ptr(rotation),
                            TypeCast<double, float>{}); */
 
-            ENG_CORE_INFO(glm::to_string(rotation));
+            // ENG_CORE_INFO(glm::to_string(rotation));
 
             transform.SetRotation(rotation);
         }

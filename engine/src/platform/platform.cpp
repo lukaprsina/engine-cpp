@@ -28,7 +28,7 @@ namespace engine
         // TODO: improve
         for (auto &folder : program_name)
         {
-            engine_directory = engine_directory / folder;            
+            engine_directory = engine_directory / folder;
 
             if (folder == m_EngineName)
                 break;
@@ -66,9 +66,7 @@ namespace engine
     bool Platform::Prepare()
     {
         if (m_App)
-        {
             return m_App->Prepare();
-        }
 
         return false;
     }

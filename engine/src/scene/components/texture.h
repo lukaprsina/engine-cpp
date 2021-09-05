@@ -23,7 +23,7 @@ namespace engine
 
             Sampler *GetSampler()
             {
-                assert(m_Sampler && "Texture has no sampler");
+                ENG_ASSERT(m_Sampler, "Texture has no sampler");
                 return m_Sampler;
             }
 
