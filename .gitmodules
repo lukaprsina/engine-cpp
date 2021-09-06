@@ -34,7 +34,7 @@
 [submodule "engine/vendor/thread_pool"]
 	path = engine/vendor/thread_pool
 	url = https://github.com/progschj/ThreadPool
-[submodule "engine/vendor/ktx-software"]
+[submodule "engine/vendor/ktx"]
 	path = engine/vendor/ktx
 	url = https://github.com/KhronosGroup/KTX-Software
 [submodule "engine/vendor/stb"]

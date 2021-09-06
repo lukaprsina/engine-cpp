@@ -8,7 +8,8 @@ from pathlib import Path
 
 def ReadJSON():
     json_data = json.loads(config.read_text())
-    print(json_data["test"])
+    print(json_data["submodules"])
+    print(json_data["not_found"])
 
 
 scripts_directory = Path(os.path.dirname(os.path.realpath(__file__)))

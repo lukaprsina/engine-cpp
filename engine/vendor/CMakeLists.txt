@@ -4,7 +4,7 @@ set(ENG_VENDOR_SUBMODULE_LIST "")
 set(ENG_VENDOR_NOT_FOUND_LIST "")
 
 macro(create_dependency)
-  set(options)
+  set(options NO_CMAKE)
   set(oneValueArgs PATH INCLUDE LIB PACKAGE)
   set(multiValueArgs)
 
@@ -12,122 +12,142 @@ macro(create_dependency)
                         "${multiValueArgs}" ${ARGN})
 
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/.git)
-    add_subdirectory(${TARGET_PATH})
+    if(${TARGET_NO_CMAKE})
+      add_library(${TARGET_PATH} INTERFACE)
+      set(TARGET_LIB ${TARGET_PATH})
+    else()
+      add_subdirectory(${TARGET_PATH})
+    endif()
+
     set(${TARGET_PATH}_FOUND TRUE)
     set(${TARGET_PATH}_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/${TARGET_INCLUDE})
     set(${TARGET_PATH}_LIBRARIES ${TARGET_LIB})
 
     list(APPEND ENG_VENDOR_SUBMODULE_LIST ${TARGET_PATH})
+  elseif(NOT "${TARGET_PACKAGE}" STREQUAL "")
+    find_package(${TARGET_PACKAGE})
 
-  else()
-    find_package(Vulkan)
-    set(${TARGET_PATH}_FOUND ${Vulkan_FOUND})
-    set(${TARGET_PATH}_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
-    set(${TARGET_PATH}_LIBRARIES ${Vulkan_LIBRARIES})
+    if("${TARGET_PACKAGE}" STREQUAL "Spdlog")
+      string(TOUPPER ${TARGET_PACKAGE} TARGET_PACKAGE)
+    endif()
 
-    if(${Vulkan_FOUND})
+    set(${TARGET_PATH}_FOUND ${${TARGET_PACKAGE}_FOUND})
+    set(${TARGET_PATH}_INCLUDE_DIRS ${${TARGET_PACKAGE}_INCLUDE_DIRS})
+    set(${TARGET_PATH}_LIBRARIES ${${TARGET_PACKAGE}_LIBRARIES})
+
+    if("${${TARGET_PACKAGE}_INCLUDE_DIRS}" STREQUAL ""
+       AND NOT "${${TARGET_PACKAGE}_INCLUDE_DIR}" STREQUAL "")
+      list(APPEND ${TARGET_PATH}_INCLUDE_DIRS ${${TARGET_PACKAGE}_INCLUDE_DIR})
+    endif()
+
+    if(${${TARGET_PACKAGE}_FOUND})
       list(APPEND ENG_VENDOR_SUBMODULE_LIST ${TARGET_PATH})
     else()
       list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
     endif()
+
+    message(
+      ${TARGET_PATH}
+      ": "
+      ${${TARGET_PATH}_FOUND}
+      ", "
+      ${${TARGET_PATH}_INCLUDE_DIRS}
+      ", "
+      ${${TARGET_PATH}_LIBRARIES})
+
+  else()
+    list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
   endif()
 endmacro()
 
-# vulkan-headers
-create_dependency(PATH "vulkan-headers" INCLUDE "include" LIB "Vulkan-Headers")
-message("AAAAA " ${ENG_VENDOR_SUBMODULE_LIST})
-message("BBBBB " ${ENG_VENDOR_NOT_FOUND_LIST})
-
-target_include_directories(engine PRIVATE ${vulkan-headers_INCLUDE_DIRS})
-target_link_libraries(engine PRIVATE ${vulkan-headers_LIBRARIES})
+# vulkan
+create_dependency(
+  PATH
+  "vulkan"
+  INCLUDE
+  "include"
+  LIB
+  "Vulkan-Headers"
+  PACKAGE
+  "Vulkan")
+target_include_directories(engine PRIVATE ${vulkan_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${vulkan_LIBRARIES})
 
 # volk
 option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
-option(VOLK_INSTALL "Create installation targets" OFF)
 
-set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
-add_subdirectory(volk)
-target_link_libraries(volk PRIVATE ${vulkan-headers_LIBRARIES})
-target_link_libraries(engine PRIVATE volk)
+create_dependency(PATH "volk" LIB "volk")
+target_link_libraries(${volk_LIBRARIES} PRIVATE ${vulkan-headers_LIBRARIES})
+target_link_libraries(engine PRIVATE ${volk_LIBRARIES})
 
 # stb TODO
-target_compile_definitions(engine PRIVATE STBI_NO_SIMD)
-add_library(stb INTERFACE)
-target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
+create_dependency(PATH "stb" NO_CMAKE)
+target_compile_definitions(${stb_LIBRARIES} INTERFACE STBI_NO_SIMD)
+target_include_directories(engine PRIVATE ${stb_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${stb_LIBRARIES})
 
 # docopt
-option(WITH_TESTS "Build tests." OFF)
-option(WITH_EXAMPLE "Build example." OFF)
-option(USE_BOOST_REGEX "Replace std::regex with Boost.Regex" OFF)
-
-add_subdirectory(docopt)
-target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/docopt)
-target_link_libraries(engine PRIVATE docopt)
+create_dependency(PATH "docopt" LIB "docopt")
+target_include_directories(engine PRIVATE ${docopt_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${docopt_LIBRARIES})
 
 # glfw
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
-option(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
-option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
-option(GLFW_INSTALL "Generate installation target" OFF)
-option(GLFW_VULKAN_STATIC
-       "Assume the Vulkan loader is linked with the application" OFF)
+option(GLFW_BUILD_DOCS OFF)
+option(GLFW_INSTALL ON)
+option(GLFW_VULKAN_STATIC OFF)
 
-add_subdirectory(glfw)
-target_include_directories(engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include)
-target_link_libraries(engine PRIVATE glfw)
+create_dependency(
+  PATH
+  "glfw"
+  INCLUDE
+  "include"
+  LIB
+  "glfw"
+  PACKAGE
+  "GLFW")
+target_include_directories(engine PRIVATE ${glfw_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${glfw_LIBRARIES})
 
 # glm
-add_subdirectory(glm)
-
+create_dependency(PATH "glm" LIB "glm" PACKAGE "GLM")
 target_compile_definitions(
-  glm INTERFACE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
-                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
+  engine PRIVATE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
+                 GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
+target_include_directories(engine PRIVATE ${glm_INCLUDE_DIRS})
 
-target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
-target_link_libraries(engine PRIVATE glm)
-
-# spdlog
-option(SPDLOG_BUILD_ALL "Build all artifacts" OFF)
-option(SPDLOG_BUILD_SHARED "Build shared library" OFF)
-option(
-  SPDLOG_ENABLE_PCH
-  "Build static or shared library using precompiled header to speed up compilation time"
-  ON)
-option(SPDLOG_BUILD_EXAMPLE "Build example" OFF)
-option(SPDLOG_BUILD_EXAMPLE_HO "Build header only example" OFF)
-option(SPDLOG_BUILD_TESTS "Build tests" OFF)
-option(SPDLOG_BUILD_TESTS_HO "Build tests using the header only version" OFF)
-
-add_subdirectory(spdlog)
-target_include_directories(engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
-target_link_libraries(engine PRIVATE spdlog)
+# spdlog TODO definitions
+option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+option(SPDLOG_FMT_EXTERNAL_HO
+       "Use external fmt header-only library instead of bundled" ON)
+create_dependency(
+  PATH
+  "spdlog"
+  INCLUDE
+  "include"
+  LIB
+  "spdlog"
+  PACKAGE
+  "Spdlog")
+target_compile_definitions(engine PRIVATE SPDLOG_FMT_EXTERNAL)
+target_include_directories(engine PRIVATE ${spdlog_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE fmt)
+target_link_libraries(engine PRIVATE ${spdlog_LIBRARIES})
 
 # vma
-option(VMA_BUILD_SAMPLE "Build VulkanMemoryAllocator sample application" OFF)
-option(VMA_BUILD_SAMPLE_SHADERS
-       "Build VulkanMemoryAllocator sample application's shaders" OFF)
-option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
-
-add_subdirectory(vma)
-target_include_directories(engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
+create_dependency(PATH "vma" INCLUDE "include")
+target_include_directories(engine PRIVATE ${vma_INCLUDE_DIRS})
 
 # entt
-option(ENTT_BUILD_TESTING "Enable building tests." OFF)
-option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
-
-add_subdirectory(entt)
+create_dependency(PATH "entt" INCLUDE "src" LIB "EnTT::EnTT")
 target_link_libraries(engine PRIVATE EnTT::EnTT)
 
 # glslang
-option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
-option(BUILD_EXTERNAL "Build external dependencies in /External" ON)
+option(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
 
-add_subdirectory(glslang)
+create_dependency(PATH "glslang" LIB "glslang")
+target_include_directories(engine PRIVATE ${glslang_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${glslang_LIBRARIES})
 
 if(NOT TARGET glslang-default-resource-limits)
   add_library(glslang-default-resource-limits
@@ -135,7 +155,7 @@ if(NOT TARGET glslang-default-resource-limits)
 
   target_include_directories(
     glslang-default-resource-limits
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)
 
 endif()
 
@@ -144,38 +164,33 @@ target_link_libraries(engine PRIVATE glslang)
 target_link_libraries(engine PRIVATE SPIRV)
 
 # spirv-cross
-add_subdirectory(spirv-cross)
-target_link_libraries(engine PRIVATE spirv-cross-core)
-target_link_libraries(engine PRIVATE spirv-cross-core)
-target_link_libraries(engine PRIVATE spirv-cross-glsl)
-target_link_libraries(engine PRIVATE spirv-cross-cpp)
-target_link_libraries(engine PRIVATE spirv-cross-reflect)
-target_link_libraries(engine PRIVATE spirv-cross-msl)
-target_link_libraries(engine PRIVATE spirv-cross-hlsl)
-target_link_libraries(engine PRIVATE spirv-cross-util)
-target_link_libraries(engine PRIVATE spirv-cross-c)
-target_include_directories(engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
+create_dependency(PATH "spirv-cross")
+target_include_directories(engine PRIVATE ${spirv-cross_INCLUDE_DIRS})
+target_link_libraries(
+  engine
+  PRIVATE spirv-cross-glsl
+          spirv-cross-cpp
+          spirv-cross-reflect
+          spirv-cross-msl
+          spirv-cross-hlsl
+          spirv-cross-util
+          spirv-cross-c)
+target_link_libraries(engine PRIVATE ${spirv-cross_LIBRARIES})
 
 # thread_pool
+create_dependency(PATH "thread_pool" NO_CMAKE)
 target_compile_definitions(engine
                            PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
 
-target_include_directories(engine
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
+target_include_directories(engine PRIVATE ${thread_pool_INCLUDE_DIRS})
 
-# ktx-software
-option(KTX_FEATURE_DOC "Create KTX documentation" OFF)
-option(KTX_FEATURE_LOADTEST_APPS
-       "Create load tests apps that load and display various KTX textures" OFF)
-option(KTX_FEATURE_STATIC_LIBRARY "Create static libraries (shared otherwise)"
-       ON)
-option(KTX_FEATURE_TESTS "Create unit tests" OFF)
+# ktx
+option(KTX_FEATURE_STATIC_LIBRARY ON)
+option(KTX_FEATURE_TESTS OFF)
 
-add_subdirectory(ktx-software)
-target_include_directories(
-  engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ktx-software/include)
-target_link_libraries(engine PRIVATE ktx)
+create_dependency(PATH "ktx" INCLUDE "include" LIB "ktx")
+target_include_directories(engine PRIVATE ${ktx_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${ktx_LIBRARIES})
 
 # astc-encoder
 set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder)
@@ -216,22 +231,43 @@ target_compile_definitions(astc PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
 target_link_libraries(engine PRIVATE astc)
 
 # tinygltf
-option(TINYGLTF_BUILD_LOADER_EXAMPLE
-       "Build loader_example(load glTF and dump infos)" OFF)
-option(TINYGLTF_BUILD_GL_EXAMPLES
-       "Build GL exampels(requires glfw, OpenGL, etc)" OFF)
-option(TINYGLTF_BUILD_VALIDATOR_EXAMPLE "Build validator exampe" OFF)
-option(TINYGLTF_BUILD_BUILDER_EXAMPLE "Build glTF builder example" OFF)
-option(
-  TINYGLTF_HEADER_ONLY
-  "On: header-only mode. Off: create tinygltf library(No TINYGLTF_IMPLEMENTATION required in your project)"
-  OFF)
-option(
-  TINYGLTF_INSTALL
-  "Install tinygltf files during install step. Usually set to OFF if you include tinygltf through add_subdirectory()"
-  OFF)
+option(TINYGLTF_BUILD_LOADER_EXAMPLE OFF)
 
-add_subdirectory(tinygltf)
-target_link_libraries(engine PRIVATE tinygltf)
+create_dependency(PATH "tinygltf" LIB "tinygltf")
+target_link_libraries(engine PRIVATE ${tinygltf_LIBRARIES})
+target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIR})
 
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/config.json ${TEST})
+message("ENG_VENDOR_SUBMODULE_LIST=" ${ENG_VENDOR_SUBMODULE_LIST})
+message("ENG_VENDOR_NOT_FOUND_LIST=" ${ENG_VENDOR_NOT_FOUND_LIST})
+
+set(SUBMODULE_CONFIG "{\"submodules\":[")
+list(LENGTH ENG_VENDOR_SUBMODULE_LIST length)
+if(${length} GREATER 0)
+  list(GET ENG_VENDOR_SUBMODULE_LIST -1 LAST_ITEM)
+endif()
+
+foreach(SUBMODULE ${ENG_VENDOR_SUBMODULE_LIST})
+  string(APPEND SUBMODULE_CONFIG "\"" ${SUBMODULE} "\"")
+  list(FIND SUBMODULE_CONFIG SUBMODULE index)
+  if(NOT "${LAST_ITEM}" STREQUAL "${SUBMODULE}")
+    string(APPEND SUBMODULE_CONFIG ",\n")
+  endif()
+endforeach()
+
+string(APPEND SUBMODULE_CONFIG "],\"not_found\":[")
+list(LENGTH ENG_VENDOR_NOT_FOUND_LIST length)
+if(${length} GREATER 0)
+  list(GET ENG_VENDOR_NOT_FOUND_LIST -1 LAST_ITEM)
+endif()
+
+foreach(SUBMODULE ${ENG_VENDOR_NOT_FOUND_LIST})
+  string(APPEND SUBMODULE_CONFIG "\"" ${SUBMODULE} "\"")
+  list(FIND SUBMODULE_CONFIG SUBMODULE index)
+  if(NOT "${LAST_ITEM}" STREQUAL "${SUBMODULE}")
+    string(APPEND SUBMODULE_CONFIG ",\n")
+  endif()
+endforeach()
+
+string(APPEND SUBMODULE_CONFIG "]}")
+
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/config.json ${SUBMODULE_CONFIG})
