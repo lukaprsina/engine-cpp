@@ -6,10 +6,23 @@ import json
 from pathlib import Path
 
 
-def ReadJSON():
-    json_data = json.loads(config.read_text())
-    print(json_data["submodules"])
-    print(json_data["not_found"])
+def ReadConfig():
+    vendor_config = json.loads(config.read_text())
+    submodules = vendor_config["submodules"]
+    external = vendor_config["external"]
+    not_found = vendor_config["not_found"]
+
+    print("Found submodules:")
+    for dependency in submodules:
+        print(f"\t{dependency}")
+
+    print("Found external:")
+    for dependency in external:
+        print(f"\t{dependency}")
+
+    print("Not found:")
+    for dependency in not_found:
+        print(f"\t{dependency}")
 
 
 scripts_directory = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -22,5 +35,7 @@ os.chdir(base_directory)
 
 config = base_directory / "engine/vendor/config.json"
 
-if (config.exists()):
-    ReadJSON()
+if (not config.exists()):
+    sys.exit()
+else:
+    ReadConfig()
