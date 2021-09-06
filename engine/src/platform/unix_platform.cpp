@@ -13,6 +13,14 @@
 #define VK_KHR_XCB_SURFACE_EXTENSION_NAME "VK_KHR_xcb_surface"
 #endif
 
+#ifndef VK_KHR_XLIB_SURFACE_EXTENSION_NAME
+#define VK_KHR_XLIB_SURFACE_EXTENSION_NAME "VK_KHR_xlib_surface"
+#endif
+
+#ifndef VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+#define VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME "VK_KHR_wayland_surface"
+#endif
+
 namespace engine
 {
     namespace
@@ -61,7 +69,7 @@ namespace engine
     const char *UnixPlatform::GetSurfaceExtension()
     {
         if (m_Type == UnixType::Mac)
-            return VK_EXT_METAL_SURFACE_EXTENSION_NAME;
+            return VK_MVK_MACOS_SURFACE_EXTENSION_NAME;
 
 #if defined(VK_USE_PLATFORM_XCB_KHR)
         return VK_KHR_XCB_SURFACE_EXTENSION_NAME;

@@ -35,7 +35,7 @@
 	path = engine/vendor/thread_pool
 	url = https://github.com/progschj/ThreadPool
 [submodule "engine/vendor/ktx-software"]
-	path = engine/vendor/ktx-software
+	path = engine/vendor/ktx
 	url = https://github.com/KhronosGroup/KTX-Software
 [submodule "engine/vendor/stb"]
 	path = engine/vendor/stb
@@ -43,9 +43,9 @@
 [submodule "engine/vendor/astc-encoder"]
 	path = engine/vendor/astc-encoder
 	url = https://github.com/ARM-software/astc-encoder
-[submodule "engine/vendor/vulkan-headers"]
-	path = engine/vendor/vulkan-headers
-	url = https://github.com/KhronosGroup/Vulkan-Headers
 [submodule "engine/vendor/glm"]
 	path = engine/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "engine/vendor/vulkan"]
+	path = engine/vendor/vulkan
+	url = https://github.com/KhronosGroup/Vulkan-Headers

@@ -191,22 +191,22 @@ elseif(UNIX)
   set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
 endif()
 
-add_executable(Engine WIN32 ${PROJECT_FILES})
+add_executable(engine WIN32 ${PROJECT_FILES})
 
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-target_precompile_headers(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
+target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
 target_compile_definitions(
-  Engine
+  engine
   PRIVATE ${ENG_PLATFORM}
   PRIVATE ENG_VALIDATION_LAYERS
   PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED)
 
 if(MSVC)
-  # target_compile_options(Engine PRIVATE /W3 /WX)
+  # target_compile_options(engine PRIVATE /W3 /WX)
 else()
-  target_compile_options(Engine PRIVATE -Wall) # -Weffc++)
+  target_compile_options(engine PRIVATE -Wall) # -Weffc++)
 endif()
 
 add_subdirectory("vendor")

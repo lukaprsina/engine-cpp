@@ -33,9 +33,9 @@ namespace engine
         SetUsage(
             R"(Engine
     Usage:
-        Engine [--headless]
-        Engine <scene> [--headless]
-        Engine --help
+        engine [--headless]
+        engine <scene> [--headless]
+        engine --help
     Options:
         --help                    Show this screen.
         )"

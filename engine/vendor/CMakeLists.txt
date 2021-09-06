@@ -1,11 +1,46 @@
 cmake_minimum_required(VERSION 3.19)
 
+set(ENG_VENDOR_SUBMODULE_LIST "")
+set(ENG_VENDOR_NOT_FOUND_LIST "")
+
+macro(create_dependency)
+  set(options)
+  set(oneValueArgs PATH INCLUDE LIB PACKAGE)
+  set(multiValueArgs)
+
+  cmake_parse_arguments(TARGET "${options}" "${oneValueArgs}"
+                        "${multiValueArgs}" ${ARGN})
+
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/.git)
+    add_subdirectory(${TARGET_PATH})
+    set(${TARGET_PATH}_FOUND TRUE)
+    set(${TARGET_PATH}_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/${TARGET_INCLUDE})
+    set(${TARGET_PATH}_LIBRARIES ${TARGET_LIB})
+
+    list(APPEND ENG_VENDOR_SUBMODULE_LIST ${TARGET_PATH})
+
+  else()
+    find_package(Vulkan)
+    set(${TARGET_PATH}_FOUND ${Vulkan_FOUND})
+    set(${TARGET_PATH}_INCLUDE_DIRS ${Vulkan_INCLUDE_DIRS})
+    set(${TARGET_PATH}_LIBRARIES ${Vulkan_LIBRARIES})
+
+    if(${Vulkan_FOUND})
+      list(APPEND ENG_VENDOR_SUBMODULE_LIST ${TARGET_PATH})
+    else()
+      list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
+    endif()
+  endif()
+endmacro()
+
 # vulkan-headers
-add_subdirectory(vulkan-headers)
-target_include_directories(
-  Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vulkan-headers/include)
-target_link_libraries(Engine PUBLIC Vulkan-Headers)
-install(TARGETS Vulkan-Headers)
+create_dependency(PATH "vulkan-headers" INCLUDE "include" LIB "Vulkan-Headers")
+message("AAAAA " ${ENG_VENDOR_SUBMODULE_LIST})
+message("BBBBB " ${ENG_VENDOR_NOT_FOUND_LIST})
+
+target_include_directories(engine PRIVATE ${vulkan-headers_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE ${vulkan-headers_LIBRARIES})
 
 # volk
 option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
@@ -13,14 +48,13 @@ option(VOLK_INSTALL "Create installation targets" OFF)
 
 set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
 add_subdirectory(volk)
-target_link_libraries(volk PUBLIC Vulkan-Headers)
-target_link_libraries(Engine PUBLIC volk)
-install(TARGETS volk)
+target_link_libraries(volk PRIVATE ${vulkan-headers_LIBRARIES})
+target_link_libraries(engine PRIVATE volk)
 
 # stb TODO
-target_compile_definitions(Engine PUBLIC STBI_NO_SIMD)
+target_compile_definitions(engine PRIVATE STBI_NO_SIMD)
 add_library(stb INTERFACE)
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/stb)
+target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/stb)
 
 # docopt
 option(WITH_TESTS "Build tests." OFF)
@@ -28,9 +62,8 @@ option(WITH_EXAMPLE "Build example." OFF)
 option(USE_BOOST_REGEX "Replace std::regex with Boost.Regex" OFF)
 
 add_subdirectory(docopt)
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/docopt)
-target_link_libraries(Engine PRIVATE docopt)
-install(TARGETS docopt)
+target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/docopt)
+target_link_libraries(engine PRIVATE docopt)
 
 # glfw
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
@@ -42,26 +75,19 @@ option(GLFW_VULKAN_STATIC
        "Assume the Vulkan loader is linked with the application" OFF)
 
 add_subdirectory(glfw)
-target_include_directories(Engine
+target_include_directories(engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glfw/include)
-target_link_libraries(Engine PRIVATE glfw)
-install(TARGETS glfw)
+target_link_libraries(engine PRIVATE glfw)
 
 # glm
 add_subdirectory(glm)
 
 target_compile_definitions(
   glm INTERFACE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
-                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
-)# GLM_FORCE_QUAT_DATA_XYZW)
+                GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
-# target_compile_definitions( Engine PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS
-# GLM_FORCE_CTOR_INIT GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE
-# GLM_FORCE_QUAT_DATA_XYZW)
-
-target_include_directories(Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
-target_link_libraries(Engine PRIVATE glm)
-install(TARGETS glm)
+target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm)
+target_link_libraries(engine PRIVATE glm)
 
 # spdlog
 option(SPDLOG_BUILD_ALL "Build all artifacts" OFF)
@@ -76,10 +102,9 @@ option(SPDLOG_BUILD_TESTS "Build tests" OFF)
 option(SPDLOG_BUILD_TESTS_HO "Build tests using the header only version" OFF)
 
 add_subdirectory(spdlog)
-target_include_directories(Engine
+target_include_directories(engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
-target_link_libraries(Engine PRIVATE spdlog)
-install(TARGETS spdlog)
+target_link_libraries(engine PRIVATE spdlog)
 
 # vma
 option(VMA_BUILD_SAMPLE "Build VulkanMemoryAllocator sample application" OFF)
@@ -88,7 +113,7 @@ option(VMA_BUILD_SAMPLE_SHADERS
 option(VMA_BUILD_REPLAY "Build VulkanMemoryAllocator replay application" OFF)
 
 add_subdirectory(vma)
-target_include_directories(Engine
+target_include_directories(engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vma/include)
 
 # entt
@@ -96,8 +121,7 @@ option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
 
 add_subdirectory(entt)
-target_link_libraries(Engine PRIVATE EnTT::EnTT)
-install(TARGETS EnTT)
+target_link_libraries(engine PRIVATE EnTT::EnTT)
 
 # glslang
 option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
@@ -111,41 +135,33 @@ if(NOT TARGET glslang-default-resource-limits)
 
   target_include_directories(
     glslang-default-resource-limits
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glslang/StandAlone)
 
 endif()
 
-target_link_libraries(Engine PRIVATE glslang-default-resource-limits)
-target_link_libraries(Engine PRIVATE glslang)
-target_link_libraries(Engine PRIVATE SPIRV)
-install(TARGETS glslang-default-resource-limits)
-install(TARGETS glslang)
-install(TARGETS SPIRV)
+target_link_libraries(engine PRIVATE glslang-default-resource-limits)
+target_link_libraries(engine PRIVATE glslang)
+target_link_libraries(engine PRIVATE SPIRV)
 
 # spirv-cross
 add_subdirectory(spirv-cross)
-target_link_libraries(Engine PRIVATE spirv-cross-core)
-target_link_libraries(Engine PRIVATE spirv-cross-core)
-target_link_libraries(Engine PRIVATE spirv-cross-glsl)
-target_link_libraries(Engine PRIVATE spirv-cross-cpp)
-target_link_libraries(Engine PRIVATE spirv-cross-reflect)
-target_link_libraries(Engine PRIVATE spirv-cross-msl)
-target_link_libraries(Engine PRIVATE spirv-cross-hlsl)
-target_link_libraries(Engine PRIVATE spirv-cross-util)
-target_link_libraries(Engine PRIVATE spirv-cross-c)
-target_include_directories(Engine
+target_link_libraries(engine PRIVATE spirv-cross-core)
+target_link_libraries(engine PRIVATE spirv-cross-core)
+target_link_libraries(engine PRIVATE spirv-cross-glsl)
+target_link_libraries(engine PRIVATE spirv-cross-cpp)
+target_link_libraries(engine PRIVATE spirv-cross-reflect)
+target_link_libraries(engine PRIVATE spirv-cross-msl)
+target_link_libraries(engine PRIVATE spirv-cross-hlsl)
+target_link_libraries(engine PRIVATE spirv-cross-util)
+target_link_libraries(engine PRIVATE spirv-cross-c)
+target_include_directories(engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/spirv-cross)
 
 # thread_pool
-target_compile_definitions(Engine
+target_compile_definitions(engine
                            PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
-# 'std::result_of<engine::GLTFLoader::LoadImages::<lambda_290143bf62d359265eaa393944e725e9>
-# (void)>': warning STL4014: std::result_of and std::result_of_t are deprecated
-# in C++17. They are superseded by std::invoke_result and std::invoke_result_t.
-# You can define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING or
-# _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to acknowledge that you have received
-# this warning. [D:\dev\c++\engine\build\engine\Engine.vcxproj]
-target_include_directories(Engine
+
+target_include_directories(engine
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool)
 
 # ktx-software
@@ -158,13 +174,10 @@ option(KTX_FEATURE_TESTS "Create unit tests" OFF)
 
 add_subdirectory(ktx-software)
 target_include_directories(
-  Engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ktx-software/include)
-target_link_libraries(Engine PRIVATE ktx)
+  engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ktx-software/include)
+target_link_libraries(engine PRIVATE ktx)
 
-# astc-encoder add_subdirectory(astc-encoder) target_include_directories( Engine
-# PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder/Source)
-
-# astc
+# astc-encoder
 set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder)
 set(ASTC_INCLUDE_DIR ${ASTC_DIR}/Source)
 set(ASTC_SOURCE_DIR ${ASTC_DIR}/Source)
@@ -200,7 +213,7 @@ add_library(astc ${ASTC_SOURCES})
 target_include_directories(astc PUBLIC ${ASTC_INCLUDE_DIR})
 target_compile_definitions(astc PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
 
-target_link_libraries(Engine PRIVATE astc)
+target_link_libraries(engine PRIVATE astc)
 
 # tinygltf
 option(TINYGLTF_BUILD_LOADER_EXAMPLE
@@ -219,5 +232,6 @@ option(
   OFF)
 
 add_subdirectory(tinygltf)
-target_link_libraries(Engine PRIVATE tinygltf)
-install(TARGETS tinygltf)
+target_link_libraries(engine PRIVATE tinygltf)
+
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/config.json ${TEST})
