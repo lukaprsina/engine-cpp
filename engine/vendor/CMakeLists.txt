@@ -48,18 +48,18 @@ macro(create_dependency)
       list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
     endif()
 
-    message(
-      ${TARGET_PATH}
-      ": "
-      ${${TARGET_PATH}_FOUND}
-      ", "
-      ${${TARGET_PATH}_INCLUDE_DIRS}
-      ", "
-      ${${TARGET_PATH}_LIBRARIES})
-
   else()
     list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
   endif()
+
+  message(
+    ${TARGET_PATH}
+    ": "
+    ${${TARGET_PATH}_FOUND}
+    ", "
+    ${${TARGET_PATH}_INCLUDE_DIRS}
+    ", "
+    ${${TARGET_PATH}_LIBRARIES})
 endmacro()
 
 # vulkan
@@ -82,11 +82,11 @@ option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
 
 create_dependency(PATH "volk" LIB "volk")
 if(${volk_FOUND})
-  target_link_libraries(${volk_LIBRARIES} PRIVATE ${vulkan-headers_LIBRARIES})
+  target_link_libraries(${volk_LIBRARIES} PRIVATE ${vulkan_LIBRARIES})
   target_link_libraries(engine PRIVATE ${volk_LIBRARIES})
 endif()
 
-# stb TODO
+# stb
 create_dependency(PATH "stb" NO_CMAKE INTERFACE)
 if(${stb_FOUND})
   target_compile_definitions(${stb_LIBRARIES} INTERFACE STBI_NO_SIMD)
@@ -131,8 +131,7 @@ endif()
 
 # spdlog TODO definitions
 option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
-option(SPDLOG_FMT_EXTERNAL_HO
-       "Use external fmt header-only library instead of bundled" ON)
+
 create_dependency(
   PATH
   "spdlog"
