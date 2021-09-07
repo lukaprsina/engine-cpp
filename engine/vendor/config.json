@@ -1,10 +1,6 @@
-{"submodules":["vulkan",
-"volk",
+{"submodules":["volk",
 "stb",
 "docopt",
-"glfw",
-"glm",
-"spdlog",
 "vma",
 "entt",
 "glslang",
@@ -12,4 +8,7 @@
 "thread_pool",
 "ktx",
 "astc-encoder",
-"tinygltf"],"external":[],"not_found":[]}
+"tinygltf"],"external":["vulkan",
+"glfw",
+"glm",
+"spdlog"],"not_found":[]}
