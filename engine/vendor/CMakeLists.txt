@@ -83,6 +83,7 @@ option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
 
 create_dependency(PATH "volk" LIB "volk")
 if(${volk_FOUND})
+  target_include_directories(${volk_LIBRARIES} PRIVATE ${vulkan_INCLUDE_DIRS})
   target_link_libraries(${volk_LIBRARIES} PRIVATE ${vulkan_LIBRARIES})
   target_link_libraries(engine PRIVATE ${volk_LIBRARIES})
 endif()
