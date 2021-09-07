@@ -1,14 +1,22 @@
-{"submodules":["volk",
-"stb",
-"docopt",
-"vma",
-"entt",
-"glslang",
-"spirv-cross",
-"thread_pool",
-"ktx",
-"astc-encoder",
-"tinygltf"],"external":["vulkan",
-"glfw",
-"glm",
-"spdlog"],"not_found":[]}
+{
+    "submodules": [
+        "volk",
+        "stb",
+        "docopt",
+        "vma",
+        "entt",
+        "glslang",
+        "spirv-cross",
+        "thread_pool",
+        "ktx",
+        "astc-encoder",
+        "tinygltf"
+    ],
+    "external": [
+        "vulkan",
+        "glfw",
+        "glm",
+        "spdlog"
+    ],
+    "not_found": []
+}
