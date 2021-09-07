@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 
-set(ENG_VENDOR_SUBMODULE_LIST "")
-set(ENG_VENDOR_EXTERNAL_LIST "")
-set(ENG_VENDOR_NOT_FOUND_LIST "")
+set(SUBMODULE_LIST "")
+set(EXTERNAL_LIST "")
+set(SUBMODULE_MISSING_LIST "")
+set(EXTERNAL_MISSING_LIST "")
 
 macro(create_dependency)
   set(options NO_CMAKE INTERFACE)
@@ -29,10 +30,10 @@ macro(create_dependency)
         ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/${TARGET_INCLUDE})
     set(${TARGET_PATH}_LIBRARIES ${TARGET_LIB})
 
-    list(APPEND ENG_VENDOR_SUBMODULE_LIST ${TARGET_PATH})
+    list(APPEND SUBMODULE_LIST ${TARGET_PATH})
   elseif(NOT "${TARGET_PACKAGE}" STREQUAL "")
     find_package(${TARGET_PACKAGE})
-
+   
     set(${TARGET_PATH}_FOUND ${${TARGET_PACKAGE}_FOUND})
     set(${TARGET_PATH}_INCLUDE_DIRS ${${TARGET_PACKAGE}_INCLUDE_DIRS})
     set(${TARGET_PATH}_LIBRARIES ${${TARGET_PACKAGE}_LIBRARIES})
@@ -43,13 +44,13 @@ macro(create_dependency)
     endif()
 
     if(${${TARGET_PACKAGE}_FOUND})
-      list(APPEND ENG_VENDOR_EXTERNAL_LIST ${TARGET_PATH})
+      list(APPEND EXTERNAL_LIST ${TARGET_PATH})
     else()
-      list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
+      list(APPEND EXTERNAL_MISSING_LIST ${TARGET_PATH})
     endif()
 
   else()
-    list(APPEND ENG_VENDOR_NOT_FOUND_LIST ${TARGET_PATH})
+    list(APPEND SUBMODULE_MISSING_LIST ${TARGET_PATH})
   endif()
 
   message(
@@ -130,7 +131,7 @@ if(${glm_FOUND})
 endif()
 
 # spdlog TODO definitions
-option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+#option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
 
 create_dependency(
   PATH
@@ -142,9 +143,9 @@ create_dependency(
   PACKAGE
   "spdlog")
 if(${spdlog_FOUND})
-  target_compile_definitions(engine PRIVATE SPDLOG_FMT_EXTERNAL)
+  # target_compile_definitions(engine PRIVATE SPDLOG_FMT_EXTERNAL)
   target_include_directories(engine PRIVATE ${spdlog_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE fmt)
+  # target_link_libraries(engine PRIVATE fmt)
   target_link_libraries(engine PRIVATE ${spdlog_LIBRARIES})
 endif()
 
@@ -274,17 +275,18 @@ if(${tinygltf_FOUND})
   target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIRS})
 endif()
 
-message("ENG_VENDOR_SUBMODULE_LIST=" ${ENG_VENDOR_SUBMODULE_LIST})
-message("ENG_VENDOR_EXTERNAL_LIST=" ${ENG_VENDOR_EXTERNAL_LIST})
-message("ENG_VENDOR_NOT_FOUND_LIST=" ${ENG_VENDOR_NOT_FOUND_LIST})
+message("SUBMODULE_LIST=" ${SUBMODULE_LIST})
+message("EXTERNAL_LIST=" ${EXTERNAL_LIST})
+message("SUBMODULE_MISSING_LIST=" ${SUBMODULE_MISSING_LIST})
+message("EXTERNAL_MISSING_LIST=" ${EXTERNAL_MISSING_LIST})
 
 set(DEPENDENCY_CONFIG "{\"submodules\":[")
-list(LENGTH ENG_VENDOR_SUBMODULE_LIST length)
+list(LENGTH SUBMODULE_LIST length)
 if(${length} GREATER 0)
-  list(GET ENG_VENDOR_SUBMODULE_LIST -1 LAST_ITEM)
+  list(GET SUBMODULE_LIST -1 LAST_ITEM)
 endif()
 
-foreach(DEPENDENCY ${ENG_VENDOR_SUBMODULE_LIST})
+foreach(DEPENDENCY ${SUBMODULE_LIST})
   string(APPEND DEPENDENCY_CONFIG "\"" ${DEPENDENCY} "\"")
   list(FIND DEPENDENCY_CONFIG DEPENDENCY index)
   if(NOT "${LAST_ITEM}" STREQUAL "${DEPENDENCY}")
@@ -293,12 +295,12 @@ foreach(DEPENDENCY ${ENG_VENDOR_SUBMODULE_LIST})
 endforeach()
 
 string(APPEND DEPENDENCY_CONFIG "],\"external\":[")
-list(LENGTH ENG_VENDOR_EXTERNAL_LIST length)
+list(LENGTH EXTERNAL_LIST length)
 if(${length} GREATER 0)
-  list(GET ENG_VENDOR_EXTERNAL_LIST -1 LAST_ITEM)
+  list(GET EXTERNAL_LIST -1 LAST_ITEM)
 endif()
 
-foreach(DEPENDENCY ${ENG_VENDOR_EXTERNAL_LIST})
+foreach(DEPENDENCY ${EXTERNAL_LIST})
   string(APPEND DEPENDENCY_CONFIG "\"" ${DEPENDENCY} "\"")
   list(FIND DEPENDENCY_CONFIG DEPENDENCY index)
   if(NOT "${LAST_ITEM}" STREQUAL "${DEPENDENCY}")
@@ -306,13 +308,27 @@ foreach(DEPENDENCY ${ENG_VENDOR_EXTERNAL_LIST})
   endif()
 endforeach()
 
-string(APPEND DEPENDENCY_CONFIG "],\"not_found\":[")
-list(LENGTH ENG_VENDOR_NOT_FOUND_LIST length)
+string(APPEND DEPENDENCY_CONFIG "],\"submodule_missing\":[")
+list(LENGTH SUBMODULE_MISSING_LIST length)
 if(${length} GREATER 0)
-  list(GET ENG_VENDOR_NOT_FOUND_LIST -1 LAST_ITEM)
+  list(GET SUBMODULE_MISSING_LIST -1 LAST_ITEM)
 endif()
 
-foreach(DEPENDENCY ${ENG_VENDOR_NOT_FOUND_LIST})
+foreach(DEPENDENCY ${SUBMODULE_MISSING_LIST})
+  string(APPEND DEPENDENCY_CONFIG "\"" ${DEPENDENCY} "\"")
+  list(FIND DEPENDENCY_CONFIG DEPENDENCY index)
+  if(NOT "${LAST_ITEM}" STREQUAL "${DEPENDENCY}")
+    string(APPEND DEPENDENCY_CONFIG ",\n")
+  endif()
+endforeach()
+
+string(APPEND DEPENDENCY_CONFIG "],\"external_missing\":[")
+list(LENGTH EXTERNAL_MISSING_LIST length)
+if(${length} GREATER 0)
+  list(GET EXTERNAL_MISSING_LIST -1 LAST_ITEM)
+endif()
+
+foreach(DEPENDENCY ${EXTERNAL_MISSING_LIST})
   string(APPEND DEPENDENCY_CONFIG "\"" ${DEPENDENCY} "\"")
   list(FIND DEPENDENCY_CONFIG DEPENDENCY index)
   if(NOT "${LAST_ITEM}" STREQUAL "${DEPENDENCY}")
@@ -324,6 +340,15 @@ string(APPEND DEPENDENCY_CONFIG "]}")
 
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/config.json ${DEPENDENCY_CONFIG})
 
-if(NOT ${length} EQUAL 0)
+list(LENGTH SUBMODULE_MISSING_LIST submodule_length)
+list(LENGTH EXTERNAL_MISSING_LIST external_length)
+
+if(NOT ${submodule_length} EQUAL 0 AND NOT ${external_length} EQUAL 0)
   message(FATAL_ERROR "Dependencies not found")
 endif()
+
+install(TARGETS ${ktx_LIBRARIES})
+install(TARGETS ${docopt_LIBRARIES})
+
+message(${ktx_LIBRARIES} " A " ${docopt_LIBRARIES})
+ 

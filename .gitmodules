@@ -4,9 +4,6 @@
 [submodule "engine/vendor/docopt"]
 	path = engine/vendor/docopt
 	url = https://github.com/docopt/docopt.cpp
-[submodule "engine/vendor/glfw"]
-	path = engine/vendor/glfw
-	url = https://github.com/glfw/glfw
 [submodule "engine/vendor/spdlog"]
 	path = engine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
@@ -40,6 +37,9 @@
 [submodule "engine/vendor/stb"]
 	path = engine/vendor/stb
 	url = https://github.com/nothings/stb
+[submodule "engine/vendor/glfw"]
+	path = engine/vendor/glfw
+	url = https://github.com/glfw/glfw
 [submodule "engine/vendor/astc-encoder"]
 	path = engine/vendor/astc-encoder
 	url = https://github.com/ARM-software/astc-encoder
