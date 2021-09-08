@@ -5,8 +5,10 @@
 #include "events/key_event.h"
 #include "events/mouse_event.h"
 
+ENG_DISABLE_WARNINGS()
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

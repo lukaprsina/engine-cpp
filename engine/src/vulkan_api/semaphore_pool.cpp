@@ -23,9 +23,7 @@ namespace engine
     {
         // Check if there is an available semaphore
         if (m_ActiveSemaphoreCount < m_Semaphores.size())
-        {
             return m_Semaphores.at(m_ActiveSemaphoreCount++);
-        }
 
         VkSemaphore semaphore{VK_NULL_HANDLE};
 

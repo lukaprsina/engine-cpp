@@ -18,8 +18,6 @@
 
 #include "scene/components/image/ktx.h"
 
-#include "common/error.h"
-
 ENG_DISABLE_WARNINGS()
 #include <ktx.h>
 #include <ktxvulkan.h>

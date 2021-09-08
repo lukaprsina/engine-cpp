@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "common/error.h"
 #include "scene/components/image.h"
 
 namespace engine

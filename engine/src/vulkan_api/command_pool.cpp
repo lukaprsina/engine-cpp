@@ -94,9 +94,7 @@ namespace engine
             result = cmd_buf->Reset(m_ResetMode);
 
             if (result != VK_SUCCESS)
-            {
                 return result;
-            }
         }
 
         m_ActivePrimaryCommandBufferCount = 0;
@@ -106,9 +104,7 @@ namespace engine
             result = cmd_buf->Reset(m_ResetMode);
 
             if (result != VK_SUCCESS)
-            {
                 return result;
-            }
         }
 
         m_ActiveSecondaryCommandBufferCount = 0;
@@ -121,9 +117,7 @@ namespace engine
         if (level == VK_COMMAND_BUFFER_LEVEL_PRIMARY)
         {
             if (m_ActivePrimaryCommandBufferCount < m_PrimaryCommandBuffers.size())
-            {
                 return *m_PrimaryCommandBuffers.at(m_ActivePrimaryCommandBufferCount++);
-            }
 
             m_PrimaryCommandBuffers.emplace_back(std::make_unique<CommandBuffer>(*this, level));
 
@@ -134,9 +128,7 @@ namespace engine
         else
         {
             if (m_ActiveSecondaryCommandBufferCount < m_SecondaryCommandBuffers.size())
-            {
                 return *m_SecondaryCommandBuffers.at(m_ActiveSecondaryCommandBufferCount++);
-            }
 
             m_SecondaryCommandBuffers.emplace_back(std::make_unique<CommandBuffer>(*this, level));
 

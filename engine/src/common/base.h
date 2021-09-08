@@ -21,8 +21,6 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "common/error.h"
-
 ENG_DISABLE_WARNINGS()
 #include <glm/gtx/hash.hpp>
 ENG_ENABLE_WARNINGS()

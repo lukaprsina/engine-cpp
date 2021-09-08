@@ -1,6 +1,8 @@
 #pragma once
 
+ENG_DISABLE_WARNINGS()
 #include <entt/entt.hpp>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

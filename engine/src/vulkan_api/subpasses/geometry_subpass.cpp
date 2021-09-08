@@ -10,8 +10,6 @@
 #include "scene/components/perspective_camera.h"
 #include "vulkan_api/device.h"
 
-#include <glm/gtx/string_cast.hpp>
-
 namespace engine
 {
     GeometrySubpass::GeometrySubpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene)
@@ -132,7 +130,7 @@ namespace engine
         GlobalUniform global_uniform;
         auto &camera = m_Scene.GetDefaultCamera();
         auto &perspective_camera = camera.GetComponent<sg::PerspectiveCamera>();
-        auto &camera_transform = camera.GetComponent<sg::Transform>();        
+        auto &camera_transform = camera.GetComponent<sg::Transform>();
 
         global_uniform.camera_view_proj = perspective_camera.m_PreRotation *
                                           VulkanStyleProjection(perspective_camera.GetProjection()) *

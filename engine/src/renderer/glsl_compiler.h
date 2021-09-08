@@ -1,3 +1,5 @@
+#pragma once
+
 ENG_DISABLE_WARNINGS()
 #include <glslang/Public/ShaderLang.h>
 ENG_ENABLE_WARNINGS()

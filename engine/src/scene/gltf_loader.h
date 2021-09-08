@@ -1,9 +1,11 @@
 #pragma once
 
+ENG_DISABLE_WARNINGS()
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #include <tiny_gltf.h>
+ENG_ENABLE_WARNINGS()
 
 #include "scene/entity.h"
 

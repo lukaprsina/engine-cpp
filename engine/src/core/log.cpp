@@ -1,6 +1,9 @@
 #include "core/log.h"
+
+ENG_DISABLE_WARNINGS()
 #include "spdlog/fmt/ostr.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

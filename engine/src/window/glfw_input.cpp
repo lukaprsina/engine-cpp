@@ -1,7 +1,9 @@
 #include "window/input.h"
 #include "platform/platform.h"
 
+ENG_DISABLE_WARNINGS()
 #include <GLFW/glfw3.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

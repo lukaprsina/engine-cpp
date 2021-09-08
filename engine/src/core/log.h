@@ -1,7 +1,9 @@
 #pragma once
 
+ENG_DISABLE_WARNINGS()
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/fmt.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

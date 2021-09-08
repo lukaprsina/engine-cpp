@@ -51,10 +51,10 @@ namespace engine
                 m_Swapchain->SetSurfaceFormatPriority(new_surface_format_priority_list);
         }
 
-        void HandleSurfaceChanges();
+        bool HandleSurfaceChanges(bool force_update = false);
         RenderFrame &GetActiveFrame();
 
-        VkSemaphore BeginFrame();
+        void BeginFrame();
         void WaitFrame();
         void EndFrame(VkSemaphore semaphore);
         void Recreate();

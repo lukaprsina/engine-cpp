@@ -88,8 +88,8 @@ namespace engine
     {
         ENG_ASSERT(m_Prepared, "RenderContext not prepared for rendering, call prepare()");
 
-        // TODO: crashed semaphore null
-        m_AcquiredSemaphore = BeginFrame();
+        if (!m_FrameActive)
+            BeginFrame();
 
         if (m_AcquiredSemaphore == VK_NULL_HANDLE)
             throw std::runtime_error("Couldn't begin frame!");
@@ -172,7 +172,7 @@ namespace engine
         queue.Submit({submit_info}, fence);
     }
 
-    VkSemaphore RenderContext::BeginFrame()
+    void RenderContext::BeginFrame()
     {
         if (m_Swapchain)
             HandleSurfaceChanges();
@@ -187,21 +187,21 @@ namespace engine
 
             if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
             {
-                HandleSurfaceChanges();
+                bool swapchain_updated = HandleSurfaceChanges(result == VK_ERROR_OUT_OF_DATE_KHR);
 
-                result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
+                if (swapchain_updated)
+                    result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
             }
 
             if (result != VK_SUCCESS)
             {
                 prev_frame.Reset();
-                return VK_NULL_HANDLE;
+                return;
             }
         }
 
         m_FrameActive = true;
         WaitFrame();
-        return m_AcquiredSemaphore;
     }
 
     void RenderContext::WaitFrame()
@@ -247,12 +247,12 @@ namespace engine
         return *m_Frames.at(m_ActiveFrameIndex);
     }
 
-    void RenderContext::HandleSurfaceChanges()
+    bool RenderContext::HandleSurfaceChanges(bool force_update)
     {
         if (!m_Swapchain)
         {
             ENG_CORE_WARN("Can't handle surface changes in headless mode, skipping.");
-            return;
+            return false;
         }
         VkSurfaceCapabilitiesKHR surface_properties;
 
@@ -261,15 +261,19 @@ namespace engine
                                                            &surface_properties));
 
         if (surface_properties.currentExtent.width == 0xFFFFFFFF)
-            return;
+            return false;
 
         if (surface_properties.currentExtent.width != m_SurfaceExtent.width ||
-            surface_properties.currentExtent.height != m_SurfaceExtent.height)
+            surface_properties.currentExtent.height != m_SurfaceExtent.height || force_update)
         {
             m_Device.WaitIdle();
             UpdateSwapchain(surface_properties.currentExtent, m_PreTransform);
             m_SurfaceExtent = surface_properties.currentExtent;
+
+            return true;
         }
+
+        return false;
     }
 
     void RenderContext::Recreate()

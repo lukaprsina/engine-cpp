@@ -17,8 +17,10 @@
 
 #include "scene/components/image/stb.h"
 
+ENG_DISABLE_WARNINGS()
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+ENG_ENABLE_WARNINGS()
 
 namespace engine
 {

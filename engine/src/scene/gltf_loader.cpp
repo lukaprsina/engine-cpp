@@ -20,10 +20,9 @@
 #include "vulkan_api/device.h"
 #include "vulkan_api/fence_pool.h"
 
-#include <ThreadPool.h>
 #include "common/glm.h"
 ENG_DISABLE_WARNINGS()
-#include <glm/gtx/string_cast.hpp>
+#include <ThreadPool.h>
 #include <glm/gtc/type_ptr.hpp>
 ENG_ENABLE_WARNINGS()
 
