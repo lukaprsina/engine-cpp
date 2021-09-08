@@ -3,6 +3,7 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
+#include "engine_config.h"
 
 #include <filesystem>
 
@@ -15,28 +16,9 @@ namespace engine
 
     Platform::Platform(const std::string name, const std::vector<std::string> &arguments)
     {
-        auto program_name = std::filesystem::path(name);
+        auto source_directory = std::filesystem::canonical(ENG_BASE_DIRECTORY);
 
-        if (!program_name.is_absolute())
-            program_name = std::filesystem::current_path() / program_name;
-
-        program_name = std::filesystem::canonical(program_name);
-        std::filesystem::current_path(program_name.parent_path());
-
-        std::filesystem::path engine_directory;
-
-        // TODO: improve
-        for (auto &folder : program_name)
-        {
-            engine_directory = engine_directory / folder;
-
-            if (folder == m_EngineName)
-                break;
-        }
-
-        auto source_directory = std::filesystem::canonical(engine_directory / m_EngineName);
-
-        Platform::SetSourceDirectory(source_directory);
+        Platform::SetSourceDirectory(source_directory / m_EngineName);
 
         Platform::SetArguments(arguments);
     }

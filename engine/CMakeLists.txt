@@ -47,7 +47,8 @@ set(WINDOWS_FILES
     # Header Files
     src/platform/windows_platform.h
     # Source Files
-    src/platform/windows_platform.cpp src/window/glfw_input.cpp)
+    src/platform/windows_platform.cpp
+    src/window/glfw_input.cpp)
 
 set(UNIX_FILES
     # Header Files
@@ -179,23 +180,20 @@ set(VULKAN_API_FILES
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})
 
-if(ANDROID)
-  set(ENG_PLATFORM VK_USE_PLATFORM_ANDROID_KHR)
-elseif(WIN32)
+                  
+if(WIN32)
   list(APPEND PROJECT_FILES ${WINDOWS_FILES})
-  set(ENG_PLATFORM VK_USE_PLATFORM_WIN32_KHR)
-elseif(APPLE)
-  set(ENG_PLATFORM VK_USE_PLATFORM_MACOS_MVK)
 elseif(UNIX)
   list(APPEND PROJECT_FILES ${UNIX_FILES})
-  set(ENG_PLATFORM VK_USE_PLATFORM_XCB_KHR)
 endif()
 
 add_executable(engine WIN32 ${PROJECT_FILES})
 
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
 
 target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
+
+configure_file(engine_config.h.in engine_config.h @ONLY)
 
 target_compile_definitions(
   engine

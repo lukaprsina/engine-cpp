@@ -17,6 +17,7 @@
 #include "scene/scene.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
+#include "engine_config.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -29,6 +30,7 @@ namespace engine
         // Log::GetCoreLogger()->set_level(spdlog::level::warn);
 
         ENG_CORE_INFO("Logger initialized.");
+        ENG_CORE_INFO(ENG_BASE_DIRECTORY);
 
         SetUsage(
             R"(Engine

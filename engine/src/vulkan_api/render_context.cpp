@@ -88,6 +88,7 @@ namespace engine
     {
         ENG_ASSERT(m_Prepared, "RenderContext not prepared for rendering, call prepare()");
 
+        // TODO: crashed semaphore null
         m_AcquiredSemaphore = BeginFrame();
 
         if (m_AcquiredSemaphore == VK_NULL_HANDLE)
