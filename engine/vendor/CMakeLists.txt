@@ -29,6 +29,8 @@ macro(create_dependency)
     set(${TARGET_PATH}_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_PATH}/${TARGET_INCLUDE})
     set(${TARGET_PATH}_LIBRARIES ${TARGET_LIB})
+    set(${TARGET_PATH}_SUBMODULE TRUE)
+    set(${TARGET_PATH}_EXTERNAL FALSE)
 
     list(APPEND SUBMODULE_LIST ${TARGET_PATH})
   elseif(NOT "${TARGET_PACKAGE}" STREQUAL "")
@@ -45,8 +47,12 @@ macro(create_dependency)
 
     if(${${TARGET_PACKAGE}_FOUND})
       list(APPEND EXTERNAL_LIST ${TARGET_PATH})
+      set(${TARGET_PATH}_SUBMODULE FALSE)
+      set(${TARGET_PATH}_EXTERNAL TRUE)
     else()
       list(APPEND EXTERNAL_MISSING_LIST ${TARGET_PATH})
+      set(${TARGET_PATH}_SUBMODULE FALSE)
+      set(${TARGET_PATH}_EXTERNAL FALSE)
     endif()
 
   else()
@@ -73,18 +79,16 @@ create_dependency(
   "Vulkan-Headers"
   PACKAGE
   "Vulkan")
-if(${vulkan_FOUND})
-  target_include_directories(engine PRIVATE ${vulkan_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE ${vulkan_LIBRARIES})
-endif()
+# Don't link and include vulkan directly, but through volk'
 
 # volk
-option(VOLK_PULL_IN_VULKAN "Vulkan as a transitive dependency" OFF)
+set(VOLK_PULL_IN_VULKAN OFF)
+set(VOLK_STATIC_DEFINES ENG_PLATFORM)
 
 create_dependency(PATH "volk" LIB "volk")
 if(${volk_FOUND})
-  target_include_directories(${volk_LIBRARIES} PRIVATE ${vulkan_INCLUDE_DIRS})
-  target_link_libraries(${volk_LIBRARIES} PRIVATE ${vulkan_LIBRARIES})
+  target_include_directories(${volk_LIBRARIES} PUBLIC ${vulkan_INCLUDE_DIRS})
+  target_link_libraries(${volk_LIBRARIES} PUBLIC ${vulkan_LIBRARIES})
   target_link_libraries(engine PRIVATE ${volk_LIBRARIES})
 endif()
 
@@ -104,9 +108,9 @@ if(${docopt_FOUND})
 endif()
 
 # glfw
-option(GLFW_BUILD_DOCS OFF)
-option(GLFW_INSTALL ON)
-option(GLFW_VULKAN_STATIC OFF)
+set(GLFW_BUILD_DOCS OFF)
+set(GLFW_INSTALL ON)
+set(GLFW_VULKAN_STATIC OFF)
 
 create_dependency(
   PATH
@@ -132,7 +136,7 @@ if(${glm_FOUND})
 endif()
 
 # spdlog TODO definitions
-#option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+# set(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
 
 create_dependency(
   PATH
@@ -163,7 +167,7 @@ if(${entt_FOUND})
 endif()
 
 # glslang
-option(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
+set(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
 
 create_dependency(PATH "glslang" LIB "glslang")
 if(${glslang_FOUND})
@@ -211,8 +215,8 @@ if(${thread_pool_FOUND})
 endif()
 
 # ktx
-option(KTX_FEATURE_STATIC_LIBRARY ON)
-option(KTX_FEATURE_TESTS OFF)
+set(KTX_FEATURE_STATIC_LIBRARY ON)
+set(KTX_FEATURE_TESTS OFF)
 
 create_dependency(PATH "ktx" INCLUDE "include" LIB "ktx")
 if(${ktx_FOUND})
@@ -268,7 +272,7 @@ if(${astc-encoder_FOUND})
 endif()
 
 # tinygltf
-option(TINYGLTF_BUILD_LOADER_EXAMPLE OFF)
+set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF)
 
 create_dependency(PATH "tinygltf" LIB "tinygltf")
 if(${tinygltf_FOUND})
@@ -350,6 +354,3 @@ endif()
 
 install(TARGETS ${ktx_LIBRARIES})
 install(TARGETS ${docopt_LIBRARIES})
-
-message(${ktx_LIBRARIES} " A " ${docopt_LIBRARIES})
- 

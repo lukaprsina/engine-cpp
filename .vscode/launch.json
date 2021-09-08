@@ -6,11 +6,14 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
-            "args": [],
+            "args": [
+                "scenes/space_module/SpaceModule.gltf"
+            ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
-            "console": "externalTerminal"
+            "preLaunchTask": "CMake Build",
+            "console": "newExternalWindow"
         },
         {
             "name": "Cmake launch",
