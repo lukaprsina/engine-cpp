@@ -83,7 +83,7 @@ create_dependency(
 
 # volk
 set(VOLK_PULL_IN_VULKAN OFF)
-set(VOLK_STATIC_DEFINES ENG_PLATFORM)
+set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
 
 create_dependency(PATH "volk" LIB "volk")
 if(${volk_FOUND})

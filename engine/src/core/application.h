@@ -8,6 +8,7 @@ namespace engine
     class Platform;
     class WindowCloseEvent;
     class WindowResizeEvent;
+    class KeyPressedEvent;
     class Event;
     class Instance;
     class Device;
@@ -31,6 +32,8 @@ namespace engine
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
         bool OnResize(WindowResizeEvent &event);
+        bool OnKeyPressed(KeyPressedEvent& event);
+
         bool Prepare();
         void Step();
         void Update(float delta_time);

@@ -195,12 +195,6 @@ target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
 configure_file(engine_config.h.in engine_config.h @ONLY)
 
-target_compile_definitions(
-  engine
-  PRIVATE ${ENG_PLATFORM}
-  PRIVATE ENG_VALIDATION_LAYERS
-  PRIVATE ENG_VALIDATION_LAYERS_GPU_ASSISTED)
-
 if(MSVC)
   # target_compile_options(engine PRIVATE /W3 /WX)
 else()

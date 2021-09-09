@@ -29,6 +29,8 @@ namespace engine
         void WindowSizeCallback(GLFWwindow *window, int width, int height)
         {
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            if (width == 0 && height == 0)
+                return;
             data.width = width;
             data.height = height;
 
@@ -47,6 +49,8 @@ namespace engine
         void WindowPositionCallback(GLFWwindow *window, int xPos, int yPos)
         {
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            data.posx = xPos;
+            data.posy = yPos;
 
             WindowMovedEvent event(xPos, yPos);
             data.EventCallback(event);
@@ -142,16 +146,20 @@ namespace engine
             settings.height = static_cast<uint32_t>(options.GetInt("--height"));
 
         if (settings.title.empty())
-            settings.title = platform.GetApp().GetName();
-
-        SetSettings(settings);
+            settings.title = platform.GetApp().GetName();        
 
         m_Handle = glfwCreateWindow(settings.width,
                                     settings.height,
                                     settings.title.c_str(), nullptr, nullptr);
 
+
         if (!m_Handle)
             throw std::runtime_error("Couldn't create GLFW window.");
+
+
+        glfwGetWindowPos(m_Handle, &settings.posx, &settings.posy);
+        SetSettings(settings);
+        m_WindowedSettings = settings;
 
         glfwSetWindowUserPointer(m_Handle, &m_Settings);
 
@@ -176,6 +184,38 @@ namespace engine
     void GlfwWindow::ProcessEvents()
     {
         glfwPollEvents();
+        Window::ProcessEvents();
+        if (m_Dirty)
+        {
+            auto mode = glfwGetVideoMode(glfwGetPrimaryMonitor());            
+        
+            if (m_Settings.fullscreen)
+            {
+                m_WindowedSettings = m_Settings;
+                m_WindowedSettings.fullscreen = false;
+
+                glfwSetWindowMonitor(m_Handle, glfwGetPrimaryMonitor(), 0, 0,
+                    mode->width, mode->height, GLFW_DONT_CARE);                    
+
+            }            
+            else
+            {
+                glfwSetWindowMonitor(m_Handle, nullptr, m_WindowedSettings.posx, m_WindowedSettings.posy,
+                    m_WindowedSettings.width, m_WindowedSettings.height, GLFW_DONT_CARE);
+            }
+
+            glfwGetWindowSize(m_Handle, &m_Settings.width, &m_Settings.height);
+            glfwGetWindowPos(m_Handle, &m_Settings.posx, &m_Settings.posy);
+    
+            if (m_Settings.focused)
+            {
+                // glfwFocusWindow(m_Handle);            
+                glfwRequestWindowAttention(m_Handle);
+            }
+        }
+
+
+        m_Dirty = false;        
     }
 
     VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)

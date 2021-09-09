@@ -1,8 +1,9 @@
 #include "core/application.h"
 
-#include "core/log.h"
 #include "core/timer.h"
 #include "events/application_event.h"
+#include "events/key_event.h"
+#include "window/input.h"
 #include "vulkan_api/command_buffer.h"
 #include "vulkan_api/device.h"
 #include "vulkan_api/instance.h"
@@ -29,8 +30,7 @@ namespace engine
         Log::Init();
         // Log::GetCoreLogger()->set_level(spdlog::level::warn);
 
-        ENG_CORE_INFO("Logger initialized.");
-        ENG_CORE_INFO(ENG_BASE_DIRECTORY);
+        ENG_CORE_INFO("Logger initialized.");        
 
         SetUsage(
             R"(Engine
@@ -114,7 +114,7 @@ namespace engine
 
         if (m_Options.Contains("<scene>"))
             scene = m_Options.GetString("<scene>");
-
+        
         if (scene.empty())
             LoadScene("scenes/sponza/Sponza01.gltf");
         else
@@ -246,12 +246,13 @@ namespace engine
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnResize));
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(Application::OnKeyPressed));
     }
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
     {
         m_Platform->Close();
-        return true;
+        return false;
     }
 
     bool Application::OnResize(WindowResizeEvent &event)
@@ -263,7 +264,22 @@ namespace engine
             free_camera.Resize(event.GetWidth(), event.GetHeight());
         }
 
-        return true;
+        return false;
+    }
+
+    bool Application::OnKeyPressed(KeyPressedEvent& event)
+    {
+        ENG_CORE_TRACE(event.ToString());
+        bool alt_enter = Input::IsKeyPressed(Key::LeftAlt) && Input::IsKeyPressed(Key::Enter);
+
+        if (event.GetKeyCode() == Key::F11 || alt_enter)
+        {            
+            auto window_settings = m_Platform->GetWindow().GetSettings();            
+            window_settings.fullscreen = !window_settings.fullscreen;
+            m_Platform->GetWindow().SetSettings(window_settings);
+        }
+
+        return false;
     }
 
     void Application::ParseOptions(std::vector<std::string> &arguments)

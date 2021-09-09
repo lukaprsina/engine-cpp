@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <array>
 
+#include "engine_config.h"
 #include "common/error.h"
 #include "common/base.h"
 #include "common/strings.h"

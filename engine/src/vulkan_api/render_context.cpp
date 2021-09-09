@@ -184,10 +184,11 @@ namespace engine
         if (m_Swapchain)
         {
             auto result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
-
-            if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
+            
+            if (result == VK_SUBOPTIMAL_KHR || result == VK_NOT_READY || result == VK_ERROR_OUT_OF_DATE_KHR)
             {
-                bool swapchain_updated = HandleSurfaceChanges(result == VK_ERROR_OUT_OF_DATE_KHR);
+                bool swapchain_updated = HandleSurfaceChanges(result == VK_ERROR_OUT_OF_DATE_KHR ||
+                    result == VK_NOT_READY);
 
                 if (swapchain_updated)
                     result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
@@ -195,6 +196,7 @@ namespace engine
 
             if (result != VK_SUCCESS)
             {
+                // TODO: VK_NOT_READY 
                 prev_frame.Reset();
                 return;
             }

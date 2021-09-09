@@ -8,4 +8,10 @@ namespace engine
         : m_Platform(platform), m_Settings(settings)
     {
     }
+
+    void Window::SetSettings(WindowSettings& settings)
+    {
+        m_Settings = settings;
+        m_Dirty = true;
+    }
 }
