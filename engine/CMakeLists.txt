@@ -118,6 +118,8 @@ set(VULKAN_API_FILES
     src/scene/script.h
     src/scene/scripts/free_camera.h
     src/window/input.h
+    src/core/layer.h
+    src/core/layer_stack.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -176,7 +178,8 @@ set(VULKAN_API_FILES
     src/scene/components/transform.cpp
     src/scene/components/perspective_camera.cpp
     src/scene/script.cpp
-    src/scene/scripts/free_camera.cpp)
+    src/scene/scripts/free_camera.cpp
+    src/core/layer_stack.cpp)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})

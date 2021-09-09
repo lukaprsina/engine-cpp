@@ -2,6 +2,7 @@
 
 #include "core/options.h"
 #include "core/timer.h"
+#include "core/layer_stack.h"
 
 namespace engine
 {
@@ -77,6 +78,7 @@ namespace engine
         std::string m_Usage{};
         Options m_Options{};
         bool m_Headless{false};
+        LayerStack m_LayerStack;
 
         float m_Fps{0.0f};
         float m_FrameTime{0.0f};

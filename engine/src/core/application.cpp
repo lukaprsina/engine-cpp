@@ -162,6 +162,9 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
+        for (auto& layer : m_LayerStack.GetLayers())        
+            layer.OnUpdate(float delta_time);        
+
         ImGui::ShowDemoWindow();
         UpdateScene(delta_time);
         auto &command_buffer = m_RenderContext->Begin();
