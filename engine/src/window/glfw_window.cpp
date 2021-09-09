@@ -29,8 +29,8 @@ namespace engine
         void WindowSizeCallback(GLFWwindow *window, int width, int height)
         {
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
-            if (width == 0 && height == 0)
-                return;
+            // ENG_ASSERT(width != 0 && height != 0, "Minimization not yet supported");
+            
             data.width = width;
             data.height = height;
 
@@ -185,6 +185,12 @@ namespace engine
     {
         glfwPollEvents();
         Window::ProcessEvents();
+
+        if (m_Settings.width == 0 && m_Settings.height == 0)
+            m_Settings.minimized = true;
+        else
+            m_Settings.minimized = false;
+
         if (m_Dirty)
         {
             auto mode = glfwGetVideoMode(glfwGetPrimaryMonitor());            

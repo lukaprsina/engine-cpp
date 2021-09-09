@@ -16,6 +16,7 @@ namespace engine
         int32_t posy = 0;
         bool focused = true;
         bool fullscreen = false;
+        bool minimized = false;
 
         std::function<void(Event &)> EventCallback = nullptr;
     };

@@ -58,7 +58,8 @@ namespace engine
         ENG_CORE_INFO("Starting the main loop.");
         while (!m_Window->ShouldClose())
         {
-            Run();
+            if (!m_Window->GetSettings().minimized)
+                Run();
             m_Window->ProcessEvents();
         }
     }
