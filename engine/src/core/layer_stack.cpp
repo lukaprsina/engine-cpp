@@ -2,12 +2,12 @@
 
 namespace engine
 {
-	void LayerStack::PushLayer(Layer* layer)
+	void LayerStack::PushLayer(Layer *layer)
 	{
 		m_Layers.emplace_back(layer);
 	}
 
-	void LayerStack::PopLayer(Layer* layer)
+	void LayerStack::PopLayer(Layer *layer)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
@@ -16,7 +16,7 @@ namespace engine
 		}
 	}
 
-	void LayerStack::BringLayerToFront(Layer* layer)
+	void LayerStack::BringLayerToFront(Layer *layer)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
@@ -26,7 +26,7 @@ namespace engine
 		}
 	}
 
-	void LayerStack::SendLayerToBack(Layer* layer)
+	void LayerStack::SendLayerToBack(Layer *layer)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
@@ -36,9 +36,7 @@ namespace engine
 		}
 	}
 
-	/*********************************************************************/
-
-	void LayerStack::BringLayerForward(Layer* layer, unsigned int count)
+	void LayerStack::BringLayerForward(Layer *layer, unsigned int count)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
@@ -50,7 +48,7 @@ namespace engine
 		}
 	}
 
-	void LayerStack::SendLayerBackward(Layer* layer, unsigned int count)
+	void LayerStack::SendLayerBackward(Layer *layer, unsigned int count)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
