@@ -20,6 +20,8 @@
 #include "scene/gltf_loader.h"
 #include "engine_config.h"
 
+#include <imgui.h>
+
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace engine
@@ -160,6 +162,7 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
+        ImGui::ShowDemoWindow();
         UpdateScene(delta_time);
         auto &command_buffer = m_RenderContext->Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -268,8 +271,7 @@ namespace engine
     }
 
     bool Application::OnKeyPressed(KeyPressedEvent& event)
-    {
-        ENG_CORE_TRACE(event.ToString());
+    {        
         bool alt_enter = Input::IsKeyPressed(Key::LeftAlt) && Input::IsKeyPressed(Key::Enter);
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)

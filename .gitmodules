@@ -49,3 +49,6 @@
 [submodule "engine/vendor/vulkan"]
 	path = engine/vendor/vulkan
 	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule ".\\engine\\vendor\\imgui"]
+	path = .\\engine\\vendor\\imgui
+	url = https://github.com/ocornut/imgui

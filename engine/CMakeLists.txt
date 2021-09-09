@@ -23,7 +23,8 @@ set(COMMON_FILES
     src/common/vulkan.cpp
     src/common/strings.cpp)
 
-set(EVENT_FILES # Header Files
+set(EVENT_FILES
+    # Header Files
     src/events/application_event.h src/events/event.h src/events/key_event.h
     src/events/mouse_event.h)
 

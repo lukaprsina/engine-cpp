@@ -66,7 +66,9 @@ macro(create_dependency)
     ", "
     ${${TARGET_PATH}_INCLUDE_DIRS}
     ", "
-    ${${TARGET_PATH}_LIBRARIES})
+    ${${TARGET_PATH}_LIBRARIES}
+    "\n"
+    ${TARGET_SOURCES})
 endmacro()
 
 # vulkan
@@ -280,6 +282,49 @@ if(${tinygltf_FOUND})
   target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIRS})
 endif()
 
+#imgui
+set(IMGUI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+set(IMGUI_BACKENDS_DIR ${IMGUI_SOURCE_DIR}/backends)
+set(IMGUI_FONTS_DIR ${IMGUI_SOURCE_DIR}/misc/fonts)
+
+set(IMGUI_SOURCES 
+    # Header files
+    ${IMGUI_SOURCE_DIR}/imgui.h
+    ${IMGUI_SOURCE_DIR}/imconfig.h
+    ${IMGUI_SOURCE_DIR}/imgui_internal.h    
+    ${IMGUI_SOURCE_DIR}/imstb_rectpack.h
+    ${IMGUI_SOURCE_DIR}/imstb_textedit.h
+    ${IMGUI_SOURCE_DIR}/imstb_truetype.h
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_vulkan.h
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_glfw.h
+
+    # Source files
+    ${IMGUI_SOURCE_DIR}/imgui.cpp
+    ${IMGUI_SOURCE_DIR}/imgui_tables.cpp
+    ${IMGUI_SOURCE_DIR}/imgui_draw.cpp
+    ${IMGUI_SOURCE_DIR}/imgui_widgets.cpp
+    ${IMGUI_SOURCE_DIR}/imgui_demo.cpp
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_vulkan.cpp
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_glfw.cpp   
+)
+
+if(ENG_PLATFORM EQUAL VK_USE_PLATFORM_WIN32_KHR)
+    list(APPEND IMGUI_SOURCES
+        # Header files
+        ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.h
+
+        # Source files
+        ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.cpp)
+endif()
+
+create_dependency(PATH "imgui" SOURCES ${IMGUI_SOURCES} LIB "imgui" NO_CMAKE)
+if(${imgui_FOUND})
+  target_include_directories(${imgui_LIBRARIES} PUBLIC ${imgui_INCLUDE_DIRS} ${vulkan_INCLUDE_DIRS} ${glfw_INCLUDE_DIRS})
+  target_link_libraries(${imgui_LIBRARIES} PUBLIC ${vulkan_LIBRARIES} ${glfw_LIBRARIES})
+  message("ADSADASDASDASD " ${imgui_LIBRARIES})
+  target_link_libraries(engine PUBLIC ${imgui_LIBRARIES})
+endif()
+
 message("SUBMODULE_LIST=" ${SUBMODULE_LIST})
 message("EXTERNAL_LIST=" ${EXTERNAL_LIST})
 message("SUBMODULE_MISSING_LIST=" ${SUBMODULE_MISSING_LIST})
@@ -354,3 +399,4 @@ endif()
 
 install(TARGETS ${ktx_LIBRARIES})
 install(TARGETS ${docopt_LIBRARIES})
+install(TARGETS ${imgui_LIBRARIES})

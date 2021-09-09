@@ -1,5 +1,4 @@
-{"submodules":["vulkan",
-"volk",
+{"submodules":["volk",
 "stb",
 "docopt",
 "glfw",
@@ -12,4 +11,5 @@
 "thread_pool",
 "ktx",
 "astc-encoder",
-"tinygltf"],"external":[],"submodule_missing":[],"external_missing":[]}
+"tinygltf",
+"imgui"],"external":["vulkan"],"submodule_missing":[],"external_missing":[]}
