@@ -2,6 +2,7 @@
 
 #include "core/timer.h"
 #include "core/gui.h"
+#include "core/layer_stack.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "window/input.h"
@@ -19,8 +20,6 @@
 #include "scene/scene.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
-
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 namespace engine
 {
@@ -236,8 +235,7 @@ namespace engine
             m_RenderPipeline->Draw(command_buffer,
                                    m_RenderContext->GetActiveFrame().GetRenderTarget());
 
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnDraw(command_buffer);
+        m_Gui->Draw(command_buffer);
 
         command_buffer.EndRenderPass();
 
@@ -261,10 +259,17 @@ namespace engine
 
     void Application::OnEvent(Event &event)
     {
+        for (auto it = m_LayerStack.GetLayers().rbegin(); it != m_LayerStack.GetLayers().rend(); ++it)
+        {
+            if (event.handled)
+                break;
+            (*it)->OnEvent(event);
+        }
+
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
-        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnResize));
-        dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(Application::OnKeyPressed));
+        dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_EVENT_FN(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_EVENT_FN(Application::OnResize));
+        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_EVENT_FN(Application::OnKeyPressed));
     }
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)

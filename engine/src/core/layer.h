@@ -15,7 +15,6 @@ namespace engine
 		virtual void OnAttach(){};
 		virtual void OnDetach() {}
 		virtual void OnUpdate(float delta_time) = 0;
-		virtual void OnDraw(CommandBuffer & /* command_buffer */) {}
 		virtual void OnEvent(Event &event) {}
 	};
 }

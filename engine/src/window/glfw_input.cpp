@@ -31,4 +31,14 @@ namespace engine
 
         return {(float)xpos, (float)ypos};
     }
+
+    float Input::GetMouseX()
+    {
+        return GetMousePosition().x;
+    }
+
+    float Input::GetMouseY()
+    {
+        return GetMousePosition().y;
+    }
 }

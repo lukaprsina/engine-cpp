@@ -1,5 +1,6 @@
 #include "core/gui.h"
 
+#include "window/input.h"
 #include "window/window.h"
 #include "vulkan_api/device.h"
 #include "core/application.h"
@@ -15,6 +16,8 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+// #include <backends/imgui_impl_glfw.h>
+// #include <backends/imgui_impl_vulkan.h>
 
 namespace engine
 {
@@ -54,6 +57,9 @@ namespace engine
         io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
         io.KeyMap[ImGuiKey_Space] = static_cast<int>(Key::Space);
         io.KeyMap[ImGuiKey_Enter] = static_cast<int>(Key::Enter);
         io.KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
@@ -62,6 +68,7 @@ namespace engine
         io.KeyMap[ImGuiKey_DownArrow] = static_cast<int>(Key::Down);
         io.KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
 
+        ImGui::StyleColorsDark();
         m_Fonts.emplace_back(default_font, font_size);
 
         unsigned char *font_data;
@@ -272,7 +279,7 @@ namespace engine
         VK_CHECK(vkCreateGraphicsPipelines(device.GetHandle(), pipeline_cache, 1, &pipeline_create_info, nullptr, &m_Pipeline));
     }
 
-    void Gui::OnDraw(CommandBuffer &command_buffer)
+    void Gui::Draw(CommandBuffer &command_buffer)
     {
         // Vertex input state
         VkVertexInputBindingDescription vertex_input_binding{};
@@ -521,21 +528,64 @@ namespace engine
     {
         NewFrame();
         ImGui::ShowDemoWindow();
-        Update(delta_time);
-    }
-
-    void Gui::NewFrame()
-    {
-        ImGui::NewFrame();
-    }
-
-    void Gui::Update(float delta_time)
-    {
         ImGuiIO &io = ImGui::GetIO();
         auto extent = m_Application.GetRenderContext().GetSurfaceExtent();
         Resize(extent.width, extent.height);
         io.DeltaTime = delta_time;
         ImGui::Render();
+    }
+
+    void Gui::OnEvent(Event &event)
+    {
+        auto &io = ImGui::GetIO();
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<MouseMovedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseMoved));
+        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_EVENT_FN(Gui::OnKeyPressed));
+        dispatcher.Dispatch<KeyReleasedEvent>(ENG_BIND_EVENT_FN(Gui::OnKeyReleased));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseButtonPressed));
+        dispatcher.Dispatch<MouseButtonReleasedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseButtonReleased));
+        event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+        event.handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+    }
+
+    bool Gui::OnKeyPressed(KeyPressedEvent &event)
+    {
+        auto &io = ImGui::GetIO();
+        io.KeysDown[event.GetKeyCode()] = true;
+        return false;
+    }
+
+    bool Gui::OnKeyReleased(KeyReleasedEvent &event)
+    {
+        auto &io = ImGui::GetIO();
+        io.KeysDown[event.GetKeyCode()] = false;
+        return false;
+    }
+
+    bool Gui::OnMouseButtonPressed(MouseButtonPressedEvent &event)
+    {
+        auto &io = ImGui::GetIO();
+        io.MouseDown[event.GetMouseButton()] = true;
+        return false;
+    }
+
+    bool Gui::OnMouseButtonReleased(MouseButtonReleasedEvent &event)
+    {
+        auto &io = ImGui::GetIO();
+        io.MouseDown[event.GetMouseButton()] = false;
+        return false;
+    }
+
+    bool Gui::OnMouseMoved(MouseMovedEvent &event)
+    {
+        auto &io = ImGui::GetIO();
+        io.MousePos = ImVec2{Input::GetMouseX(), Input::GetMouseY()};
+        return false;
+    }
+
+    void Gui::NewFrame()
+    {
+        ImGui::NewFrame();
     }
 
     void Gui::Resize(const uint32_t width, const uint32_t height) const

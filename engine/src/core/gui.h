@@ -2,6 +2,8 @@
 
 #include "platform/filesystem.h"
 #include "core/layer.h"
+#include "events/mouse_event.h"
+#include "events/key_event.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -59,11 +61,15 @@ namespace engine
         void NewFrame();
 
         void OnUpdate(float delta_time) override;
-        void Update(float delta_time);
         void Resize(const uint32_t width, const uint32_t height) const;
+        void Draw(CommandBuffer &command_buffer);
 
-        void OnDraw(CommandBuffer &command_buffer) override;
-        // void Draw(VkCommandBuffer command_buffer);
+        void OnEvent(Event &event) override;
+        bool OnKeyPressed(KeyPressedEvent &event);
+        bool OnKeyReleased(KeyReleasedEvent &event);
+        bool OnMouseButtonPressed(MouseButtonPressedEvent &event);
+        bool OnMouseButtonReleased(MouseButtonReleasedEvent &event);
+        bool OnMouseMoved(MouseMovedEvent &event);
 
         static const std::string default_font;
 
