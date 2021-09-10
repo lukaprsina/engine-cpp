@@ -18,7 +18,6 @@
 #include "scene/scene.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
-#include "engine_config.h"
 
 #include <imgui.h>
 
@@ -167,9 +166,6 @@ namespace engine
         for (auto &layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
 
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-        ImGui::Render();
         UpdateScene(delta_time);
         auto &command_buffer = m_RenderContext->Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);

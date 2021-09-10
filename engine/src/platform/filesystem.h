@@ -11,6 +11,7 @@ namespace engine
                 Storage,
                 Shaders,
                 Assets,
+                Fonts,
 
                 SourceDirectory,
                 ExternalStorage,

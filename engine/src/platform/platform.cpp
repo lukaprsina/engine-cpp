@@ -3,7 +3,6 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
-#include "engine_config.h"
 
 #include <filesystem>
 
