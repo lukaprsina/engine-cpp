@@ -18,7 +18,6 @@
 #include "scene/scene.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
-#include "engine_config.h"
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -30,7 +29,7 @@ namespace engine
         Log::Init();
         // Log::GetCoreLogger()->set_level(spdlog::level::warn);
 
-        ENG_CORE_INFO("Logger initialized.");        
+        ENG_CORE_INFO("Logger initialized.");
 
         SetUsage(
             R"(Engine
@@ -114,7 +113,7 @@ namespace engine
 
         if (m_Options.Contains("<scene>"))
             scene = m_Options.GetString("<scene>");
-        
+
         if (scene.empty())
             LoadScene("scenes/sponza/Sponza01.gltf");
         else
@@ -160,6 +159,9 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
+        for (auto &layer : m_LayerStack.GetLayers())
+            layer->OnUpdate(delta_time);
+
         UpdateScene(delta_time);
         auto &command_buffer = m_RenderContext->Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -267,14 +269,14 @@ namespace engine
         return false;
     }
 
-    bool Application::OnKeyPressed(KeyPressedEvent& event)
+    bool Application::OnKeyPressed(KeyPressedEvent &event)
     {
         ENG_CORE_TRACE(event.ToString());
         bool alt_enter = Input::IsKeyPressed(Key::LeftAlt) && Input::IsKeyPressed(Key::Enter);
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
-        {            
-            auto window_settings = m_Platform->GetWindow().GetSettings();            
+        {
+            auto window_settings = m_Platform->GetWindow().GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
             m_Platform->GetWindow().SetSettings(window_settings);
         }

@@ -19,7 +19,7 @@ namespace engine
                 {Type::Assets, "assets"},
                 {Type::Shaders, "shaders"},
                 {Type::Storage, "output"},
-            };
+                {Type::Fonts, "vendor/imgui/misc/fonts"}};
 
             std::filesystem::path Get(const Type type, const std::string &filename)
             {

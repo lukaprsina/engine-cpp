@@ -47,8 +47,7 @@ set(WINDOWS_FILES
     # Header Files
     src/platform/windows_platform.h
     # Source Files
-    src/platform/windows_platform.cpp
-    src/window/glfw_input.cpp)
+    src/platform/windows_platform.cpp src/window/glfw_input.cpp)
 
 set(UNIX_FILES
     # Header Files
@@ -117,6 +116,10 @@ set(VULKAN_API_FILES
     src/scene/script.h
     src/scene/scripts/free_camera.h
     src/window/input.h
+    src/vulkan_api/initializers.h
+    src/core/layer.h
+    src/core/layer_stack.h
+    src/core/gui.h
     # Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
@@ -175,12 +178,20 @@ set(VULKAN_API_FILES
     src/scene/components/transform.cpp
     src/scene/components/perspective_camera.cpp
     src/scene/script.cpp
-    src/scene/scripts/free_camera.cpp)
+    src/scene/scripts/free_camera.cpp
+    <<<<<<<
+    Updated
+    upstream
+    =======
+    src/core/layer_stack.cpp
+    >>>>>>>
+    Stashed
+    changes
+    src/core/gui.cpp)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})
 
-                  
 if(WIN32)
   list(APPEND PROJECT_FILES ${WINDOWS_FILES})
 elseif(UNIX)
@@ -189,7 +200,8 @@ endif()
 
 add_executable(engine WIN32 ${PROJECT_FILES})
 
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+                                         ${CMAKE_CURRENT_BINARY_DIR})
 
 target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
