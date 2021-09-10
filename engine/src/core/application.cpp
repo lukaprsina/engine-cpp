@@ -54,7 +54,12 @@ namespace engine
         if (m_Device)
             m_Device->WaitIdle();
 
+        for (Layer *layer : m_LayerStack.GetLayers())
+            layer->OnDetach();
+
         m_Scene.reset();
+        m_Gui.reset();
+
         m_RenderContext.reset();
         m_Device.reset();
 
