@@ -49,15 +49,11 @@ namespace engine
         VkResult AcquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence);
 
         VkSurfaceKHR GetSurface() const { return m_Surface; }
-
+        SwapchainProperties &GetProperties() { return m_Properties; }
         VkSwapchainKHR GetHandle() const { return m_Handle; }
-
         const VkExtent2D &GetExtent() const { return m_Properties.extent; }
-
         const std::vector<VkImage> &GetImages() const { return m_Images; }
-
         VkFormat GetFormat() const { return m_Properties.surface_format.format; }
-
         VkImageUsageFlags GetUsage() const { return m_Properties.image_usage; }
 
         void SetPresentModePriority(const std::vector<VkPresentModeKHR> &new_present_mode_priority_list)

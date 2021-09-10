@@ -1,6 +1,7 @@
 #pragma once
 
 #include "platform/filesystem.h"
+#include "core/layer.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -10,12 +11,16 @@ namespace engine
     class Window;
     class Application;
     class PipelineLayout;
+    class CommandBuffer;
+    class RenderTarget;
+    class RenderFrame;
 
     namespace core
     {
         class Image;
         class ImageView;
         class Buffer;
+        class Sampler;
     }
 
     struct Font
@@ -39,7 +44,7 @@ namespace engine
         float size{};
     };
 
-    class Gui
+    class Gui : public Layer
     {
     public:
         Gui(Application &application,
@@ -51,9 +56,20 @@ namespace engine
         void Prepare(const VkPipelineCache pipeline_cache, const VkRenderPass render_pass,
                      const std::vector<VkPipelineShaderStageCreateInfo> &shader_stages);
 
+        void NewFrame();
+
+        void OnUpdate(float delta_time) override;
+        void Update(float delta_time);
+        void Resize(const uint32_t width, const uint32_t height) const;
+
+        void OnDraw(CommandBuffer &command_buffer) override;
+        // void Draw(VkCommandBuffer command_buffer);
+
         static const std::string default_font;
 
     private:
+        Application &m_Application;
+
         std::vector<Font> m_Fonts;
         std::unique_ptr<core::Image> m_FontImage;
         std::unique_ptr<core::ImageView> m_FontImageView;
@@ -68,5 +84,9 @@ namespace engine
         VkDescriptorSetLayout m_DescriptorSetLayout{VK_NULL_HANDLE};
         VkDescriptorSet m_DescriptorSet{VK_NULL_HANDLE};
         VkPipeline m_Pipeline{VK_NULL_HANDLE};
+
+        bool m_ExplicitUpdate{false};
+
+        void UpdateBuffers(CommandBuffer &command_buffer, RenderFrame &render_frame);
     };
 }

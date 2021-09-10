@@ -14,641 +14,574 @@ namespace engine
 {
     namespace initializers
     {
-        inline VkMemoryAllocateInfo memoryAllocateInfo()
+        inline VkMemoryAllocateInfo memory_allocate_info()
         {
-            VkMemoryAllocateInfo memAllocInfo{};
-            memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-            return memAllocInfo;
+            VkMemoryAllocateInfo memory_allocation{};
+            memory_allocation.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            return memory_allocation;
         }
 
-        inline VkMappedMemoryRange mappedMemoryRange()
+        inline VkMappedMemoryRange mapped_memory_range()
         {
-            VkMappedMemoryRange mappedMemoryRange{};
-            mappedMemoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-            return mappedMemoryRange;
+            VkMappedMemoryRange mapped_memory_range{};
+            mapped_memory_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+            return mapped_memory_range;
         }
 
-        inline VkCommandBufferAllocateInfo commandBufferAllocateInfo(
-            VkCommandPool commandPool,
+        inline VkCommandBufferAllocateInfo command_buffer_allocate_info(
+            VkCommandPool command_pool,
             VkCommandBufferLevel level,
-            uint32_t bufferCount)
+            uint32_t buffer_count)
         {
-            VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-            commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            commandBufferAllocateInfo.commandPool = commandPool;
-            commandBufferAllocateInfo.level = level;
-            commandBufferAllocateInfo.commandBufferCount = bufferCount;
-            return commandBufferAllocateInfo;
+            VkCommandBufferAllocateInfo command_buffer_allocate_info{};
+            command_buffer_allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            command_buffer_allocate_info.commandPool = command_pool;
+            command_buffer_allocate_info.level = level;
+            command_buffer_allocate_info.commandBufferCount = buffer_count;
+            return command_buffer_allocate_info;
         }
 
-        inline VkCommandPoolCreateInfo commandPoolCreateInfo()
+        inline VkCommandPoolCreateInfo command_pool_create_info()
         {
-            VkCommandPoolCreateInfo cmdPoolCreateInfo{};
-            cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-            return cmdPoolCreateInfo;
+            VkCommandPoolCreateInfo command_pool_create_info{};
+            command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+            return command_pool_create_info;
         }
 
-        inline VkCommandBufferBeginInfo commandBufferBeginInfo()
+        inline VkCommandBufferBeginInfo command_buffer_begin_info()
         {
             VkCommandBufferBeginInfo cmdBufferBeginInfo{};
             cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
             return cmdBufferBeginInfo;
         }
 
-        inline VkCommandBufferInheritanceInfo commandBufferInheritanceInfo()
+        inline VkCommandBufferInheritanceInfo command_buffer_inheritance_info()
         {
-            VkCommandBufferInheritanceInfo cmdBufferInheritanceInfo{};
-            cmdBufferInheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-            return cmdBufferInheritanceInfo;
+            VkCommandBufferInheritanceInfo command_buffer_inheritance_info{};
+            command_buffer_inheritance_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+            return command_buffer_inheritance_info;
         }
 
-        inline VkRenderPassBeginInfo renderPassBeginInfo()
+        inline VkRenderPassBeginInfo render_pass_begin_info()
         {
-            VkRenderPassBeginInfo renderPassBeginInfo{};
-            renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            return renderPassBeginInfo;
+            VkRenderPassBeginInfo render_pass_begin_info{};
+            render_pass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            return render_pass_begin_info;
         }
 
-        inline VkRenderPassCreateInfo renderPassCreateInfo()
+        inline VkRenderPassCreateInfo render_pass_create_info()
         {
-            VkRenderPassCreateInfo renderPassCreateInfo{};
-            renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-            return renderPassCreateInfo;
+            VkRenderPassCreateInfo render_pass_create_info{};
+            render_pass_create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+            return render_pass_create_info;
         }
 
         /** @brief Initialize an image memory barrier with no image transfer ownership */
-        inline VkImageMemoryBarrier imageMemoryBarrier()
+        inline VkImageMemoryBarrier image_memory_barrier()
         {
-            VkImageMemoryBarrier imageMemoryBarrier{};
-            imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-            imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            return imageMemoryBarrier;
+            VkImageMemoryBarrier image_memory_barrier{};
+            image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            image_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            image_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            return image_memory_barrier;
         }
 
         /** @brief Initialize a buffer memory barrier with no image transfer ownership */
-        inline VkBufferMemoryBarrier bufferMemoryBarrier()
+        inline VkBufferMemoryBarrier buffer_memory_barrier()
         {
-            VkBufferMemoryBarrier bufferMemoryBarrier{};
-            bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-            bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-            return bufferMemoryBarrier;
+            VkBufferMemoryBarrier buffer_memory_barrier{};
+            buffer_memory_barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+            buffer_memory_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            buffer_memory_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            return buffer_memory_barrier;
         }
 
-        inline VkMemoryBarrier memoryBarrier()
+        inline VkMemoryBarrier memory_barrier()
         {
-            VkMemoryBarrier memoryBarrier{};
-            memoryBarrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-            return memoryBarrier;
+            VkMemoryBarrier memory_barrier{};
+            memory_barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+            return memory_barrier;
         }
 
-        inline VkImageCreateInfo imageCreateInfo()
+        inline VkImageCreateInfo image_create_info()
         {
-            VkImageCreateInfo imageCreateInfo{};
-            imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-            return imageCreateInfo;
+            VkImageCreateInfo image_create_info{};
+            image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            return image_create_info;
         }
 
-        inline VkSamplerCreateInfo samplerCreateInfo()
+        inline VkSamplerCreateInfo sampler_create_info()
         {
-            VkSamplerCreateInfo samplerCreateInfo{};
-            samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerCreateInfo.maxAnisotropy = 1.0f;
-            return samplerCreateInfo;
+            VkSamplerCreateInfo sampler_create_info{};
+            sampler_create_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+            sampler_create_info.maxAnisotropy = 1.0f;
+            return sampler_create_info;
         }
 
-        inline VkImageViewCreateInfo imageViewCreateInfo()
+        inline VkImageViewCreateInfo image_view_create_info()
         {
-            VkImageViewCreateInfo imageViewCreateInfo{};
-            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            return imageViewCreateInfo;
+            VkImageViewCreateInfo image_view_create_info{};
+            image_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            return image_view_create_info;
         }
 
-        inline VkFramebufferCreateInfo framebufferCreateInfo()
+        inline VkFramebufferCreateInfo framebuffer_create_info()
         {
-            VkFramebufferCreateInfo framebufferCreateInfo{};
-            framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            return framebufferCreateInfo;
+            VkFramebufferCreateInfo framebuffer_create_info{};
+            framebuffer_create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            return framebuffer_create_info;
         }
 
-        inline VkSemaphoreCreateInfo semaphoreCreateInfo()
+        inline VkSemaphoreCreateInfo semaphore_create_info()
         {
-            VkSemaphoreCreateInfo semaphoreCreateInfo{};
-            semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            return semaphoreCreateInfo;
+            VkSemaphoreCreateInfo semaphore_create_info{};
+            semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            return semaphore_create_info;
         }
 
-        inline VkFenceCreateInfo fenceCreateInfo(VkFenceCreateFlags flags = 0)
+        inline VkFenceCreateInfo fence_create_info(VkFenceCreateFlags flags = 0)
         {
-            VkFenceCreateInfo fenceCreateInfo{};
-            fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-            fenceCreateInfo.flags = flags;
-            return fenceCreateInfo;
+            VkFenceCreateInfo fence_create_info{};
+            fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+            fence_create_info.flags = flags;
+            return fence_create_info;
         }
 
-        inline VkEventCreateInfo eventCreateInfo()
+        inline VkEventCreateInfo event_create_info()
         {
-            VkEventCreateInfo eventCreateInfo{};
-            eventCreateInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
-            return eventCreateInfo;
+            VkEventCreateInfo event_create_info{};
+            event_create_info.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
+            return event_create_info;
         }
 
-        inline VkSubmitInfo submitInfo()
+        inline VkSubmitInfo submit_info()
         {
-            VkSubmitInfo submitInfo{};
-            submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            return submitInfo;
+            VkSubmitInfo submit_info{};
+            submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            return submit_info;
         }
 
         inline VkViewport viewport(
             float width,
             float height,
-            float minDepth,
-            float maxDepth)
+            float min_depth,
+            float max_depth)
         {
             VkViewport viewport{};
             viewport.width = width;
             viewport.height = height;
-            viewport.minDepth = minDepth;
-            viewport.maxDepth = maxDepth;
+            viewport.minDepth = min_depth;
+            viewport.maxDepth = max_depth;
             return viewport;
         }
 
         inline VkRect2D rect2D(
             int32_t width,
             int32_t height,
-            int32_t offsetX,
-            int32_t offsetY)
+            int32_t offset_x,
+            int32_t offset_y)
         {
             VkRect2D rect2D{};
             rect2D.extent.width = width;
             rect2D.extent.height = height;
-            rect2D.offset.x = offsetX;
-            rect2D.offset.y = offsetY;
+            rect2D.offset.x = offset_x;
+            rect2D.offset.y = offset_y;
             return rect2D;
         }
 
-        inline VkBufferCreateInfo bufferCreateInfo()
+        inline VkBufferCreateInfo buffer_create_info()
         {
-            VkBufferCreateInfo bufCreateInfo{};
-            bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            return bufCreateInfo;
+            VkBufferCreateInfo buffer_create_info{};
+            buffer_create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            return buffer_create_info;
         }
 
-        inline VkBufferCreateInfo bufferCreateInfo(
+        inline VkBufferCreateInfo buffer_create_info(
             VkBufferUsageFlags usage,
             VkDeviceSize size)
         {
-            VkBufferCreateInfo bufCreateInfo{};
-            bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-            bufCreateInfo.usage = usage;
-            bufCreateInfo.size = size;
-            return bufCreateInfo;
+            VkBufferCreateInfo buffer_create_info{};
+            buffer_create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            buffer_create_info.usage = usage;
+            buffer_create_info.size = size;
+            return buffer_create_info;
         }
 
-        inline VkDescriptorPoolCreateInfo descriptorPoolCreateInfo(
-            uint32_t poolSizeCount,
-            VkDescriptorPoolSize *pPoolSizes,
-            uint32_t maxSets)
+        inline VkDescriptorPoolCreateInfo descriptor_pool_create_info(
+            uint32_t count,
+            VkDescriptorPoolSize *pool_sizes,
+            uint32_t max_sets)
         {
-            VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-            descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-            descriptorPoolInfo.poolSizeCount = poolSizeCount;
-            descriptorPoolInfo.pPoolSizes = pPoolSizes;
-            descriptorPoolInfo.maxSets = maxSets;
-            return descriptorPoolInfo;
+            VkDescriptorPoolCreateInfo descriptor_pool_info{};
+            descriptor_pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+            descriptor_pool_info.poolSizeCount = count;
+            descriptor_pool_info.pPoolSizes = pool_sizes;
+            descriptor_pool_info.maxSets = max_sets;
+            return descriptor_pool_info;
         }
 
-        inline VkDescriptorPoolCreateInfo descriptorPoolCreateInfo(
-            const std::vector<VkDescriptorPoolSize> &poolSizes,
-            uint32_t maxSets)
+        inline VkDescriptorPoolCreateInfo descriptor_pool_create_info(
+            const std::vector<VkDescriptorPoolSize> &pool_sizes,
+            uint32_t max_sets)
         {
-            VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-            descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-            descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-            descriptorPoolInfo.pPoolSizes = poolSizes.data();
-            descriptorPoolInfo.maxSets = maxSets;
-            return descriptorPoolInfo;
+            VkDescriptorPoolCreateInfo descriptor_pool_info{};
+            descriptor_pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+            descriptor_pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
+            descriptor_pool_info.pPoolSizes = pool_sizes.data();
+            descriptor_pool_info.maxSets = max_sets;
+            return descriptor_pool_info;
         }
 
-        inline VkDescriptorPoolSize descriptorPoolSize(
+        inline VkDescriptorPoolSize descriptor_pool_size(
             VkDescriptorType type,
-            uint32_t descriptorCount)
+            uint32_t count)
         {
-            VkDescriptorPoolSize descriptorPoolSize{};
-            descriptorPoolSize.type = type;
-            descriptorPoolSize.descriptorCount = descriptorCount;
-            return descriptorPoolSize;
+            VkDescriptorPoolSize descriptor_pool_size{};
+            descriptor_pool_size.type = type;
+            descriptor_pool_size.descriptorCount = count;
+            return descriptor_pool_size;
         }
 
-        inline VkDescriptorSetLayoutBinding descriptorSetLayoutBinding(
+        inline VkDescriptorSetLayoutBinding descriptor_set_layout_binding(
             VkDescriptorType type,
-            VkShaderStageFlags stageFlags,
+            VkShaderStageFlags flags,
             uint32_t binding,
-            uint32_t descriptorCount = 1)
+            uint32_t count = 1)
         {
-            VkDescriptorSetLayoutBinding setLayoutBinding{};
-            setLayoutBinding.descriptorType = type;
-            setLayoutBinding.stageFlags = stageFlags;
-            setLayoutBinding.binding = binding;
-            setLayoutBinding.descriptorCount = descriptorCount;
-            return setLayoutBinding;
+            VkDescriptorSetLayoutBinding set_layout_binding{};
+            set_layout_binding.descriptorType = type;
+            set_layout_binding.stageFlags = flags;
+            set_layout_binding.binding = binding;
+            set_layout_binding.descriptorCount = count;
+            return set_layout_binding;
         }
 
-        inline VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo(
-            const VkDescriptorSetLayoutBinding *pBindings,
-            uint32_t bindingCount)
+        inline VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info(
+            const VkDescriptorSetLayoutBinding *bindings,
+            uint32_t binding_count)
         {
-            VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo{};
-            descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-            descriptorSetLayoutCreateInfo.pBindings = pBindings;
-            descriptorSetLayoutCreateInfo.bindingCount = bindingCount;
-            return descriptorSetLayoutCreateInfo;
+            VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info{};
+            descriptor_set_layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+            descriptor_set_layout_create_info.pBindings = bindings;
+            descriptor_set_layout_create_info.bindingCount = binding_count;
+            return descriptor_set_layout_create_info;
         }
 
-        inline VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo(
+        inline VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info(
             const std::vector<VkDescriptorSetLayoutBinding> &bindings)
         {
-            VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo{};
-            descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-            descriptorSetLayoutCreateInfo.pBindings = bindings.data();
-            descriptorSetLayoutCreateInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-            return descriptorSetLayoutCreateInfo;
+            VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info{};
+            descriptor_set_layout_create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+            descriptor_set_layout_create_info.pBindings = bindings.data();
+            descriptor_set_layout_create_info.bindingCount = static_cast<uint32_t>(bindings.size());
+            return descriptor_set_layout_create_info;
         }
 
-        inline VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo(
-            const VkDescriptorSetLayout *pSetLayouts,
-            uint32_t setLayoutCount = 1)
+        inline VkPipelineLayoutCreateInfo pipeline_layout_create_info(
+            const VkDescriptorSetLayout *set_layouts,
+            uint32_t set_layout_count = 1)
         {
-            VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
-            pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-            pipelineLayoutCreateInfo.setLayoutCount = setLayoutCount;
-            pipelineLayoutCreateInfo.pSetLayouts = pSetLayouts;
-            return pipelineLayoutCreateInfo;
+            VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
+            pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+            pipeline_layout_create_info.setLayoutCount = set_layout_count;
+            pipeline_layout_create_info.pSetLayouts = set_layouts;
+            return pipeline_layout_create_info;
         }
 
-        inline VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo(
-            uint32_t setLayoutCount = 1)
+        inline VkPipelineLayoutCreateInfo pipeline_layout_create_info(
+            uint32_t set_layout_count = 1)
         {
-            VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
-            pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-            pipelineLayoutCreateInfo.setLayoutCount = setLayoutCount;
-            return pipelineLayoutCreateInfo;
+            VkPipelineLayoutCreateInfo pipeline_layout_create_info{};
+            pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+            pipeline_layout_create_info.setLayoutCount = set_layout_count;
+            return pipeline_layout_create_info;
         }
 
-        inline VkDescriptorSetAllocateInfo descriptorSetAllocateInfo(
-            VkDescriptorPool descriptorPool,
-            const VkDescriptorSetLayout *pSetLayouts,
-            uint32_t descriptorSetCount)
+        inline VkDescriptorSetAllocateInfo descriptor_set_allocate_info(
+            VkDescriptorPool descriptor_pool,
+            const VkDescriptorSetLayout *set_layouts,
+            uint32_t descriptor_set_count)
         {
-            VkDescriptorSetAllocateInfo descriptorSetAllocateInfo{};
-            descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-            descriptorSetAllocateInfo.descriptorPool = descriptorPool;
-            descriptorSetAllocateInfo.pSetLayouts = pSetLayouts;
-            descriptorSetAllocateInfo.descriptorSetCount = descriptorSetCount;
-            return descriptorSetAllocateInfo;
+            VkDescriptorSetAllocateInfo descriptor_set_allocate_info{};
+            descriptor_set_allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            descriptor_set_allocate_info.descriptorPool = descriptor_pool;
+            descriptor_set_allocate_info.pSetLayouts = set_layouts;
+            descriptor_set_allocate_info.descriptorSetCount = descriptor_set_count;
+            return descriptor_set_allocate_info;
         }
 
-        inline VkDescriptorImageInfo descriptorImageInfo(VkSampler sampler, VkImageView imageView, VkImageLayout imageLayout)
+        inline VkDescriptorImageInfo descriptor_image_info(VkSampler sampler, VkImageView image_view, VkImageLayout image_layout)
         {
-            VkDescriptorImageInfo descriptorImageInfo{};
-            descriptorImageInfo.sampler = sampler;
-            descriptorImageInfo.imageView = imageView;
-            descriptorImageInfo.imageLayout = imageLayout;
-            return descriptorImageInfo;
+            VkDescriptorImageInfo descriptor_image_info{};
+            descriptor_image_info.sampler = sampler;
+            descriptor_image_info.imageView = image_view;
+            descriptor_image_info.imageLayout = image_layout;
+            return descriptor_image_info;
         }
 
-        inline VkWriteDescriptorSet writeDescriptorSet(
-            VkDescriptorSet dstSet,
+        inline VkWriteDescriptorSet write_descriptor_set(
+            VkDescriptorSet dst_set,
             VkDescriptorType type,
             uint32_t binding,
-            VkDescriptorBufferInfo *bufferInfo,
-            uint32_t descriptorCount = 1)
+            VkDescriptorBufferInfo *buffer_info,
+            uint32_t descriptor_count = 1)
         {
-            VkWriteDescriptorSet writeDescriptorSet{};
-            writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            writeDescriptorSet.dstSet = dstSet;
-            writeDescriptorSet.descriptorType = type;
-            writeDescriptorSet.dstBinding = binding;
-            writeDescriptorSet.pBufferInfo = bufferInfo;
-            writeDescriptorSet.descriptorCount = descriptorCount;
-            return writeDescriptorSet;
+            VkWriteDescriptorSet write_descriptor_set{};
+            write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write_descriptor_set.dstSet = dst_set;
+            write_descriptor_set.descriptorType = type;
+            write_descriptor_set.dstBinding = binding;
+            write_descriptor_set.pBufferInfo = buffer_info;
+            write_descriptor_set.descriptorCount = descriptor_count;
+            return write_descriptor_set;
         }
 
-        inline VkWriteDescriptorSet writeDescriptorSet(
-            VkDescriptorSet dstSet,
+        inline VkWriteDescriptorSet write_descriptor_set(
+            VkDescriptorSet dst_set,
             VkDescriptorType type,
             uint32_t binding,
-            VkDescriptorImageInfo *imageInfo,
-            uint32_t descriptorCount = 1)
+            VkDescriptorImageInfo *image_info,
+            uint32_t descriptor_count = 1)
         {
-            VkWriteDescriptorSet writeDescriptorSet{};
-            writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            writeDescriptorSet.dstSet = dstSet;
-            writeDescriptorSet.descriptorType = type;
-            writeDescriptorSet.dstBinding = binding;
-            writeDescriptorSet.pImageInfo = imageInfo;
-            writeDescriptorSet.descriptorCount = descriptorCount;
-            return writeDescriptorSet;
+            VkWriteDescriptorSet write_descriptor_set{};
+            write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write_descriptor_set.dstSet = dst_set;
+            write_descriptor_set.descriptorType = type;
+            write_descriptor_set.dstBinding = binding;
+            write_descriptor_set.pImageInfo = image_info;
+            write_descriptor_set.descriptorCount = descriptor_count;
+            return write_descriptor_set;
         }
 
-        inline VkVertexInputBindingDescription vertexInputBindingDescription(
+        inline VkVertexInputBindingDescription vertex_input_binding_description(
             uint32_t binding,
             uint32_t stride,
-            VkVertexInputRate inputRate)
+            VkVertexInputRate input_rate)
         {
-            VkVertexInputBindingDescription vInputBindDescription{};
-            vInputBindDescription.binding = binding;
-            vInputBindDescription.stride = stride;
-            vInputBindDescription.inputRate = inputRate;
-            return vInputBindDescription;
+            VkVertexInputBindingDescription vertex_input_binding_description{};
+            vertex_input_binding_description.binding = binding;
+            vertex_input_binding_description.stride = stride;
+            vertex_input_binding_description.inputRate = input_rate;
+            return vertex_input_binding_description;
         }
 
-        inline VkVertexInputAttributeDescription vertexInputAttributeDescription(
+        inline VkVertexInputAttributeDescription vertex_input_attribute_description(
             uint32_t binding,
             uint32_t location,
             VkFormat format,
             uint32_t offset)
         {
-            VkVertexInputAttributeDescription vInputAttribDescription{};
-            vInputAttribDescription.location = location;
-            vInputAttribDescription.binding = binding;
-            vInputAttribDescription.format = format;
-            vInputAttribDescription.offset = offset;
-            return vInputAttribDescription;
+            VkVertexInputAttributeDescription vertex_input_attribute_description{};
+            vertex_input_attribute_description.location = location;
+            vertex_input_attribute_description.binding = binding;
+            vertex_input_attribute_description.format = format;
+            vertex_input_attribute_description.offset = offset;
+            return vertex_input_attribute_description;
         }
 
-        inline VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo()
+        inline VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state_create_info()
         {
-            VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo{};
-            pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-            return pipelineVertexInputStateCreateInfo;
+            VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state_create_info{};
+            pipeline_vertex_input_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+            return pipeline_vertex_input_state_create_info;
         }
 
-        inline VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo(
-            const std::vector<VkVertexInputBindingDescription> &vertexBindingDescriptions,
-            const std::vector<VkVertexInputAttributeDescription> &vertexAttributeDescriptions)
-        {
-            VkPipelineVertexInputStateCreateInfo pipelineVertexInputStateCreateInfo{};
-            pipelineVertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-            pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindingDescriptions.size());
-            pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions = vertexBindingDescriptions.data();
-            pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions.size());
-            pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions.data();
-            return pipelineVertexInputStateCreateInfo;
-        }
-
-        inline VkPipelineInputAssemblyStateCreateInfo pipelineInputAssemblyStateCreateInfo(
+        inline VkPipelineInputAssemblyStateCreateInfo pipeline_input_assembly_state_create_info(
             VkPrimitiveTopology topology,
             VkPipelineInputAssemblyStateCreateFlags flags,
-            VkBool32 primitiveRestartEnable)
+            VkBool32 primitive_restart_enable)
         {
-            VkPipelineInputAssemblyStateCreateInfo pipelineInputAssemblyStateCreateInfo{};
-            pipelineInputAssemblyStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-            pipelineInputAssemblyStateCreateInfo.topology = topology;
-            pipelineInputAssemblyStateCreateInfo.flags = flags;
-            pipelineInputAssemblyStateCreateInfo.primitiveRestartEnable = primitiveRestartEnable;
-            return pipelineInputAssemblyStateCreateInfo;
+            VkPipelineInputAssemblyStateCreateInfo pipeline_input_assembly_state_create_info{};
+            pipeline_input_assembly_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+            pipeline_input_assembly_state_create_info.topology = topology;
+            pipeline_input_assembly_state_create_info.flags = flags;
+            pipeline_input_assembly_state_create_info.primitiveRestartEnable = primitive_restart_enable;
+            return pipeline_input_assembly_state_create_info;
         }
 
-        inline VkPipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo(
-            VkPolygonMode polygonMode,
-            VkCullModeFlags cullMode,
-            VkFrontFace frontFace,
+        inline VkPipelineRasterizationStateCreateInfo pipeline_rasterization_state_create_info(
+            VkPolygonMode polygon_mode,
+            VkCullModeFlags cull_mode,
+            VkFrontFace front_face,
             VkPipelineRasterizationStateCreateFlags flags = 0)
         {
-            VkPipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo{};
-            pipelineRasterizationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-            pipelineRasterizationStateCreateInfo.polygonMode = polygonMode;
-            pipelineRasterizationStateCreateInfo.cullMode = cullMode;
-            pipelineRasterizationStateCreateInfo.frontFace = frontFace;
-            pipelineRasterizationStateCreateInfo.flags = flags;
-            pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
-            pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
-            return pipelineRasterizationStateCreateInfo;
+            VkPipelineRasterizationStateCreateInfo pipeline_rasterization_state_create_info{};
+            pipeline_rasterization_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+            pipeline_rasterization_state_create_info.polygonMode = polygon_mode;
+            pipeline_rasterization_state_create_info.cullMode = cull_mode;
+            pipeline_rasterization_state_create_info.frontFace = front_face;
+            pipeline_rasterization_state_create_info.flags = flags;
+            pipeline_rasterization_state_create_info.depthClampEnable = VK_FALSE;
+            pipeline_rasterization_state_create_info.lineWidth = 1.0f;
+            return pipeline_rasterization_state_create_info;
         }
 
-        inline VkPipelineColorBlendAttachmentState pipelineColorBlendAttachmentState(
-            VkColorComponentFlags colorWriteMask,
-            VkBool32 blendEnable)
+        inline VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state(
+            VkColorComponentFlags color_write_mask,
+            VkBool32 blend_enable)
         {
-            VkPipelineColorBlendAttachmentState pipelineColorBlendAttachmentState{};
-            pipelineColorBlendAttachmentState.colorWriteMask = colorWriteMask;
-            pipelineColorBlendAttachmentState.blendEnable = blendEnable;
-            return pipelineColorBlendAttachmentState;
+            VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state{};
+            pipeline_color_blend_attachment_state.colorWriteMask = color_write_mask;
+            pipeline_color_blend_attachment_state.blendEnable = blend_enable;
+            return pipeline_color_blend_attachment_state;
         }
 
-        inline VkPipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo(
-            uint32_t attachmentCount,
-            const VkPipelineColorBlendAttachmentState *pAttachments)
+        inline VkPipelineColorBlendStateCreateInfo pipeline_color_blend_state_create_info(
+            uint32_t attachment_count,
+            const VkPipelineColorBlendAttachmentState *attachments)
         {
-            VkPipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo{};
-            pipelineColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-            pipelineColorBlendStateCreateInfo.attachmentCount = attachmentCount;
-            pipelineColorBlendStateCreateInfo.pAttachments = pAttachments;
-            return pipelineColorBlendStateCreateInfo;
+            VkPipelineColorBlendStateCreateInfo pipeline_color_blend_state_create_info{};
+            pipeline_color_blend_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+            pipeline_color_blend_state_create_info.attachmentCount = attachment_count;
+            pipeline_color_blend_state_create_info.pAttachments = attachments;
+            return pipeline_color_blend_state_create_info;
         }
 
-        inline VkPipelineDepthStencilStateCreateInfo pipelineDepthStencilStateCreateInfo(
-            VkBool32 depthTestEnable,
-            VkBool32 depthWriteEnable,
-            VkCompareOp depthCompareOp)
+        inline VkPipelineDepthStencilStateCreateInfo pipeline_depth_stencil_state_create_info(
+            VkBool32 depth_test_enable,
+            VkBool32 depth_write_enable,
+            VkCompareOp depth_compare_op)
         {
-            VkPipelineDepthStencilStateCreateInfo pipelineDepthStencilStateCreateInfo{};
-            pipelineDepthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-            pipelineDepthStencilStateCreateInfo.depthTestEnable = depthTestEnable;
-            pipelineDepthStencilStateCreateInfo.depthWriteEnable = depthWriteEnable;
-            pipelineDepthStencilStateCreateInfo.depthCompareOp = depthCompareOp;
-            pipelineDepthStencilStateCreateInfo.back.compareOp = VK_COMPARE_OP_ALWAYS;
-            return pipelineDepthStencilStateCreateInfo;
+            VkPipelineDepthStencilStateCreateInfo pipeline_depth_stencil_state_create_info{};
+            pipeline_depth_stencil_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+            pipeline_depth_stencil_state_create_info.depthTestEnable = depth_test_enable;
+            pipeline_depth_stencil_state_create_info.depthWriteEnable = depth_write_enable;
+            pipeline_depth_stencil_state_create_info.depthCompareOp = depth_compare_op;
+            pipeline_depth_stencil_state_create_info.front = pipeline_depth_stencil_state_create_info.back;
+            pipeline_depth_stencil_state_create_info.back.compareOp = VK_COMPARE_OP_ALWAYS;
+            return pipeline_depth_stencil_state_create_info;
         }
 
-        inline VkPipelineViewportStateCreateInfo pipelineViewportStateCreateInfo(
-            uint32_t viewportCount,
-            uint32_t scissorCount,
+        inline VkPipelineViewportStateCreateInfo pipeline_viewport_state_create_info(
+            uint32_t viewport_count,
+            uint32_t scissor_count,
             VkPipelineViewportStateCreateFlags flags = 0)
         {
-            VkPipelineViewportStateCreateInfo pipelineViewportStateCreateInfo{};
-            pipelineViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-            pipelineViewportStateCreateInfo.viewportCount = viewportCount;
-            pipelineViewportStateCreateInfo.scissorCount = scissorCount;
-            pipelineViewportStateCreateInfo.flags = flags;
-            return pipelineViewportStateCreateInfo;
+            VkPipelineViewportStateCreateInfo pipeline_viewport_state_create_info{};
+            pipeline_viewport_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+            pipeline_viewport_state_create_info.viewportCount = viewport_count;
+            pipeline_viewport_state_create_info.scissorCount = scissor_count;
+            pipeline_viewport_state_create_info.flags = flags;
+            return pipeline_viewport_state_create_info;
         }
 
-        inline VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo(
-            VkSampleCountFlagBits rasterizationSamples,
+        inline VkPipelineMultisampleStateCreateInfo pipeline_multisample_state_create_info(
+            VkSampleCountFlagBits rasterization_samples,
             VkPipelineMultisampleStateCreateFlags flags = 0)
         {
-            VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo{};
-            pipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-            pipelineMultisampleStateCreateInfo.rasterizationSamples = rasterizationSamples;
-            pipelineMultisampleStateCreateInfo.flags = flags;
-            return pipelineMultisampleStateCreateInfo;
+            VkPipelineMultisampleStateCreateInfo pipeline_multisample_state_create_info{};
+            pipeline_multisample_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+            pipeline_multisample_state_create_info.rasterizationSamples = rasterization_samples;
+            pipeline_multisample_state_create_info.flags = flags;
+            return pipeline_multisample_state_create_info;
         }
 
-        inline VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo(
-            const VkDynamicState *pDynamicStates,
+        inline VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info(
+            const VkDynamicState *dynamic_states,
             uint32_t dynamicStateCount,
             VkPipelineDynamicStateCreateFlags flags = 0)
         {
-            VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo{};
-            pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-            pipelineDynamicStateCreateInfo.pDynamicStates = pDynamicStates;
-            pipelineDynamicStateCreateInfo.dynamicStateCount = dynamicStateCount;
-            pipelineDynamicStateCreateInfo.flags = flags;
-            return pipelineDynamicStateCreateInfo;
+            VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info{};
+            pipeline_dynamic_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+            pipeline_dynamic_state_create_info.pDynamicStates = dynamic_states;
+            pipeline_dynamic_state_create_info.dynamicStateCount = dynamicStateCount;
+            pipeline_dynamic_state_create_info.flags = flags;
+            return pipeline_dynamic_state_create_info;
         }
 
-        inline VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo(
-            const std::vector<VkDynamicState> &pDynamicStates,
+        inline VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info(
+            const std::vector<VkDynamicState> &dynamic_states,
             VkPipelineDynamicStateCreateFlags flags = 0)
         {
-            VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo{};
-            pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-            pipelineDynamicStateCreateInfo.pDynamicStates = pDynamicStates.data();
-            pipelineDynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(pDynamicStates.size());
-            pipelineDynamicStateCreateInfo.flags = flags;
-            return pipelineDynamicStateCreateInfo;
+            VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info{};
+            pipeline_dynamic_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+            pipeline_dynamic_state_create_info.pDynamicStates = dynamic_states.data();
+            pipeline_dynamic_state_create_info.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
+            pipeline_dynamic_state_create_info.flags = flags;
+            return pipeline_dynamic_state_create_info;
         }
 
-        inline VkPipelineTessellationStateCreateInfo pipelineTessellationStateCreateInfo(uint32_t patchControlPoints)
+        inline VkPipelineTessellationStateCreateInfo pipeline_tessellation_state_create_info(uint32_t patch_control_points)
         {
-            VkPipelineTessellationStateCreateInfo pipelineTessellationStateCreateInfo{};
-            pipelineTessellationStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
-            pipelineTessellationStateCreateInfo.patchControlPoints = patchControlPoints;
-            return pipelineTessellationStateCreateInfo;
+            VkPipelineTessellationStateCreateInfo pipeline_tessellation_state_create_info{};
+            pipeline_tessellation_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
+            pipeline_tessellation_state_create_info.patchControlPoints = patch_control_points;
+            return pipeline_tessellation_state_create_info;
         }
 
-        inline VkGraphicsPipelineCreateInfo pipelineCreateInfo(
+        inline VkGraphicsPipelineCreateInfo pipeline_create_info(
             VkPipelineLayout layout,
-            VkRenderPass renderPass,
+            VkRenderPass render_pass,
             VkPipelineCreateFlags flags = 0)
         {
-            VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
-            pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-            pipelineCreateInfo.layout = layout;
-            pipelineCreateInfo.renderPass = renderPass;
-            pipelineCreateInfo.flags = flags;
-            pipelineCreateInfo.basePipelineIndex = -1;
-            pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
-            return pipelineCreateInfo;
+            VkGraphicsPipelineCreateInfo pipeline_create_info{};
+            pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+            pipeline_create_info.layout = layout;
+            pipeline_create_info.renderPass = render_pass;
+            pipeline_create_info.flags = flags;
+            pipeline_create_info.basePipelineIndex = -1;
+            pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
+            return pipeline_create_info;
         }
 
-        inline VkGraphicsPipelineCreateInfo pipelineCreateInfo()
+        inline VkGraphicsPipelineCreateInfo pipeline_create_info()
         {
-            VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
-            pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-            pipelineCreateInfo.basePipelineIndex = -1;
-            pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
-            return pipelineCreateInfo;
+            VkGraphicsPipelineCreateInfo pipeline_create_info{};
+            pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+            pipeline_create_info.basePipelineIndex = -1;
+            pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
+            return pipeline_create_info;
         }
 
-        inline VkComputePipelineCreateInfo computePipelineCreateInfo(
+        inline VkComputePipelineCreateInfo compute_pipeline_create_info(
             VkPipelineLayout layout,
             VkPipelineCreateFlags flags = 0)
         {
-            VkComputePipelineCreateInfo computePipelineCreateInfo{};
-            computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-            computePipelineCreateInfo.layout = layout;
-            computePipelineCreateInfo.flags = flags;
-            return computePipelineCreateInfo;
+            VkComputePipelineCreateInfo compute_pipeline_create_info{};
+            compute_pipeline_create_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+            compute_pipeline_create_info.layout = layout;
+            compute_pipeline_create_info.flags = flags;
+            return compute_pipeline_create_info;
         }
 
-        inline VkPushConstantRange pushConstantRange(
-            VkShaderStageFlags stageFlags,
+        inline VkPushConstantRange push_constant_range(
+            VkShaderStageFlags stage_flags,
             uint32_t size,
             uint32_t offset)
         {
-            VkPushConstantRange pushConstantRange{};
-            pushConstantRange.stageFlags = stageFlags;
-            pushConstantRange.offset = offset;
-            pushConstantRange.size = size;
-            return pushConstantRange;
+            VkPushConstantRange push_constant_range{};
+            push_constant_range.stageFlags = stage_flags;
+            push_constant_range.offset = offset;
+            push_constant_range.size = size;
+            return push_constant_range;
         }
 
-        inline VkBindSparseInfo bindSparseInfo()
+        inline VkBindSparseInfo bind_sparse_info()
         {
-            VkBindSparseInfo bindSparseInfo{};
-            bindSparseInfo.sType = VK_STRUCTURE_TYPE_BIND_SPARSE_INFO;
-            return bindSparseInfo;
+            VkBindSparseInfo bind_sparse_info{};
+            bind_sparse_info.sType = VK_STRUCTURE_TYPE_BIND_SPARSE_INFO;
+            return bind_sparse_info;
         }
 
         /** @brief Initialize a map entry for a shader specialization constant */
-        inline VkSpecializationMapEntry specializationMapEntry(uint32_t constantID, uint32_t offset, size_t size)
+        inline VkSpecializationMapEntry specialization_map_entry(uint32_t constant_id, uint32_t offset, size_t size)
         {
-            VkSpecializationMapEntry specializationMapEntry{};
-            specializationMapEntry.constantID = constantID;
-            specializationMapEntry.offset = offset;
-            specializationMapEntry.size = size;
-            return specializationMapEntry;
+            VkSpecializationMapEntry specialization_map_entry{};
+            specialization_map_entry.constantID = constant_id;
+            specialization_map_entry.offset = offset;
+            specialization_map_entry.size = size;
+            return specialization_map_entry;
         }
 
         /** @brief Initialize a specialization constant info structure to pass to a shader stage */
-        inline VkSpecializationInfo specializationInfo(uint32_t mapEntryCount, const VkSpecializationMapEntry *mapEntries, size_t dataSize, const void *data)
+        inline VkSpecializationInfo specialization_info(uint32_t map_entry_count, const VkSpecializationMapEntry *map_entries, size_t data_size, const void *data)
         {
-            VkSpecializationInfo specializationInfo{};
-            specializationInfo.mapEntryCount = mapEntryCount;
-            specializationInfo.pMapEntries = mapEntries;
-            specializationInfo.dataSize = dataSize;
-            specializationInfo.pData = data;
-            return specializationInfo;
+            VkSpecializationInfo specialization_info{};
+            specialization_info.mapEntryCount = map_entry_count;
+            specialization_info.pMapEntries = map_entries;
+            specialization_info.dataSize = data_size;
+            specialization_info.pData = data;
+            return specialization_info;
         }
-
-        /** @brief Initialize a specialization constant info structure to pass to a shader stage */
-        inline VkSpecializationInfo specializationInfo(const std::vector<VkSpecializationMapEntry> &mapEntries, size_t dataSize, const void *data)
-        {
-            VkSpecializationInfo specializationInfo{};
-            specializationInfo.mapEntryCount = static_cast<uint32_t>(mapEntries.size());
-            specializationInfo.pMapEntries = mapEntries.data();
-            specializationInfo.dataSize = dataSize;
-            specializationInfo.pData = data;
-            return specializationInfo;
-        }
-
-        // Ray tracing related
-        inline VkAccelerationStructureGeometryKHR accelerationStructureGeometryKHR()
-        {
-            VkAccelerationStructureGeometryKHR accelerationStructureGeometryKHR{};
-            accelerationStructureGeometryKHR.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
-            return accelerationStructureGeometryKHR;
-        }
-
-        inline VkAccelerationStructureBuildGeometryInfoKHR accelerationStructureBuildGeometryInfoKHR()
-        {
-            VkAccelerationStructureBuildGeometryInfoKHR accelerationStructureBuildGeometryInfoKHR{};
-            accelerationStructureBuildGeometryInfoKHR.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-            return accelerationStructureBuildGeometryInfoKHR;
-        }
-
-        inline VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfoKHR()
-        {
-            VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfoKHR{};
-            accelerationStructureBuildSizesInfoKHR.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-            return accelerationStructureBuildSizesInfoKHR;
-        }
-
-        inline VkRayTracingShaderGroupCreateInfoKHR rayTracingShaderGroupCreateInfoKHR()
-        {
-            VkRayTracingShaderGroupCreateInfoKHR rayTracingShaderGroupCreateInfoKHR{};
-            rayTracingShaderGroupCreateInfoKHR.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
-            return rayTracingShaderGroupCreateInfoKHR;
-        }
-
-        inline VkRayTracingPipelineCreateInfoKHR rayTracingPipelineCreateInfoKHR()
-        {
-            VkRayTracingPipelineCreateInfoKHR rayTracingPipelineCreateInfoKHR{};
-            rayTracingPipelineCreateInfoKHR.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
-            return rayTracingPipelineCreateInfoKHR;
-        }
-
-        inline VkWriteDescriptorSetAccelerationStructureKHR writeDescriptorSetAccelerationStructureKHR()
-        {
-            VkWriteDescriptorSetAccelerationStructureKHR writeDescriptorSetAccelerationStructureKHR{};
-            writeDescriptorSetAccelerationStructureKHR.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
-            return writeDescriptorSetAccelerationStructureKHR;
-        }
-
     }
 }

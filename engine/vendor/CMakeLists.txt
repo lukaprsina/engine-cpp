@@ -35,7 +35,7 @@ macro(create_dependency)
     list(APPEND SUBMODULE_LIST ${TARGET_PATH})
   elseif(NOT "${TARGET_PACKAGE}" STREQUAL "")
     find_package(${TARGET_PACKAGE})
-   
+
     set(${TARGET_PATH}_FOUND ${${TARGET_PACKAGE}_FOUND})
     set(${TARGET_PATH}_INCLUDE_DIRS ${${TARGET_PACKAGE}_INCLUDE_DIRS})
     set(${TARGET_PATH}_LIBRARIES ${${TARGET_PACKAGE}_LIBRARIES})
@@ -137,8 +137,8 @@ if(${glm_FOUND})
   target_include_directories(engine PRIVATE ${glm_INCLUDE_DIRS})
 endif()
 
-# spdlog TODO definitions
-# set(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+# spdlog TODO definitions set(SPDLOG_FMT_EXTERNAL "Use external fmt library
+# instead of bundled" ON)
 
 create_dependency(
   PATH
@@ -282,22 +282,21 @@ if(${tinygltf_FOUND})
   target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIRS})
 endif()
 
-#imgui
+# imgui
 set(IMGUI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 set(IMGUI_BACKENDS_DIR ${IMGUI_SOURCE_DIR}/backends)
 set(IMGUI_FONTS_DIR ${IMGUI_SOURCE_DIR}/misc/fonts)
 
-set(IMGUI_SOURCES 
+set(IMGUI_SOURCES
     # Header files
     ${IMGUI_SOURCE_DIR}/imgui.h
     ${IMGUI_SOURCE_DIR}/imconfig.h
-    ${IMGUI_SOURCE_DIR}/imgui_internal.h    
+    ${IMGUI_SOURCE_DIR}/imgui_internal.h
     ${IMGUI_SOURCE_DIR}/imstb_rectpack.h
     ${IMGUI_SOURCE_DIR}/imstb_textedit.h
     ${IMGUI_SOURCE_DIR}/imstb_truetype.h
     ${IMGUI_BACKENDS_DIR}/imgui_impl_vulkan.h
     ${IMGUI_BACKENDS_DIR}/imgui_impl_glfw.h
-
     # Source files
     ${IMGUI_SOURCE_DIR}/imgui.cpp
     ${IMGUI_SOURCE_DIR}/imgui_tables.cpp
@@ -305,23 +304,32 @@ set(IMGUI_SOURCES
     ${IMGUI_SOURCE_DIR}/imgui_widgets.cpp
     ${IMGUI_SOURCE_DIR}/imgui_demo.cpp
     ${IMGUI_BACKENDS_DIR}/imgui_impl_vulkan.cpp
-    ${IMGUI_BACKENDS_DIR}/imgui_impl_glfw.cpp   
-)
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_glfw.cpp)
 
 if(ENG_PLATFORM EQUAL VK_USE_PLATFORM_WIN32_KHR)
-    list(APPEND IMGUI_SOURCES
-        # Header files
-        ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.h
-
-        # Source files
-        ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.cpp)
+  list(
+    APPEND
+    IMGUI_SOURCES
+    # Header files
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.h
+    # Source files
+    ${IMGUI_BACKENDS_DIR}/imgui_impl_win32.cpp)
 endif()
 
-create_dependency(PATH "imgui" SOURCES ${IMGUI_SOURCES} LIB "imgui" NO_CMAKE)
+create_dependency(
+  PATH
+  "imgui"
+  SOURCES
+  ${IMGUI_SOURCES}
+  LIB
+  "imgui"
+  NO_CMAKE)
 if(${imgui_FOUND})
-  target_include_directories(${imgui_LIBRARIES} PUBLIC ${imgui_INCLUDE_DIRS} ${vulkan_INCLUDE_DIRS} ${glfw_INCLUDE_DIRS})
-  target_link_libraries(${imgui_LIBRARIES} PUBLIC ${vulkan_LIBRARIES} ${glfw_LIBRARIES})
-  message("ADSADASDASDASD " ${imgui_LIBRARIES})
+  target_include_directories(
+    ${imgui_LIBRARIES} PUBLIC ${imgui_INCLUDE_DIRS} ${vulkan_INCLUDE_DIRS}
+                              ${glfw_INCLUDE_DIRS})
+  target_link_libraries(${imgui_LIBRARIES} PUBLIC ${vulkan_LIBRARIES}
+                                                  ${glfw_LIBRARIES})
   target_link_libraries(engine PUBLIC ${imgui_LIBRARIES})
 endif()
 

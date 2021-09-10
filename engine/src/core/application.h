@@ -18,6 +18,7 @@ namespace engine
     class RenderTarget;
     class RenderPipeline;
     class CommandBuffer;
+    class Gui;
 
     class Application
     {
@@ -33,7 +34,7 @@ namespace engine
         void OnEvent(Event &event);
         bool OnWindowClose(WindowCloseEvent &event);
         bool OnResize(WindowResizeEvent &event);
-        bool OnKeyPressed(KeyPressedEvent& event);
+        bool OnKeyPressed(KeyPressedEvent &event);
 
         bool Prepare();
         void Step();
@@ -89,6 +90,7 @@ namespace engine
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
         std::unique_ptr<Scene> m_Scene{};
+        std::unique_ptr<Gui> m_Gui{};
         std::unique_ptr<RenderContext> m_RenderContext{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
 

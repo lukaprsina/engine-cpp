@@ -346,7 +346,6 @@ namespace engine
         create_info.compositeAlpha = m_Properties.composite_alpha;
         create_info.oldSwapchain = m_Properties.old_swapchain;
         create_info.surface = m_Surface;
-        ENG_CORE_TRACE("Min image count: {}", create_info.minImageCount);
 
         VkResult result = vkCreateSwapchainKHR(m_Device.GetHandle(), &create_info, nullptr, &m_Handle);
 

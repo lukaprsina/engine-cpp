@@ -53,6 +53,7 @@ namespace engine
 
         bool HandleSurfaceChanges(bool force_update = false);
         RenderFrame &GetActiveFrame();
+        std::unique_ptr<Swapchain> &GetSwapchain() { return m_Swapchain; }
 
         void BeginFrame();
         void WaitFrame();

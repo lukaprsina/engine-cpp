@@ -69,6 +69,22 @@ namespace engine
                                   const std::vector<LoadStoreInfo> &load_store_infos,
                                   const std::vector<std::unique_ptr<Subpass>> &subpasses);
 
+        template <typename T>
+        void PushConstants(const T &value)
+        {
+            auto data = ToBytes(value);
+
+            uint32_t size = ToUint32_t(m_StoredPushConstants.size() + data.size());
+
+            if (size > m_MaxPushConstantsSize)
+            {
+                ENG_CORE_ERROR("Push constant limit exceeded ({} / {} bytes)", size, m_MaxPushConstantsSize);
+                throw std::runtime_error("Cannot overflow push constant limit");
+            }
+
+            m_StoredPushConstants.insert(m_StoredPushConstants.end(), data.begin(), data.end());
+        }
+
         void PushConstants(const std::vector<uint8_t> &values);
 
         void BindBuffer(const core::Buffer &buffer, VkDeviceSize offset, VkDeviceSize range, uint32_t set, uint32_t binding, uint32_t array_element);

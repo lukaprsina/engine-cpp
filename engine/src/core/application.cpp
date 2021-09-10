@@ -1,6 +1,7 @@
 #include "core/application.h"
 
 #include "core/timer.h"
+#include "core/gui.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "window/input.h"
@@ -18,8 +19,6 @@
 #include "scene/scene.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
-
-#include <imgui.h>
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -56,7 +55,6 @@ namespace engine
             m_Device->WaitIdle();
 
         m_Scene.reset();
-
         m_RenderContext.reset();
         m_Device.reset();
 
@@ -131,7 +129,12 @@ namespace engine
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
-        ImGui::CreateContext();
+        m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
+
+        m_LayerStack.PushLayer(m_Gui.get());
+
+        for (Layer *layer : m_LayerStack.GetLayers())
+            layer->OnAttach();
 
         return true;
     }
@@ -163,10 +166,11 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
-        for (auto &layer : m_LayerStack.GetLayers())
+        UpdateScene(delta_time);
+
+        for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
 
-        UpdateScene(delta_time);
         auto &command_buffer = m_RenderContext->Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         Draw(command_buffer);
@@ -226,6 +230,9 @@ namespace engine
         if (m_RenderPipeline)
             m_RenderPipeline->Draw(command_buffer,
                                    m_RenderContext->GetActiveFrame().GetRenderTarget());
+
+        for (Layer *layer : m_LayerStack.GetLayers())
+            layer->OnDraw(command_buffer);
 
         command_buffer.EndRenderPass();
 
