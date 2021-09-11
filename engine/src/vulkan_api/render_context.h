@@ -64,6 +64,7 @@ namespace engine
 
         Device &GetDevice() { return m_Device; }
         VkExtent2D &GetSurfaceExtent() { return m_SurfaceExtent; }
+        const QueueFamily &GetQueueFamily() const { return m_QueueFamily; }
 
     private:
         Device &m_Device;

@@ -52,6 +52,9 @@ namespace engine
             m_Name = name;
         }
         std::string GetName() const { return m_Name; };
+        Platform &GetPlatform() { return *m_Platform; };
+        Instance &GetInstance() { return *m_Instance; };
+        Device &GetDevice() { return *m_Device; };
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }

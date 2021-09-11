@@ -19,6 +19,7 @@ namespace engine
 
         const QueueFamily &GetQueueFamily() const { return m_QueueFamily; }
         uint32_t GetIndex() const { return m_Index; }
+        VkQueue GetHandle() const { return m_Handle; }
 
     private:
         Device &m_Device;

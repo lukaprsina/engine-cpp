@@ -54,6 +54,8 @@ namespace engine
                                         const RenderPass &render_pass);
 
         void SetPipelineCache(VkPipelineCache pipeline_cache);
+        VkPipelineCache GetPipelineCache() { return m_PipelineCache; }
+
         void ClearPipelines();
         void UpdateDescriptorSets(const std::vector<core::ImageView> &old_views, const std::vector<core::ImageView> &new_views);
         void ClearFramebuffers();

@@ -50,19 +50,15 @@ namespace engine
     {
     public:
         Gui(Application &application,
-            const Window &window,
+            Window &window,
             const float font_size = 21.0f,
             bool explicit_update = false);
         ~Gui();
 
-        void Prepare(const VkPipelineCache pipeline_cache, const VkRenderPass render_pass,
-                     const std::vector<VkPipelineShaderStageCreateInfo> &shader_stages);
-
+        void Draw(CommandBuffer &command_buffer);
         void NewFrame();
-
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
-        void Draw(CommandBuffer &command_buffer);
 
         void OnEvent(Event &event) override;
         bool OnKeyPressed(KeyPressedEvent &event);
@@ -70,6 +66,7 @@ namespace engine
         bool OnMouseButtonPressed(MouseButtonPressedEvent &event);
         bool OnMouseButtonReleased(MouseButtonReleasedEvent &event);
         bool OnMouseMoved(MouseMovedEvent &event);
+        bool OnMouseScrolled(MouseScrolledEvent &event);
 
         static const std::string default_font;
 
