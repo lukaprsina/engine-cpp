@@ -15,6 +15,7 @@ namespace engine
 
         ~GlfwWindow();
 
+        static void Init();
         void ProcessEvents() override;
         VkSurfaceKHR CreateSurface(Instance &instance) override;
         bool ShouldClose() const override;
@@ -22,6 +23,6 @@ namespace engine
         void *GetNativeWindow() override { return reinterpret_cast<void *>(m_Handle); }
 
     private:
-        GLFWwindow *m_Handle{nullptr};       
+        GLFWwindow *m_Handle{nullptr};
     };
 }

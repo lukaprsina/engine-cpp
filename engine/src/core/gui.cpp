@@ -1,7 +1,8 @@
 #include "core/gui.h"
 
 #include "window/input.h"
-#include "window/window.h"
+#include "window/glfw_window.h"
+#include "vulkan_api/render_context.h"
 #include "vulkan_api/device.h"
 #include "core/application.h"
 #include "vulkan_api/render_context.h"
@@ -111,6 +112,35 @@ namespace engine
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
+                                                             VK_PRESENT_MODE_FIFO_KHR,
+                                                             VK_PRESENT_MODE_MAILBOX_KHR});
+
+        std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+
+        WindowSettings settings;
+        m_Window = std::make_unique<GlfwWindow>(m_Application.GetPlatform(), settings);
+        m_Window->SetEventCallback(std::bind(&Application::OnEvent, &m_Application, std::placeholders::_1));
+
+        auto surface = m_Window->CreateSurface(m_Application.GetInstance());
+
+        m_RenderContext = std::make_unique<RenderContext>(m_Application.GetDevice(),
+                                                          surface,
+                                                          present_mode_priority,
+                                                          surface_format_priority,
+                                                          1280,
+                                                          720);
+
+        ImGuiStyle &style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
 
         ImGui_ImplVulkan_Data *bd = IM_NEW(ImGui_ImplVulkan_Data)();
         io.BackendRendererUserData = (void *)bd;
@@ -243,6 +273,35 @@ namespace engine
         ImGui::DestroyContext();
     }
 
+    void Gui::NewFrame()
+    {
+        ImGui_ImplVulkan_Data *bd = ImGui::GetCurrentContext() ? (ImGui_ImplVulkan_Data *)ImGui::GetIO().BackendRendererUserData : NULL;
+        ENG_ASSERT(bd != NULL);
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void Gui::OnUpdate(float delta_time)
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        NewFrame();
+        ImGui::ShowDemoWindow();
+        auto extent = m_Application.GetRenderContext().GetSurfaceExtent();
+        Resize(extent.width, extent.height);
+        io.DeltaTime = delta_time;
+        ImGui::Render();
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            ImGui::UpdatePlatformWindows();
+    }
+
+    void Gui::Resize(const uint32_t width, const uint32_t height) const
+    {
+        auto &io = ImGui::GetIO();
+        io.DisplaySize.x = static_cast<float>(width);
+        io.DisplaySize.y = static_cast<float>(height);
+    }
+
     void Gui::Draw(CommandBuffer &command_buffer)
     {
         // Vertex input state
@@ -343,6 +402,21 @@ namespace engine
 
         // Render commands
         ImDrawData *draw_data = ImGui::GetDrawData();
+        Render(draw_data, swapchain.get(), command_buffer);
+
+        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
+        for (int i = 1; i < platform_io.Viewports.Size; i++)
+        {
+            ImGuiViewport *viewport = platform_io.Viewports[i];
+            ImDrawData *draw_data = viewport->DrawData;
+            // Render(draw_data, swapchain.get(), command_buffer);
+            Render(draw_data, m_RenderContext->GetSwapchain().get(), command_buffer);
+        }
+    }
+
+    void Gui::Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer)
+    {
+        auto &io = ImGui::GetIO();
         int32_t vertex_offset = 0;
         uint32_t index_offset = 0;
 
@@ -437,32 +511,6 @@ namespace engine
         index_allocation.Update(index_data);
 
         command_buffer.BindIndexBuffer(index_allocation.GetBuffer(), index_allocation.GetOffset(), VK_INDEX_TYPE_UINT16);
-    }
-
-    void Gui::NewFrame()
-    {
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-    }
-
-    void Gui::OnUpdate(float delta_time)
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        NewFrame();
-        ImGui::ShowDemoWindow();
-        auto extent = m_Application.GetRenderContext().GetSurfaceExtent();
-        Resize(extent.width, extent.height);
-        io.DeltaTime = delta_time;
-        ImGui::Render();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-    }
-
-    void Gui::Resize(const uint32_t width, const uint32_t height) const
-    {
-        auto &io = ImGui::GetIO();
-        io.DisplaySize.x = static_cast<float>(width);
-        io.DisplaySize.y = static_cast<float>(height);
     }
 
     void Gui::OnEvent(Event &event)

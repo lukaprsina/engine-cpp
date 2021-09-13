@@ -55,6 +55,7 @@ namespace engine
     void Platform::MainLoop()
     {
         ENG_CORE_INFO("Starting the main loop.");
+
         while (!m_Window->ShouldClose())
         {
             if (!m_Window->GetSettings().minimized)

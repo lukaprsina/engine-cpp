@@ -16,6 +16,8 @@ namespace engine
     class CommandBuffer;
     class RenderTarget;
     class RenderFrame;
+    class Swapchain;
+    class RenderContext;
 
     namespace core
     {
@@ -55,10 +57,11 @@ namespace engine
             bool explicit_update = false);
         ~Gui();
 
-        void Draw(CommandBuffer &command_buffer);
         void NewFrame();
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
+        void Draw(CommandBuffer &command_buffer);
+        void Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer);
 
         void OnEvent(Event &event) override;
         bool OnKeyPressed(KeyPressedEvent &event);
@@ -76,6 +79,9 @@ namespace engine
         std::vector<Font> m_Fonts;
         std::unique_ptr<core::Image> m_FontImage;
         std::unique_ptr<core::ImageView> m_FontImageView;
+
+        std::unique_ptr<RenderContext> m_RenderContext;
+        std::unique_ptr<Window> m_Window;
 
         std::unique_ptr<core::Buffer> m_VertexBuffer;
         std::unique_ptr<core::Buffer> m_IndexBuffer;

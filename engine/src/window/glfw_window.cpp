@@ -29,7 +29,6 @@ namespace engine
         void WindowSizeCallback(GLFWwindow *window, int width, int height)
         {
             WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
-            // ENG_ASSERT(width != 0 && height != 0, "Minimization not yet supported");
 
             data.width = width;
             data.height = height;
@@ -130,9 +129,7 @@ namespace engine
         }
     }
 
-    GlfwWindow::GlfwWindow(Platform &platform,
-                           WindowSettings &settings)
-        : Window(platform, settings)
+    void GlfwWindow::Init()
     {
         if (!glfwInit())
             throw std::runtime_error("GLFW couldn't be initialized.");
@@ -140,7 +137,12 @@ namespace engine
         glfwSetErrorCallback(ErrorCallback);
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    }
 
+    GlfwWindow::GlfwWindow(Platform &platform,
+                           WindowSettings &settings)
+        : Window(platform, settings)
+    {
         const Options &options = platform.GetApp().GetOptions();
 
         if (options.Contains("--width"))

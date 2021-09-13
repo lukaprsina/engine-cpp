@@ -63,7 +63,10 @@ namespace engine
             m_Window = std::make_unique<HeadlessWindow>(*this, settings);
 
         else
+        {
+            GlfwWindow::Init();
             m_Window = std::make_unique<GlfwWindow>(*this, settings);
+        }
     }
 
     const char *UnixPlatform::GetSurfaceExtension()
