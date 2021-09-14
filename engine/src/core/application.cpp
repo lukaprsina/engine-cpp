@@ -59,7 +59,7 @@ namespace engine
         m_Scene.reset();
         m_Gui.reset();
 
-        m_RenderContext.reset();
+        m_Platform->GetWindow(m_Surface).DeleteRenderContext();
         m_Device.reset();
 
         if (m_Surface != VK_NULL_HANDLE)
@@ -81,7 +81,7 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
-        m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
+        m_Surface = m_Platform->CreatePlatformWindow(*m_Instance.get());
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
@@ -101,13 +101,11 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        m_RenderContext = std::make_unique<RenderContext>(*m_Device,
-                                                          m_Surface,
-                                                          present_mode_priority,
-                                                          surface_format_priority,
-                                                          m_Platform->GetWindow().GetSettings().width,
-                                                          m_Platform->GetWindow().GetSettings().height);
+        m_Platform->GetWindow(m_Surface).CreateRenderContext(*m_Device.get(),
+                                                             present_mode_priority,
+                                                             surface_format_priority);
 
+        m_RenderContext = &m_Platform->GetWindow(m_Surface).GetRenderContext();
         m_RenderContext->Prepare();
 
         ShaderSource vert_shader("base.vert");
@@ -125,7 +123,7 @@ namespace engine
 
         m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
 
-        auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
+        auto scene_subpass = std::make_unique<ForwardSubpass>(*m_RenderContext,
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
                                                               *m_Scene);
@@ -133,7 +131,7 @@ namespace engine
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
-        m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
+        m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow(m_Surface));
 
         m_LayerStack.PushLayer(m_Gui.get());
 
@@ -296,9 +294,9 @@ namespace engine
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
         {
-            auto window_settings = m_Platform->GetWindow().GetSettings();
+            auto window_settings = m_Platform->GetWindow(m_Surface).GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
-            m_Platform->GetWindow().SetSettings(window_settings);
+            m_Platform->GetWindow(m_Surface).SetSettings(window_settings);
         }
 
         return false;

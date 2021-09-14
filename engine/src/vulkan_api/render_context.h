@@ -19,6 +19,7 @@ namespace engine
                       std::vector<VkSurfaceFormatKHR> surface_format_priority,
                       uint32_t width,
                       uint32_t height);
+
         ~RenderContext();
 
         void UpdateSwapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform);

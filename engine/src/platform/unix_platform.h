@@ -17,7 +17,7 @@ namespace engine
         virtual ~UnixPlatform() = default;
 
         virtual bool Initialize(std::unique_ptr<Application> &&app) override;
-        virtual void CreatePlatformWindow() override;
+        virtual VkSurfaceKHR CreatePlatformWindow(Instance &instance) override;
         virtual const char *GetSurfaceExtension() override;
 
     private:

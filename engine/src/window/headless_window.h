@@ -8,7 +8,8 @@ namespace engine
     {
     public:
         HeadlessWindow(Platform &platform,
-                       WindowSettings &settings);
+                       WindowSettings &settings,
+                       VkSurfaceKHR &surface);
 
         ~HeadlessWindow();
 

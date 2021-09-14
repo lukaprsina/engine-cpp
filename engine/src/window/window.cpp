@@ -9,7 +9,7 @@ namespace engine
     {
     }
 
-    void Window::SetSettings(WindowSettings& settings)
+    void Window::SetSettings(WindowSettings &settings)
     {
         m_Settings = settings;
         m_Dirty = true;

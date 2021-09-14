@@ -32,15 +32,6 @@ namespace engine
 
         CreatePlatformWindow();
 
-        if (!m_Window)
-            throw std::runtime_error("Can't create window!");
-        else
-            ENG_CORE_INFO("Window created!");
-
-        Input::m_WindowPointer = m_Window->GetNativeWindow();
-
-        m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
-
         return true;
     }
 

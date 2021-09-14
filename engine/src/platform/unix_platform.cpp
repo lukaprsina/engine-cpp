@@ -1,6 +1,7 @@
 #include "platform/unix_platform.h"
 
 #include "window/glfw_window.h"
+#include "window/input.h"
 #include "window/headless_window.h"
 #include "events/event.h"
 #include "platform/filesystem.h"
@@ -55,18 +56,33 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    void UnixPlatform::CreatePlatformWindow()
+    VkSurfaceKHR UnixPlatform::CreatePlatformWindow(Instance &instance)
     {
         WindowSettings settings;
+        VkSurfaceKHR surface;
+
+        std::unique_ptr<Window> window;
 
         if (m_App->IsHeadless())
-            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
+        {
+            window = std::make_unique<HeadlessWindow>(*this, settings, surface);
+        }
 
         else
         {
             GlfwWindow::Init();
-            m_Window = std::make_unique<GlfwWindow>(*this, settings);
+            window = std::make_unique<GlfwWindow>(*this, settings, instance, surface);
         }
+
+        if (!GetWindow(surface).GetNativeWindow())
+            throw std::runtime_error("Can't create window!");
+        else
+            ENG_CORE_INFO("Window created!");
+
+        Input::m_WindowPointer = window->GetNativeWindow();
+        window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+
+        return surface;
     }
 
     const char *UnixPlatform::GetSurfaceExtension()

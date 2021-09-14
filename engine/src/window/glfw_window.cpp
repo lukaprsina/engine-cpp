@@ -1,6 +1,7 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
+#include "vulkan_api/instance.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
@@ -140,8 +141,10 @@ namespace engine
     }
 
     GlfwWindow::GlfwWindow(Platform &platform,
-                           WindowSettings &settings)
-        : Window(platform, settings)
+                           WindowSettings &settings,
+                           Instance &instance,
+                           VkSurfaceKHR &surface)
+        : Window(platform, settings), m_Surface(surface)
     {
         const Options &options = platform.GetApp().GetOptions();
 
@@ -176,6 +179,8 @@ namespace engine
         glfwSetMouseButtonCallback(m_Handle, MouseButtonCallback);
         glfwSetScrollCallback(m_Handle, ScrollCallback);
         glfwSetCursorPosCallback(m_Handle, CursorPositionCallback);
+
+        surface = CreateSurface(instance);
     }
 
     GlfwWindow::~GlfwWindow()
@@ -184,6 +189,18 @@ namespace engine
             glfwDestroyWindow(m_Handle);
 
         glfwTerminate();
+    }
+
+    void GlfwWindow::CreateRenderContext(Device &device,
+                                         std::vector<VkPresentModeKHR> &present_mode_priority,
+                                         std::vector<VkSurfaceFormatKHR> &surface_format_priority)
+    {
+        m_RenderContext = std::make_unique<RenderContext>(device,
+                                                          m_Surface,
+                                                          present_mode_priority,
+                                                          surface_format_priority,
+                                                          m_Settings.width,
+                                                          m_Settings.height);
     }
 
     void GlfwWindow::ProcessEvents()
