@@ -27,10 +27,9 @@ namespace engine
         virtual void MainLoop();
         void Run();
         virtual void Terminate(ExitCode code);
-        virtual void Close() const;
 
         virtual VkSurfaceKHR CreatePlatformWindow(Instance &instance) = 0;
-        Window &GetWindow(VkSurfaceKHR surface) const { return *m_Windows.at(surface).get(); }
+        Window *GetWindow(VkSurfaceKHR surface) const { return m_Windows.at(surface).get(); }
         Application &GetApp() const { return *m_App; }
         virtual const char *GetSurfaceExtension() = 0;
 

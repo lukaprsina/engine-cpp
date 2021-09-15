@@ -3,6 +3,7 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
+#include "window/window.h"
 
 #include <filesystem>
 
@@ -30,8 +31,6 @@ namespace engine
         bool is_headless = m_App->GetOptions().Contains("--headless");
         m_App->SetHeadless(is_headless);
 
-        CreatePlatformWindow();
-
         return true;
     }
 
@@ -46,12 +45,13 @@ namespace engine
     void Platform::MainLoop()
     {
         ENG_CORE_INFO("Starting the main loop.");
+        auto &window = m_Windows.at(m_App->GetSurface());
 
-        while (!m_Window->ShouldClose())
+        while (window->ShouldClose())
         {
-            if (!m_Window->GetSettings().minimized)
+            if (!window->GetSettings().minimized)
                 Run();
-            m_Window->ProcessEvents();
+            window->ProcessEvents();
         }
     }
 
@@ -66,13 +66,8 @@ namespace engine
             m_App->Finish();
 
         m_App.reset();
-        m_Window.reset();
+        m_Windows.at(m_App->GetSurface()).reset();
 
         spdlog::drop_all();
-    }
-
-    void Platform::Close() const
-    {
-        m_Window->Close();
     }
 }

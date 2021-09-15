@@ -5,6 +5,7 @@
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
+#include "vulkan_api/render_context.h"
 
 ENG_DISABLE_WARNINGS()
 #define GLFW_INCLUDE_NONE

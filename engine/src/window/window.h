@@ -27,7 +27,7 @@ namespace engine
     {
     public:
         Window(Platform &platform, WindowSettings &settings);
-        virtual ~Window() = default;
+        virtual ~Window();
 
         virtual void ProcessEvents(){};
         virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
@@ -35,16 +35,16 @@ namespace engine
         virtual void Close() = 0;
         virtual void *GetNativeWindow() = 0;
 
-        RenderContext &GetRenderContext()
+        RenderContext *GetRenderContext()
         {
             ENG_ASSERT(m_RenderContext, "Render context is not valid");
-            return *m_RenderContext;
+            return m_RenderContext.get();
         }
 
         void CreateRenderContext(Device &device,
                                  std::vector<VkPresentModeKHR> &present_mode_priority,
                                  std::vector<VkSurfaceFormatKHR> &surface_format_priority) {}
-        void DeleteRenderContext() { m_RenderContext.reset(); }
+        void DeleteRenderContext();
 
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }

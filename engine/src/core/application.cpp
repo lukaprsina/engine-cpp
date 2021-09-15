@@ -59,7 +59,7 @@ namespace engine
         m_Scene.reset();
         m_Gui.reset();
 
-        m_Platform->GetWindow(m_Surface).DeleteRenderContext();
+        m_Platform->GetWindow(m_Surface)->DeleteRenderContext();
         m_Device.reset();
 
         if (m_Surface != VK_NULL_HANDLE)
@@ -101,11 +101,11 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        m_Platform->GetWindow(m_Surface).CreateRenderContext(*m_Device.get(),
-                                                             present_mode_priority,
-                                                             surface_format_priority);
+        m_Platform->GetWindow(m_Surface)->CreateRenderContext(*m_Device.get(),
+                                                              present_mode_priority,
+                                                              surface_format_priority);
 
-        m_RenderContext = &m_Platform->GetWindow(m_Surface).GetRenderContext();
+        m_RenderContext = m_Platform->GetWindow(m_Surface)->GetRenderContext();
         m_RenderContext->Prepare();
 
         ShaderSource vert_shader("base.vert");
@@ -272,7 +272,6 @@ namespace engine
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
     {
-        m_Platform->Close();
         return false;
     }
 
@@ -294,9 +293,9 @@ namespace engine
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
         {
-            auto window_settings = m_Platform->GetWindow(m_Surface).GetSettings();
+            auto window_settings = m_Platform->GetWindow(m_Surface)->GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
-            m_Platform->GetWindow(m_Surface).SetSettings(window_settings);
+            m_Platform->GetWindow(m_Surface)->SetSettings(window_settings);
         }
 
         return false;

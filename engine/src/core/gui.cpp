@@ -1027,15 +1027,15 @@ namespace engine
     const std::string Gui::default_font = "Roboto-Medium";
 
     Gui::Gui(Application &application,
-             Window &window,
+             Window *window,
              const float font_size,
              bool explicit_update)
         : m_Application(application), m_ExplicitUpdate(explicit_update)
     {
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        auto &render_context = m_Application.GetPlatform().GetWindow(m_Application.GetSurface()).GetRenderContext();
-        auto &extent = render_context.GetSurfaceExtent();
+        m_RenderContext = m_Application.GetPlatform().GetWindow(m_Application.GetSurface())->GetRenderContext();
+        auto &extent = m_RenderContext->GetSurfaceExtent();
 
         io.DisplaySize.x = static_cast<float>(extent.width);
         io.DisplaySize.y = static_cast<float>(extent.height);
@@ -1044,29 +1044,7 @@ namespace engine
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
-                                                             VK_PRESENT_MODE_FIFO_KHR,
-                                                             VK_PRESENT_MODE_MAILBOX_KHR});
-
-        std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
-                                                                 {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
-                                                                 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
-                                                                 {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
-
-        WindowSettings settings;
-        m_Window = std::make_unique<GlfwWindow>(m_Application.GetPlatform(), settings);
-        m_Window->SetEventCallback(std::bind(&Application::OnEvent, &m_Application, std::placeholders::_1));
-
-        auto surface = m_Window->CreateSurface(m_Application.GetInstance());
-
-        m_RenderContext = std::make_unique<RenderContext>(m_Application.GetDevice(),
-                                                          surface,
-                                                          present_mode_priority,
-                                                          surface_format_priority,
-                                                          1280,
-                                                          720);
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         ImGuiStyle &style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -1097,7 +1075,7 @@ namespace engine
         io.Fonts->GetTexDataAsRGBA32(&font_data, &tex_width, &tex_height);
         size_t upload_size = tex_width * tex_height * 4 * sizeof(char);
 
-        auto &device = render_context.GetDevice();
+        auto &device = m_RenderContext->GetDevice();
 
         // Create target image for copy
         VkExtent3D font_extent{ToUint32_t(tex_width), ToUint32_t(tex_height), 1u};
@@ -1188,17 +1166,17 @@ namespace engine
 
         if (explicit_update)
         {
-            m_VertexBuffer = std::make_unique<core::Buffer>(render_context.GetDevice(), 1, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
-            m_IndexBuffer = std::make_unique<core::Buffer>(render_context.GetDevice(), 1, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
+            m_VertexBuffer = std::make_unique<core::Buffer>(m_RenderContext->GetDevice(), 1, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
+            m_IndexBuffer = std::make_unique<core::Buffer>(m_RenderContext->GetDevice(), 1, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
         }
 
-        auto glfw_window = reinterpret_cast<GLFWwindow *>(window.GetNativeWindow());
+        auto glfw_window = reinterpret_cast<GLFWwindow *>(window->GetNativeWindow());
         ImGui_ImplGlfw_InitForVulkan(glfw_window, true);
     }
 
     Gui::~Gui()
     {
-        auto &device = render_context.GetDevice();
+        auto &device = m_RenderContext->GetDevice();
         vkDestroyDescriptorPool(device.GetHandle(), m_DescriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(device.GetHandle(), m_DescriptorSetLayout, nullptr);
         vkDestroyPipeline(device.GetHandle(), m_Pipeline, nullptr);
@@ -1219,7 +1197,7 @@ namespace engine
         ImGuiIO &io = ImGui::GetIO();
         NewFrame();
         ImGui::ShowDemoWindow();
-        auto extent = render_context.GetSurfaceExtent();
+        auto extent = m_RenderContext->GetSurfaceExtent();
         Resize(extent.width, extent.height);
         io.DeltaTime = delta_time;
         ImGui::Render();
@@ -1295,7 +1273,7 @@ namespace engine
         auto &io = ImGui::GetIO();
         auto push_transform = glm::mat4(1.0f);
 
-        auto &swapchain = render_context.GetSwapchain();
+        auto &swapchain = m_RenderContext->GetSwapchain();
 
         if (swapchain != nullptr)
         {
@@ -1322,7 +1300,7 @@ namespace engine
         // If a render context is used, then use the frames buffer pools to allocate GUI vertex/index data from
         if (!m_ExplicitUpdate)
         {
-            UpdateBuffers(command_buffer, render_context.GetActiveFrame());
+            UpdateBuffers(command_buffer, m_RenderContext->GetActiveFrame());
         }
         else
         {
@@ -1427,7 +1405,7 @@ namespace engine
 
         UploadDrawData(draw_data, vertex_data.data(), index_data.data());
 
-        // auto &render_frame = render_context.GetActiveFrame();
+        // auto &render_frame = m_RenderContext->GetActiveFrame();
         auto vertex_allocation = render_frame.AllocateBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_buffer_size);
 
         vertex_allocation.Update(vertex_data);

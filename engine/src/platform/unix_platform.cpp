@@ -61,26 +61,30 @@ namespace engine
         WindowSettings settings;
         VkSurfaceKHR surface;
 
-        std::unique_ptr<Window> window;
-
-        if (m_App->IsHeadless())
         {
-            window = std::make_unique<HeadlessWindow>(*this, settings, surface);
+            std::unique_ptr<Window> window;
+
+            if (m_App->IsHeadless())
+            {
+                window = std::make_unique<HeadlessWindow>(*this, settings, surface);
+            }
+
+            else
+            {
+                GlfwWindow::Init();
+                window = std::make_unique<GlfwWindow>(*this, settings, instance, surface);
+            }
+
+            m_Windows.emplace(surface, std::move(window));
         }
 
-        else
-        {
-            GlfwWindow::Init();
-            window = std::make_unique<GlfwWindow>(*this, settings, instance, surface);
-        }
-
-        if (!GetWindow(surface).GetNativeWindow())
+        if (!m_Windows.at(surface)->GetNativeWindow())
             throw std::runtime_error("Can't create window!");
         else
             ENG_CORE_INFO("Window created!");
 
-        Input::m_WindowPointer = window->GetNativeWindow();
-        window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+        Input::m_WindowPointer = m_Windows.at(surface)->GetNativeWindow();
+        m_Windows.at(surface)->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
         return surface;
     }
