@@ -28,8 +28,10 @@ namespace engine
         void Run();
         virtual void Terminate(ExitCode code);
 
-        virtual VkSurfaceKHR CreatePlatformWindow(Instance &instance) = 0;
-        Window *GetWindow(VkSurfaceKHR surface) const { return m_Windows.at(surface).get(); }
+        virtual VkSurfaceKHR CreatePlatformWindow(/* Instance &instance */) = 0;
+        Window *GetWindow(size_t index) const { return m_Windows[index].get(); }
+        std::vector<std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
+
         Application &GetApp() const { return *m_App; }
         virtual const char *GetSurfaceExtension() = 0;
 
@@ -46,7 +48,7 @@ namespace engine
         static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
-        std::unordered_map<VkSurfaceKHR, std::unique_ptr<Window>> m_Windows{};
+        std::vector<std::unique_ptr<Window>> m_Windows{};
         std::unique_ptr<Application> m_App{};
         Timer m_Timer{};
 

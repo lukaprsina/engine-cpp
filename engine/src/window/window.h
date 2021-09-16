@@ -41,9 +41,9 @@ namespace engine
             return m_RenderContext.get();
         }
 
-        void CreateRenderContext(Device &device,
-                                 std::vector<VkPresentModeKHR> &present_mode_priority,
-                                 std::vector<VkSurfaceFormatKHR> &surface_format_priority) {}
+        virtual void CreateRenderContext(Device &device,
+                                         std::vector<VkPresentModeKHR> &present_mode_priority,
+                                         std::vector<VkSurfaceFormatKHR> &surface_format_priority) {}
         void DeleteRenderContext();
 
         void SetSettings(WindowSettings &settings);

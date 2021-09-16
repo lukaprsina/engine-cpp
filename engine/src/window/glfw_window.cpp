@@ -143,7 +143,7 @@ namespace engine
 
     GlfwWindow::GlfwWindow(Platform &platform,
                            WindowSettings &settings,
-                           Instance &instance,
+                           /* Instance &instance, */
                            VkSurfaceKHR &surface)
         : Window(platform, settings), m_Surface(surface)
     {
@@ -181,7 +181,7 @@ namespace engine
         glfwSetScrollCallback(m_Handle, ScrollCallback);
         glfwSetCursorPosCallback(m_Handle, CursorPositionCallback);
 
-        surface = CreateSurface(instance);
+        // surface = CreateSurface(instance);
     }
 
     GlfwWindow::~GlfwWindow()

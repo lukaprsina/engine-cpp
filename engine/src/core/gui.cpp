@@ -1034,7 +1034,7 @@ namespace engine
     {
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
-        m_RenderContext = m_Application.GetPlatform().GetWindow(m_Application.GetSurface())->GetRenderContext();
+        m_RenderContext = m_Application.GetPlatform().GetWindow(0)->GetRenderContext();
         auto &extent = m_RenderContext->GetSurfaceExtent();
 
         io.DisplaySize.x = static_cast<float>(extent.width);

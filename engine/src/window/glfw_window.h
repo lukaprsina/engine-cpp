@@ -15,14 +15,14 @@ namespace engine
     public:
         GlfwWindow(Platform &platform,
                    WindowSettings &settings,
-                   Instance &instance,
+                   /* Instance &instance, */
                    VkSurfaceKHR &surface);
 
         ~GlfwWindow();
 
         void CreateRenderContext(Device &device,
                                  std::vector<VkPresentModeKHR> &present_mode_priority,
-                                 std::vector<VkSurfaceFormatKHR> &surface_format_priority);
+                                 std::vector<VkSurfaceFormatKHR> &surface_format_priority) override;
         static void Init();
         void ProcessEvents() override;
         VkSurfaceKHR CreateSurface(Instance &instance) override;

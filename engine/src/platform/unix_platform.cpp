@@ -56,7 +56,7 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    VkSurfaceKHR UnixPlatform::CreatePlatformWindow(Instance &instance)
+    VkSurfaceKHR UnixPlatform::CreatePlatformWindow(/* Instance &instance */)
     {
         WindowSettings settings;
         VkSurfaceKHR surface;
@@ -72,19 +72,19 @@ namespace engine
             else
             {
                 GlfwWindow::Init();
-                window = std::make_unique<GlfwWindow>(*this, settings, instance, surface);
+                window = std::make_unique<GlfwWindow>(*this, settings, /* instance, */ surface);
             }
 
-            m_Windows.emplace(surface, std::move(window));
+            m_Windows.emplace_back(std::move(window));
         }
 
-        if (!m_Windows.at(surface)->GetNativeWindow())
+        if (!m_Windows[0]->GetNativeWindow())
             throw std::runtime_error("Can't create window!");
         else
             ENG_CORE_INFO("Window created!");
 
-        Input::m_WindowPointer = m_Windows.at(surface)->GetNativeWindow();
-        m_Windows.at(surface)->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+        Input::m_WindowPointer = m_Windows[0]->GetNativeWindow();
+        m_Windows[0]->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
         return surface;
     }

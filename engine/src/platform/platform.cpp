@@ -31,6 +31,17 @@ namespace engine
         bool is_headless = m_App->GetOptions().Contains("--headless");
         m_App->SetHeadless(is_headless);
 
+        CreatePlatformWindow();
+
+        if (!m_Windows[0])
+            throw std::runtime_error("Can't create window!");
+        else
+            ENG_CORE_INFO("Window created!");
+
+        Input::m_WindowPointer = m_Windows[0]->GetNativeWindow();
+
+        m_Windows[0]->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+
         return true;
     }
 
@@ -45,7 +56,7 @@ namespace engine
     void Platform::MainLoop()
     {
         ENG_CORE_INFO("Starting the main loop.");
-        auto &window = m_Windows.at(m_App->GetSurface());
+        auto &window = m_Windows[0];
 
         while (window->ShouldClose())
         {
@@ -66,7 +77,7 @@ namespace engine
             m_App->Finish();
 
         m_App.reset();
-        m_Windows.at(m_App->GetSurface()).reset();
+        m_Windows[0].reset();
 
         spdlog::drop_all();
     }
