@@ -27,13 +27,13 @@ namespace engine
         Window(Platform &platform, WindowSettings &settings);
         virtual ~Window() = default;
 
-        virtual void ProcessEvents() {};
+        virtual void ProcessEvents(){};
         virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
         virtual void *GetNativeWindow() = 0;
 
-        void SetSettings(WindowSettings& settings);
+        void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 
@@ -41,6 +41,7 @@ namespace engine
         Platform &m_Platform;
         WindowSettings m_Settings;
         WindowSettings m_WindowedSettings;
-        bool m_Dirty{ false };
+
+        bool m_Dirty{false};
     };
 }

@@ -55,18 +55,36 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    void UnixPlatform::CreatePlatformWindow()
+    Window &UnixPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
+        void *handle;
 
-        if (m_App->IsHeadless())
-            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
-
-        else
         {
-            GlfwWindow::Init();
-            m_Window = std::make_unique<GlfwWindow>(*this, settings);
+            std::unique_ptr<Window> window;
+
+            if (m_App->IsHeadless())
+                window = std::make_unique<HeadlessWindow>(*this, settings);
+
+            else
+            {
+                GlfwWindow::Init();
+                window = std::make_unique<GlfwWindow>(*this, settings);
+            }
+
+            handle = window->GetNativeWindow();
+            m_Windows.emplace(handle, std::move(window));
         }
+
+        auto &window = m_Windows.at(handle);
+        if (window)
+            throw std::runtime_error("Can't create window!");
+        else
+            ENG_CORE_INFO("Window created!");
+
+        window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+
+        return *window;
     }
 
     const char *UnixPlatform::GetSurfaceExtension()

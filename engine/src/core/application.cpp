@@ -74,6 +74,10 @@ namespace engine
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
 
+        auto &window = m_Platform->CreatePlatformWindow();
+
+        Input::m_WindowPointer = window.GetNativeWindow();
+
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
                                                 m_ValidationLayers,
@@ -81,7 +85,7 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
-        m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
+        m_Surface = window.CreateSurface(*m_Instance);
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
@@ -105,8 +109,8 @@ namespace engine
                                                           m_Surface,
                                                           present_mode_priority,
                                                           surface_format_priority,
-                                                          m_Platform->GetWindow().GetSettings().width,
-                                                          m_Platform->GetWindow().GetSettings().height);
+                                                          window.GetSettings().width,
+                                                          window.GetSettings().height);
 
         m_RenderContext->Prepare();
 
@@ -133,9 +137,9 @@ namespace engine
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
-        m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
+        /* m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
 
-        m_LayerStack.PushLayer(m_Gui.get());
+        m_LayerStack.PushLayer(m_Gui.get()); */
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnAttach();

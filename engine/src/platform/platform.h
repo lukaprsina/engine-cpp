@@ -27,7 +27,8 @@ namespace engine
         virtual void Terminate(ExitCode code);
         void Run();
 
-        Window &GetWindow() const { return *m_Window; };
+        virtual Window &CreatePlatformWindow() = 0;
+        Window &GetWindow(void *handle) { return *m_Windows.at(handle); };
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
@@ -44,11 +45,9 @@ namespace engine
         static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
-        std::unique_ptr<Window> m_Window{};
         std::unique_ptr<Application> m_App{};
+        std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
         Timer m_Timer{};
-
-        virtual void CreatePlatformWindow() = 0;
 
     private:
         std::string m_EngineName = "engine";
