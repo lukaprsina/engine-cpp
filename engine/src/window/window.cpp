@@ -1,6 +1,7 @@
 #include "window/window.h"
 
 #include "platform/platform.h"
+#include "vulkan_api/render_context.h"
 
 namespace engine
 {
@@ -9,7 +10,7 @@ namespace engine
     {
     }
 
-    void Window::SetSettings(WindowSettings& settings)
+    void Window::SetSettings(WindowSettings &settings)
     {
         m_Settings = settings;
         m_Dirty = true;

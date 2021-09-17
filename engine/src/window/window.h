@@ -1,11 +1,13 @@
 #pragma once
 
 #include "vulkan_api/instance.h"
+#include "window/input.h"
 
 namespace engine
 {
     class Platform;
     class Event;
+    class RenderContext;
 
     struct WindowSettings
     {
@@ -35,12 +37,16 @@ namespace engine
 
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
+        Input &GetInput() { return m_Input; }
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 
     protected:
         Platform &m_Platform;
         WindowSettings m_Settings;
         WindowSettings m_WindowedSettings;
+
+        Input m_Input;
+        std::unique_ptr<RenderContext> m_RenderContext{};
 
         bool m_Dirty{false};
     };

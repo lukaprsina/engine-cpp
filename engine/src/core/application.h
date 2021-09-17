@@ -13,7 +13,6 @@ namespace engine
     class Event;
     class Instance;
     class Device;
-    class RenderContext;
     class Scene;
     class RenderTarget;
     class RenderPipeline;
@@ -94,7 +93,6 @@ namespace engine
         std::unique_ptr<Device> m_Device{};
         std::unique_ptr<Scene> m_Scene{};
         std::unique_ptr<Gui> m_Gui{};
-        std::unique_ptr<RenderContext> m_RenderContext{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
@@ -103,4 +101,8 @@ namespace engine
 
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
     };
+
+    Application *CreateApplication();
 }
+
+extern engine::Application *engine::CreateApplication();

@@ -9,12 +9,10 @@ namespace engine
     class Input
     {
     public:
-        static bool IsKeyPressed(KeyCode key);
-        static bool IsMouseButtonPressed(MouseCode button);
-        static glm::vec2 GetMousePosition();
-        static float GetMouseX();
-        static float GetMouseY();
-
-        static void *m_WindowPointer;
+        bool IsKeyPressed(KeyCode key);
+        bool IsMouseButtonPressed(MouseCode button);
+        glm::vec2 GetMousePosition();
+        float GetMouseX();
+        float GetMouseY();
     };
 }
