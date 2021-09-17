@@ -3,7 +3,6 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
-#include "window/window.h"
 
 #include <filesystem>
 
@@ -33,14 +32,14 @@ namespace engine
 
         CreatePlatformWindow();
 
-        if (!m_Windows[0])
+        if (!m_Window)
             throw std::runtime_error("Can't create window!");
         else
             ENG_CORE_INFO("Window created!");
 
-        Input::m_WindowPointer = m_Windows[0]->GetNativeWindow();
+        Input::m_WindowPointer = m_Window->GetNativeWindow();
 
-        m_Windows[0]->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
+        m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
         return true;
     }
@@ -56,13 +55,12 @@ namespace engine
     void Platform::MainLoop()
     {
         ENG_CORE_INFO("Starting the main loop.");
-        auto &window = m_Windows[0];
 
-        while (window->ShouldClose())
+        while (!m_Window->ShouldClose())
         {
-            if (!window->GetSettings().minimized)
+            if (!m_Window->GetSettings().minimized)
                 Run();
-            window->ProcessEvents();
+            m_Window->ProcessEvents();
         }
     }
 
@@ -77,7 +75,7 @@ namespace engine
             m_App->Finish();
 
         m_App.reset();
-        m_Windows[0].reset();
+        m_Window.reset();
 
         spdlog::drop_all();
     }

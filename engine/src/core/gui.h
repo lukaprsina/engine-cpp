@@ -52,7 +52,7 @@ namespace engine
     {
     public:
         Gui(Application &application,
-            Window *window,
+            Window &window,
             const float font_size = 21.0f,
             bool explicit_update = false);
         ~Gui();
@@ -80,12 +80,14 @@ namespace engine
         std::unique_ptr<core::Image> m_FontImage;
         std::unique_ptr<core::ImageView> m_FontImageView;
 
+        std::unique_ptr<RenderContext> m_RenderContext;
+        std::unique_ptr<Window> m_Window;
+
         std::unique_ptr<core::Buffer> m_VertexBuffer;
         std::unique_ptr<core::Buffer> m_IndexBuffer;
 
         std::unique_ptr<core::Sampler> m_Sampler{nullptr};
         PipelineLayout *m_PipelineLayout{nullptr};
-        RenderContext *m_RenderContext;
 
         VkDescriptorPool m_DescriptorPool{VK_NULL_HANDLE};
         VkDescriptorSetLayout m_DescriptorSetLayout{VK_NULL_HANDLE};

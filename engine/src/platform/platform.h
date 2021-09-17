@@ -14,7 +14,6 @@ namespace engine
     };
 
     class Event;
-    class Instance;
 
     class Platform
     {
@@ -25,14 +24,11 @@ namespace engine
         virtual bool Initialize(std::unique_ptr<Application> &&app);
         virtual bool Prepare();
         virtual void MainLoop();
-        void Run();
         virtual void Terminate(ExitCode code);
+        void Run();
 
-        virtual VkSurfaceKHR CreatePlatformWindow(/* Instance &instance */) = 0;
-        Window *GetWindow(size_t index) const { return m_Windows[index].get(); }
-        std::vector<std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
-
-        Application &GetApp() const { return *m_App; }
+        Window &GetWindow() const { return *m_Window; };
+        Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
@@ -48,9 +44,11 @@ namespace engine
         static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
-        std::vector<std::unique_ptr<Window>> m_Windows{};
+        std::unique_ptr<Window> m_Window{};
         std::unique_ptr<Application> m_App{};
         Timer m_Timer{};
+
+        virtual void CreatePlatformWindow() = 0;
 
     private:
         std::string m_EngineName = "engine";

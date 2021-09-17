@@ -1,11 +1,9 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
-#include "vulkan_api/instance.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
-#include "vulkan_api/render_context.h"
 
 ENG_DISABLE_WARNINGS()
 #define GLFW_INCLUDE_NONE
@@ -142,10 +140,8 @@ namespace engine
     }
 
     GlfwWindow::GlfwWindow(Platform &platform,
-                           WindowSettings &settings,
-                           /* Instance &instance, */
-                           VkSurfaceKHR &surface)
-        : Window(platform, settings), m_Surface(surface)
+                           WindowSettings &settings)
+        : Window(platform, settings)
     {
         const Options &options = platform.GetApp().GetOptions();
 
@@ -180,28 +176,12 @@ namespace engine
         glfwSetMouseButtonCallback(m_Handle, MouseButtonCallback);
         glfwSetScrollCallback(m_Handle, ScrollCallback);
         glfwSetCursorPosCallback(m_Handle, CursorPositionCallback);
-
-        // surface = CreateSurface(instance);
     }
 
     GlfwWindow::~GlfwWindow()
     {
         if (m_Handle)
             glfwDestroyWindow(m_Handle);
-
-        glfwTerminate();
-    }
-
-    void GlfwWindow::CreateRenderContext(Device &device,
-                                         std::vector<VkPresentModeKHR> &present_mode_priority,
-                                         std::vector<VkSurfaceFormatKHR> &surface_format_priority)
-    {
-        m_RenderContext = std::make_unique<RenderContext>(device,
-                                                          m_Surface,
-                                                          present_mode_priority,
-                                                          surface_format_priority,
-                                                          m_Settings.width,
-                                                          m_Settings.height);
     }
 
     void GlfwWindow::ProcessEvents()
@@ -237,7 +217,6 @@ namespace engine
 
             if (m_Settings.focused)
             {
-                // glfwFocusWindow(m_Handle);
                 glfwRequestWindowAttention(m_Handle);
             }
         }
@@ -270,5 +249,10 @@ namespace engine
     void GlfwWindow::Close()
     {
         glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
+    }
+
+    void GlfwWindow::DeInit()
+    {
+        glfwTerminate();
     }
 }

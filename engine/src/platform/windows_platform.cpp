@@ -47,7 +47,7 @@ namespace engine
             WideCharToMultiByte(CP_UTF8, 0, &wstr[0], wstr_len, &str[0], str_len, NULL, NULL);
 
             return str;
-        }
+        }        
 
         inline std::vector<std::string> GetArgs()
         {
@@ -72,8 +72,8 @@ namespace engine
         {
             TCHAR szFileName[MAX_PATH];
             GetModuleFileName(NULL, szFileName, MAX_PATH);
-
-            return std::string{szFileName};
+            
+            return std::string{ szFileName };
         }
 
         inline std::filesystem::path GetRootFolder()
@@ -84,7 +84,7 @@ namespace engine
     }
 
     WindowsPlatform::WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                                     PSTR lpCmdLine, INT nCmdShow)
+        PSTR lpCmdLine, INT nCmdShow)
         : Platform(GetName(), GetArgs())
     {
         auto args = GetArgs();
@@ -108,7 +108,7 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    VkSurfaceKHR WindowsPlatform::CreatePlatformWindow()
+    void WindowsPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
 

@@ -7,23 +7,16 @@ struct GLFWwindow;
 
 namespace engine
 {
-    class Instance;
-    class Device;
-
     class GlfwWindow : public Window
     {
     public:
         GlfwWindow(Platform &platform,
-                   WindowSettings &settings,
-                   /* Instance &instance, */
-                   VkSurfaceKHR &surface);
+                   WindowSettings &settings);
 
         ~GlfwWindow();
 
-        void CreateRenderContext(Device &device,
-                                 std::vector<VkPresentModeKHR> &present_mode_priority,
-                                 std::vector<VkSurfaceFormatKHR> &surface_format_priority) override;
         static void Init();
+        static void DeInit();
         void ProcessEvents() override;
         VkSurfaceKHR CreateSurface(Instance &instance) override;
         bool ShouldClose() const override;
@@ -32,6 +25,5 @@ namespace engine
 
     private:
         GLFWwindow *m_Handle{nullptr};
-        VkSurfaceKHR m_Surface;
     };
 }

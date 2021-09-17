@@ -4,8 +4,7 @@
 namespace engine
 {
     HeadlessWindow::HeadlessWindow(Platform &platform,
-                                   WindowSettings &settings,
-                                   VkSurfaceKHR &surface)
+                                   WindowSettings &settings)
         : Window(platform, settings)
     {
     }
