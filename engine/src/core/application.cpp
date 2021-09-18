@@ -86,7 +86,7 @@ namespace engine
                                                 VK_API_VERSION_1_0);
 
         m_Surface = m_Window->CreateSurface(*m_Instance);
-        m_Surface2 = m_Window->CreateSurface(*m_Instance);
+        m_Surface2 = m_Window2->CreateSurface(*m_Instance);
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
         gpu.IsPresentSupported(m_Surface2, 0);
 
@@ -152,7 +152,7 @@ namespace engine
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
         m_RenderPipeline2 = std::make_unique<RenderPipeline>();
-        m_RenderPipeline2->AddSubpass(std::move(scene_subpass));
+        m_RenderPipeline2->AddSubpass(std::move(scene_subpass2));
 
         /* m_Gui = std::make_unique<Gui>(*this, m_Window);
 
@@ -343,8 +343,9 @@ namespace engine
         GLTFLoader loader(*m_Device);
 
         m_Scene = loader.ReadSceneFromFile(path);
+        m_Scene2 = loader.ReadSceneFromFile(path);
 
-        if (!m_Scene)
+        if (!m_Scene && !m_Scene2)
             throw std::runtime_error("Cannot load scene: " + path);
     }
 

@@ -77,6 +77,7 @@ namespace engine
         }
 
         auto &window = m_Windows.at(handle);
+
         if (!window)
             throw std::runtime_error("Can't create window!");
         else
