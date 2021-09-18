@@ -2,13 +2,18 @@
 
 #include "core/application.h"
 
+#include <memory>
+
+namespace engine
+{
+    class Platform;
+}
 class Sandbox : public engine::Application
 {
-    Sandbox() = default;
-    ~Sandbox() = default;
+    Sandbox(engine::Platform *platform);
 };
 
-engine::Application *engine::CreateApplication()
+std::unique_ptr<engine::Application> engine::CreateApplication(engine::Platform *platform)
 {
-    return new Sandbox();
+    return std::make_unique<Sandbox>(platform);
 }

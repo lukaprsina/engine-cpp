@@ -1,7 +1,6 @@
 #include "window/window.h"
 
 #include "platform/platform.h"
-#include "vulkan_api/render_context.h"
 
 namespace engine
 {

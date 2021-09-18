@@ -1,13 +1,13 @@
 #pragma once
 
 #include "vulkan_api/instance.h"
+#include "vulkan_api/render_context.h"
 #include "window/input.h"
 
 namespace engine
 {
     class Platform;
     class Event;
-    class RenderContext;
 
     struct WindowSettings
     {

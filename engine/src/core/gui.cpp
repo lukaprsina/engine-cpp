@@ -386,7 +386,7 @@ namespace engine
             return ImGui_ImplGlfw_Init(window, install_callbacks, GlfwClientApi_Vulkan);
         }
 
-        void ImGui_ImplGlfw_Shutdown()
+        /* void ImGui_ImplGlfw_Shutdown()
         {
             ImGuiIO &io = ImGui::GetIO();
             ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
@@ -410,7 +410,7 @@ namespace engine
             io.BackendPlatformName = NULL;
             io.BackendPlatformUserData = NULL;
             IM_DELETE(bd);
-        }
+        } */
 
         void ImGui_ImplGlfw_UpdateMousePosAndButtons()
         {

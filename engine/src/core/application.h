@@ -102,7 +102,7 @@ namespace engine
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
     };
 
-    Application *CreateApplication();
+    std::unique_ptr<Application> CreateApplication(Platform *platform);
 }
 
-extern engine::Application *engine::CreateApplication();
+extern std::unique_ptr<engine::Application> engine::CreateApplication(engine::Platform *platform);
