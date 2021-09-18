@@ -193,10 +193,12 @@ endif()
 
 add_executable(engine WIN32 ${PROJECT_FILES})
 
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-                                         ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(
+  sandbox
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
+target_precompile_headers(sandbox PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
 configure_file(engine_config.h.in engine_config.h @ONLY)
 
@@ -206,4 +208,4 @@ else()
   target_compile_options(engine PRIVATE -Wall) # -Weffc++)
 endif()
 
-add_subdirectory("vendor")
+add_subdirectory(vendor)

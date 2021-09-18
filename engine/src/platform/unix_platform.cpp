@@ -55,7 +55,7 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    Window &UnixPlatform::CreatePlatformWindow()
+    Window *UnixPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
         void *handle;
@@ -77,14 +77,14 @@ namespace engine
         }
 
         auto &window = m_Windows.at(handle);
-        if (window)
+        if (!window)
             throw std::runtime_error("Can't create window!");
         else
             ENG_CORE_INFO("Window created!");
 
         window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
-        return *window;
+        return window.get();
     }
 
     const char *UnixPlatform::GetSurfaceExtension()

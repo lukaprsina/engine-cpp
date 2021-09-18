@@ -6,6 +6,7 @@
 
 namespace engine
 {
+    class Window;
     class Platform;
     class WindowCloseEvent;
     class WindowResizeEvent;
@@ -54,6 +55,7 @@ namespace engine
         Platform &GetPlatform() { return *m_Platform; };
         Instance &GetInstance() { return *m_Instance; };
         Device &GetDevice() { return *m_Device; };
+        Window *GetWindow() { return m_Window; };
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
@@ -63,12 +65,6 @@ namespace engine
 
         void SetHeadless(bool headless) { m_Headless = headless; };
         bool IsHeadless() const { return m_Headless; };
-
-        RenderContext &GetRenderContext()
-        {
-            ENG_ASSERT(m_RenderContext, "Render context is not valid");
-            return *m_RenderContext;
-        }
 
         void AddInstanceExtension(const char *extension, bool optional = false) { m_InstanceExtensions[extension] = optional; }
         const std::unordered_map<const char *, bool> GetInstanceExtensions() { return m_InstanceExtensions; }
@@ -94,6 +90,7 @@ namespace engine
         std::unique_ptr<Scene> m_Scene{};
         std::unique_ptr<Gui> m_Gui{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
+        Window *m_Window;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};

@@ -7,6 +7,7 @@ ENG_ENABLE_WARNINGS()
 namespace engine
 {
     class Entity;
+    class Window;
 
     namespace sg
     {
@@ -28,7 +29,7 @@ namespace engine
 
         Entity CreateEntity();
 
-        void AddFreeCamera(VkExtent2D extent);
+        void AddFreeCamera(VkExtent2D extent, Window *window);
 
         entt::registry &GetRegistry() { return m_Registry; }
         Entity &GetDefaultCamera() { return *m_DefaultCamera; }

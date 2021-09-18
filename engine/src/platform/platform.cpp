@@ -45,11 +45,11 @@ namespace engine
     {
         ENG_CORE_INFO("Starting the main loop.");
 
-        while (!m_Windows->ShouldClose())
+        while (!m_App->GetWindow()->ShouldClose())
         {
-            if (!m_Windows->GetSettings().minimized)
+            if (!m_App->GetWindow()->GetSettings().minimized)
                 Run();
-            m_Windows->ProcessEvents();
+            m_App->GetWindow()->ProcessEvents();
         }
     }
 
@@ -64,7 +64,8 @@ namespace engine
             m_App->Finish();
 
         m_App.reset();
-        m_Windows.reset();
+
+        m_Windows.clear();
 
         spdlog::drop_all();
     }

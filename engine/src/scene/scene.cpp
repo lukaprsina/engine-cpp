@@ -1,6 +1,7 @@
 #include "scene/scene.h"
 
 #include "scene/entity.h"
+#include "window/window.h"
 #include "scene/components/image.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/components/perspective_camera.h"
@@ -32,10 +33,10 @@ namespace engine
         return entity;
     }
 
-    void Scene::AddFreeCamera(VkExtent2D extent)
+    void Scene::AddFreeCamera(VkExtent2D extent, Window *window)
     {
         m_DefaultCamera = m_Cameras[0].get();
-        auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this);
+        auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this, window);
         free_camera_script.Resize(extent.width, extent.height);
         ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());
     }

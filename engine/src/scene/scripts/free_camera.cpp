@@ -4,6 +4,7 @@
 #include "scene/components/transform.h"
 #include "scene/scene.h"
 #include "window/input.h"
+#include "window/window.h"
 
 #include "common/glm.h"
 ENG_DISABLE_WARNINGS()
@@ -16,8 +17,8 @@ namespace engine
 {
     namespace sg
     {
-        FreeCamera::FreeCamera(Scene &scene)
-            : m_Scene(scene)
+        FreeCamera::FreeCamera(Scene &scene, Window *window)
+            : m_Scene(scene), m_Window(window)
         {
         }
 
@@ -42,34 +43,34 @@ namespace engine
 
             float mul_translation = m_SpeedMultiplier;
 
-            if (Input::IsKeyPressed(Key::W))
+            if (m_Window->GetInput().IsKeyPressed(Key::W))
                 delta_translation.z -= 50.0f;
 
-            if (Input::IsKeyPressed(Key::S))
+            if (m_Window->GetInput().IsKeyPressed(Key::S))
                 delta_translation.z += 50.0f;
 
-            if (Input::IsKeyPressed(Key::A))
+            if (m_Window->GetInput().IsKeyPressed(Key::A))
                 delta_translation.x -= 50.0f;
 
-            if (Input::IsKeyPressed(Key::D))
+            if (m_Window->GetInput().IsKeyPressed(Key::D))
                 delta_translation.x += 50.0f;
 
-            if (Input::IsKeyPressed(Key::Up))
+            if (m_Window->GetInput().IsKeyPressed(Key::Up))
                 delta_rotation.x -= 2.0f;
 
-            if (Input::IsKeyPressed(Key::Down))
+            if (m_Window->GetInput().IsKeyPressed(Key::Down))
                 delta_rotation.x += 2.0f;
 
-            if (Input::IsKeyPressed(Key::Left))
+            if (m_Window->GetInput().IsKeyPressed(Key::Left))
                 delta_rotation.y += 2.0f;
 
-            if (Input::IsKeyPressed(Key::Right))
+            if (m_Window->GetInput().IsKeyPressed(Key::Right))
                 delta_rotation.y -= 2.0f;
 
-            if (Input::IsKeyPressed(Key::LeftShift))
+            if (m_Window->GetInput().IsKeyPressed(Key::LeftShift))
                 mul_translation /= 4;
 
-            if (Input::IsKeyPressed(Key::LeftControl))
+            if (m_Window->GetInput().IsKeyPressed(Key::LeftControl))
                 mul_translation *= 4;
 
             delta_translation *= mul_translation * delta_time;

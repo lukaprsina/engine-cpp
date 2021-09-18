@@ -91,7 +91,8 @@ create_dependency(PATH "volk" LIB "volk")
 if(${volk_FOUND})
   target_include_directories(${volk_LIBRARIES} PUBLIC ${vulkan_INCLUDE_DIRS})
   target_link_libraries(${volk_LIBRARIES} PUBLIC ${vulkan_LIBRARIES})
-  target_link_libraries(engine PRIVATE ${volk_LIBRARIES})
+  target_include_directories(sandbox PUBLIC ${volk_INCLUDE_DIRS})
+  target_link_libraries(sandbox PUBLIC ${volk_LIBRARIES})
 endif()
 
 # stb
@@ -105,6 +106,8 @@ endif()
 # docopt
 create_dependency(PATH "docopt" LIB "docopt")
 if(${docopt_FOUND})
+  target_include_directories(sandbox PRIVATE ${docopt_INCLUDE_DIRS})
+  target_link_libraries(sandbox PRIVATE ${docopt_LIBRARIES})
   target_include_directories(engine PRIVATE ${docopt_INCLUDE_DIRS})
   target_link_libraries(engine PRIVATE ${docopt_LIBRARIES})
 endif()
@@ -132,9 +135,9 @@ endif()
 create_dependency(PATH "glm" LIB "glm" PACKAGE "GLM")
 if(${glm_FOUND})
   target_compile_definitions(
-    engine PRIVATE GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
+    sandbox PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
                    GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
-  target_include_directories(engine PRIVATE ${glm_INCLUDE_DIRS})
+  target_include_directories(sandbox PUBLIC ${glm_INCLUDE_DIRS})
 endif()
 
 # spdlog TODO definitions set(SPDLOG_FMT_EXTERNAL "Use external fmt library
@@ -150,22 +153,24 @@ create_dependency(
   PACKAGE
   "spdlog")
 if(${spdlog_FOUND})
-  # target_compile_definitions(engine PRIVATE SPDLOG_FMT_EXTERNAL)
+  target_include_directories(sandbox PRIVATE ${spdlog_INCLUDE_DIRS})
+  target_link_libraries(sandbox PRIVATE ${spdlog_LIBRARIES})
   target_include_directories(engine PRIVATE ${spdlog_INCLUDE_DIRS})
-  # target_link_libraries(engine PRIVATE fmt)
   target_link_libraries(engine PRIVATE ${spdlog_LIBRARIES})
 endif()
 
 # vma
 create_dependency(PATH "vma" INCLUDE "include")
 if(${vma_FOUND})
+  target_include_directories(sandbox PUBLIC ${vma_INCLUDE_DIRS})
   target_include_directories(engine PRIVATE ${vma_INCLUDE_DIRS})
 endif()
 
 # entt
 create_dependency(PATH "entt" INCLUDE "src" LIB "EnTT::EnTT")
 if(${entt_FOUND})
-  target_link_libraries(engine PRIVATE EnTT::EnTT)
+  target_link_libraries(sandbox PRIVATE ${entt_LIBRARIES})
+  target_link_libraries(engine PRIVATE ${entt_LIBRARIES})
 endif()
 
 # glslang

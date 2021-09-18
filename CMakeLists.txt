@@ -7,7 +7,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake
 
 include(global_options)
 
-add_subdirectory(engine)
 add_subdirectory(sandbox)
+add_subdirectory(engine)
 
 target_link_libraries(engine PRIVATE sandbox)

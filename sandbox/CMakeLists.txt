@@ -5,4 +5,7 @@ set(SANDBOX_FILES
     src/sandbox.cpp)
 
 add_library(sandbox STATIC ${SANDBOX_FILES})
-target_include_directories(sandbox PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(
+  sandbox
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PUBLIC ${CMAKE_SOURCE_DIR}/engine/src)

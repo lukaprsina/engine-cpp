@@ -27,7 +27,7 @@ namespace engine
         virtual void Terminate(ExitCode code);
         void Run();
 
-        virtual Window &CreatePlatformWindow() = 0;
+        virtual Window *CreatePlatformWindow() = 0;
         Window &GetWindow(void *handle) { return *m_Windows.at(handle); };
         Application &GetApp() const { return *m_App; };
         virtual const char *GetSurfaceExtension() = 0;

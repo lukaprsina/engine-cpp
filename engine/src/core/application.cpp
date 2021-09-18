@@ -1,5 +1,6 @@
 #include "core/application.h"
 
+#include "window/window.h"
 #include "core/timer.h"
 #include "core/gui.h"
 #include "core/layer_stack.h"
@@ -59,7 +60,7 @@ namespace engine
         m_Scene.reset();
         m_Gui.reset();
 
-        m_RenderContext.reset();
+        m_Window->DeleteRenderContext();
         m_Device.reset();
 
         if (m_Surface != VK_NULL_HANDLE)
@@ -74,9 +75,7 @@ namespace engine
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
 
-        auto &window = m_Platform->CreatePlatformWindow();
-
-        Input::m_WindowPointer = window.GetNativeWindow();
+        m_Window = m_Platform->CreatePlatformWindow();
 
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
@@ -85,7 +84,7 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
-        m_Surface = window.CreateSurface(*m_Instance);
+        m_Surface = m_Window->CreateSurface(*m_Instance);
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
@@ -104,15 +103,19 @@ namespace engine
                                                                  {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+        m_Window->CreateRenderContext(*m_Device,
+                                      m_Surface,
+                                      present_mode_priority,
+                                      surface_format_priority);
 
-        m_RenderContext = std::make_unique<RenderContext>(*m_Device,
+        /* m_RenderContext = std::make_unique<RenderContext>(*m_Device,
                                                           m_Surface,
                                                           present_mode_priority,
                                                           surface_format_priority,
-                                                          window.GetSettings().width,
-                                                          window.GetSettings().height);
+                                                          m_Window->GetSettings().width,
+                                                          m_Window->GetSettings().height); */
 
-        m_RenderContext->Prepare();
+        m_Window->GetRenderContext().Prepare();
 
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
@@ -127,9 +130,9 @@ namespace engine
         else
             LoadScene(scene);
 
-        m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
+        m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window);
 
-        auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
+        auto scene_subpass = std::make_unique<ForwardSubpass>(m_Window->GetRenderContext(),
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
                                                               *m_Scene);
@@ -137,7 +140,7 @@ namespace engine
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
-        /* m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
+        /* m_Gui = std::make_unique<Gui>(*this, m_Window);
 
         m_LayerStack.PushLayer(m_Gui.get()); */
 
@@ -179,11 +182,11 @@ namespace engine
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
 
-        auto &command_buffer = m_RenderContext->Begin();
+        auto &command_buffer = m_Window->GetRenderContext().Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         Draw(command_buffer);
         command_buffer.End();
-        m_RenderContext->Submit(command_buffer);
+        m_Window->GetRenderContext().Submit(command_buffer);
     }
 
     void Application::UpdateScene(float delta_time)
@@ -199,7 +202,7 @@ namespace engine
 
     void Application::Draw(CommandBuffer &command_buffer)
     {
-        auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
+        auto &views = m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetViews();
 
         {
             // Image 0 is the swapchain
@@ -233,13 +236,14 @@ namespace engine
         }
 
         SetViewportAndScissor(command_buffer,
-                              m_RenderContext->GetActiveFrame().GetRenderTarget().GetExtent());
+                              m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
 
         if (m_RenderPipeline)
             m_RenderPipeline->Draw(command_buffer,
-                                   m_RenderContext->GetActiveFrame().GetRenderTarget());
+                                   m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget());
 
-        m_Gui->Draw(command_buffer);
+        if (m_Gui)
+            m_Gui->Draw(command_buffer);
 
         command_buffer.EndRenderPass();
 
@@ -295,13 +299,13 @@ namespace engine
 
     bool Application::OnKeyPressed(KeyPressedEvent &event)
     {
-        bool alt_enter = Input::IsKeyPressed(Key::LeftAlt) && Input::IsKeyPressed(Key::Enter);
+        bool alt_enter = m_Window->GetInput().IsKeyPressed(Key::LeftAlt) && m_Window->GetInput().IsKeyPressed(Key::Enter);
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
         {
-            auto window_settings = m_Platform->GetWindow().GetSettings();
+            auto window_settings = m_Window->GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
-            m_Platform->GetWindow().SetSettings(window_settings);
+            m_Window->SetSettings(window_settings);
         }
 
         return false;
