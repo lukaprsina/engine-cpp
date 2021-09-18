@@ -25,7 +25,7 @@ namespace engine
         virtual bool Prepare();
         virtual void MainLoop();
         virtual void Terminate(ExitCode code);
-        void Run();
+        void Run(Window *window);
 
         virtual Window *CreatePlatformWindow() = 0;
         Window &GetWindow(void *handle) { return *m_Windows.at(handle); };

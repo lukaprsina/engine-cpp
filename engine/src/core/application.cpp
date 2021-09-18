@@ -76,6 +76,7 @@ namespace engine
         DebugUtilsSettings debug_utils_settings;
 
         m_Window = m_Platform->CreatePlatformWindow();
+        m_Window2 = m_Platform->CreatePlatformWindow();
 
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
@@ -85,10 +86,13 @@ namespace engine
                                                 VK_API_VERSION_1_0);
 
         m_Surface = m_Window->CreateSurface(*m_Instance);
+        m_Surface2 = m_Window->CreateSurface(*m_Instance);
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
+        gpu.IsPresentSupported(m_Surface2, 0);
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
-            gpu.GetMutableRequestedFeatures().textureCompressionASTC_LDR = VK_TRUE;
+            gpu.GetMutableRequestedFeatures()
+                .textureCompressionASTC_LDR = VK_TRUE;
 
         if (!IsHeadless() || m_Instance->IsExtensionEnabled(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME))
             AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -103,19 +107,20 @@ namespace engine
                                                                  {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+
+        // TODO: move surface to window
         m_Window->CreateRenderContext(*m_Device,
                                       m_Surface,
                                       present_mode_priority,
                                       surface_format_priority);
 
-        /* m_RenderContext = std::make_unique<RenderContext>(*m_Device,
-                                                          m_Surface,
-                                                          present_mode_priority,
-                                                          surface_format_priority,
-                                                          m_Window->GetSettings().width,
-                                                          m_Window->GetSettings().height); */
+        m_Window2->CreateRenderContext(*m_Device,
+                                       m_Surface2,
+                                       present_mode_priority,
+                                       surface_format_priority);
 
         m_Window->GetRenderContext().Prepare();
+        m_Window2->GetRenderContext().Prepare();
 
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
@@ -131,14 +136,23 @@ namespace engine
             LoadScene(scene);
 
         m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window);
+        m_Scene2->AddFreeCamera(m_Window2->GetRenderContext().GetSurfaceExtent(), m_Window2);
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(m_Window->GetRenderContext(),
                                                               std::move(vert_shader),
                                                               std::move(frag_shader),
                                                               *m_Scene);
 
+        auto scene_subpass2 = std::make_unique<ForwardSubpass>(m_Window2->GetRenderContext(),
+                                                               std::move(vert_shader),
+                                                               std::move(frag_shader),
+                                                               *m_Scene2);
+
         m_RenderPipeline = std::make_unique<RenderPipeline>();
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
+
+        m_RenderPipeline2 = std::make_unique<RenderPipeline>();
+        m_RenderPipeline2->AddSubpass(std::move(scene_subpass));
 
         /* m_Gui = std::make_unique<Gui>(*this, m_Window);
 
@@ -150,14 +164,14 @@ namespace engine
         return true;
     }
 
-    void Application::Step()
+    void Application::Step(Window *window)
     {
         auto delta_time = static_cast<float>(m_Timer.Tick());
 
         if (m_FrameCount == 0)
             delta_time = 0.01667f;
 
-        Update(delta_time);
+        Update(window, delta_time);
 
         auto elapsed_time = static_cast<float>(m_Timer.Elapsed<Timer::Seconds>());
 
@@ -175,18 +189,18 @@ namespace engine
         m_FrameCount++;
     }
 
-    void Application::Update(float delta_time)
+    void Application::Update(Window *window, float delta_time)
     {
         UpdateScene(delta_time);
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
 
-        auto &command_buffer = m_Window->GetRenderContext().Begin();
+        auto &command_buffer = window->GetRenderContext().Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Draw(command_buffer);
+        Draw(window, command_buffer);
         command_buffer.End();
-        m_Window->GetRenderContext().Submit(command_buffer);
+        window->GetRenderContext().Submit(command_buffer);
     }
 
     void Application::UpdateScene(float delta_time)
@@ -198,11 +212,19 @@ namespace engine
             auto &camera = view.get<sg::FreeCamera>(entity);
             camera.Update(delta_time);
         }
+
+        auto view2 = m_Scene2->GetRegistry().view<sg::FreeCamera>();
+
+        for (auto &entity : view2)
+        {
+            auto &camera = view.get<sg::FreeCamera>(entity);
+            camera.Update(delta_time);
+        }
     }
 
-    void Application::Draw(CommandBuffer &command_buffer)
+    void Application::Draw(Window *window, CommandBuffer &command_buffer)
     {
-        auto &views = m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetViews();
+        auto &views = window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetViews();
 
         {
             // Image 0 is the swapchain
@@ -236,11 +258,11 @@ namespace engine
         }
 
         SetViewportAndScissor(command_buffer,
-                              m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
+                              window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
 
         if (m_RenderPipeline)
             m_RenderPipeline->Draw(command_buffer,
-                                   m_Window->GetRenderContext().GetActiveFrame().GetRenderTarget());
+                                   window->GetRenderContext().GetActiveFrame().GetRenderTarget());
 
         if (m_Gui)
             m_Gui->Draw(command_buffer);

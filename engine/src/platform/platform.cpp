@@ -47,15 +47,19 @@ namespace engine
 
         while (!m_App->GetWindow()->ShouldClose())
         {
-            if (!m_App->GetWindow()->GetSettings().minimized)
-                Run();
-            m_App->GetWindow()->ProcessEvents();
+            for (auto &window_pair : m_Windows)
+            {
+                auto *window = window_pair.second.get();
+                Run(window);
+                window->ProcessEvents();
+            }
         }
     }
 
-    void Platform::Run()
+    void Platform::Run(Window *window)
     {
-        m_App->Step();
+        if (!window->GetSettings().minimized)
+            m_App->Step(window);
     }
 
     void Platform::Terminate(ExitCode)

@@ -37,10 +37,10 @@ namespace engine
         bool OnKeyPressed(KeyPressedEvent &event);
 
         bool Prepare();
-        void Step();
-        void Update(float delta_time);
+        void Step(Window *window);
+        void Update(Window *window, float delta_time);
         void UpdateScene(float delta_time);
-        void Draw(CommandBuffer &command_buffer);
+        void Draw(Window *window, CommandBuffer &command_buffer);
         void Finish();
 
         void LoadScene(const std::string &path);
@@ -87,16 +87,21 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
+        std::unique_ptr<Device> m_Device2{};
         std::unique_ptr<Scene> m_Scene{};
+        std::unique_ptr<Scene> m_Scene2{};
         std::unique_ptr<Gui> m_Gui{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
+        std::unique_ptr<RenderPipeline> m_RenderPipeline2{};
         Window *m_Window;
+        Window *m_Window2;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};
         std::vector<const char *> m_ValidationLayers{};
 
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
+        VkSurfaceKHR m_Surface2{VK_NULL_HANDLE};
     };
 
     std::unique_ptr<Application> CreateApplication(Platform *platform);
