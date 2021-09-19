@@ -35,6 +35,7 @@ namespace engine
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
         virtual void *GetNativeWindow() = 0;
+        void OnEvent(Event &event);
 
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
@@ -44,7 +45,8 @@ namespace engine
         RenderContext &CreateRenderContext(Device &device,
                                            VkSurfaceKHR surface,
                                            std::vector<VkPresentModeKHR> &present_mode_priority,
-                                           std::vector<VkSurfaceFormatKHR> &surface_format_priority);
+                                           std::vector<VkSurfaceFormatKHR> &surface_format_priority,
+                                           int test);
         RenderContext &GetRenderContext();
         void DeleteRenderContext();
 

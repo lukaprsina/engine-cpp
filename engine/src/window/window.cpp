@@ -2,12 +2,18 @@
 
 #include "platform/platform.h"
 #include "vulkan_api/device.h"
+#include "events/event.h"
 
 namespace engine
 {
     Window::Window(Platform &platform, WindowSettings &settings)
         : m_Platform(platform), m_Settings(settings), m_Input(this)
     {
+    }
+
+    void Window::OnEvent(Event &event)
+    {
+        ENG_CORE_TRACE((void *)this);
     }
 
     void Window::SetSettings(WindowSettings &settings)
@@ -19,14 +25,16 @@ namespace engine
     RenderContext &Window::CreateRenderContext(Device &device,
                                                VkSurfaceKHR surface,
                                                std::vector<VkPresentModeKHR> &present_mode_priority,
-                                               std::vector<VkSurfaceFormatKHR> &surface_format_priority)
+                                               std::vector<VkSurfaceFormatKHR> &surface_format_priority,
+                                               int test)
     {
         m_RenderContext = std::make_unique<RenderContext>(device,
                                                           surface,
                                                           present_mode_priority,
                                                           surface_format_priority,
                                                           m_Settings.width,
-                                                          m_Settings.height);
+                                                          m_Settings.height,
+                                                          test);
 
         return *m_RenderContext;
     }

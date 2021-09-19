@@ -112,12 +112,14 @@ namespace engine
         m_Window->CreateRenderContext(*m_Device,
                                       m_Surface,
                                       present_mode_priority,
-                                      surface_format_priority);
+                                      surface_format_priority,
+                                      1);
 
         m_Window2->CreateRenderContext(*m_Device,
                                        m_Surface2,
                                        present_mode_priority,
-                                       surface_format_priority);
+                                       surface_format_priority,
+                                       2);
 
         m_Window->GetRenderContext().Prepare();
         m_Window2->GetRenderContext().Prepare();
@@ -260,9 +262,18 @@ namespace engine
         SetViewportAndScissor(command_buffer,
                               window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
 
-        if (m_RenderPipeline)
-            m_RenderPipeline->Draw(command_buffer,
-                                   window->GetRenderContext().GetActiveFrame().GetRenderTarget());
+        if (window->GetRenderContext().m_Test == 1)
+        {
+            if (m_RenderPipeline)
+                m_RenderPipeline->Draw(command_buffer,
+                                       window->GetRenderContext().GetActiveFrame().GetRenderTarget());
+        }
+        else if (window->GetRenderContext().m_Test == 2)
+        {
+            if (m_RenderPipeline2)
+                m_RenderPipeline2->Draw(command_buffer,
+                                        window->GetRenderContext().GetActiveFrame().GetRenderTarget());
+        }
 
         if (m_Gui)
             m_Gui->Draw(command_buffer);

@@ -18,7 +18,8 @@ namespace engine
                       std::vector<VkPresentModeKHR> present_mode_priority,
                       std::vector<VkSurfaceFormatKHR> surface_format_priority,
                       uint32_t width,
-                      uint32_t height);
+                      uint32_t height,
+                      int test);
         ~RenderContext();
 
         void UpdateSwapchain(const VkExtent2D &extent, const VkSurfaceTransformFlagBitsKHR transform);
@@ -65,6 +66,8 @@ namespace engine
         Device &GetDevice() { return m_Device; }
         VkExtent2D &GetSurfaceExtent() { return m_SurfaceExtent; }
         const QueueFamily &GetQueueFamily() const { return m_QueueFamily; }
+
+        int m_Test{0};
 
     private:
         Device &m_Device;
