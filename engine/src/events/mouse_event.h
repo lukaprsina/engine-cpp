@@ -29,8 +29,8 @@ namespace engine
 	class MouseMovedEvent : public Event
 	{
 	public:
-		MouseMovedEvent(float x, float y)
-			: m_MouseX(x), m_MouseY(y) {}
+		MouseMovedEvent(Window *window, float x, float y)
+			: Event(window), m_MouseX(x), m_MouseY(y) {}
 
 		inline float GetX() const { return m_MouseX; }
 		inline float GetY() const { return m_MouseY; }
@@ -51,8 +51,8 @@ namespace engine
 	class MouseScrolledEvent : public Event
 	{
 	public:
-		MouseScrolledEvent(float xOffset, float yOffset)
-			: m_XOffset(xOffset), m_YOffset(yOffset) {}
+		MouseScrolledEvent(Window *window, float xOffset, float yOffset)
+			: Event(window), m_XOffset(xOffset), m_YOffset(yOffset) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
 		inline float GetYOffset() const { return m_YOffset; }
@@ -77,8 +77,8 @@ namespace engine
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	protected:
-		MouseButtonEvent(int button)
-			: m_Button(button) {}
+		MouseButtonEvent(Window *window, int button)
+			: Event(window), m_Button(button) {}
 
 		int m_Button;
 	};
@@ -86,8 +86,8 @@ namespace engine
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button)
-			: MouseButtonEvent(button) {}
+		MouseButtonPressedEvent(Window *window, int button)
+			: MouseButtonEvent(window, button) {}
 
 		std::string ToString() const override
 		{
@@ -102,8 +102,8 @@ namespace engine
 	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button)
-			: MouseButtonEvent(button) {}
+		MouseButtonReleasedEvent(Window *window, int button)
+			: MouseButtonEvent(window, button) {}
 
 		std::string ToString() const override
 		{

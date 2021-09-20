@@ -31,5 +31,5 @@ namespace engine
 			virtual ~Ktx() = default;
 		};
 
-	} // namespace sg
-} // namespace engine
+	}
+}

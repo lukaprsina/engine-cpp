@@ -10,12 +10,10 @@
 
 namespace engine
 {
-    ForwardSubpass::ForwardSubpass(RenderContext &render_context,
-                                   ShaderSource &&vertex_shader,
+    ForwardSubpass::ForwardSubpass(ShaderSource &&vertex_shader,
                                    ShaderSource &&fragment_shader,
                                    Scene &scene)
-        : GeometrySubpass(render_context,
-                          std::move(vertex_shader),
+        : GeometrySubpass(std::move(vertex_shader),
                           std::move(fragment_shader),
                           scene)
     {
@@ -25,9 +23,9 @@ namespace engine
     {
     }
 
-    void ForwardSubpass::Prepare()
+    void ForwardSubpass::Prepare(Device &device)
     {
-        auto &device = m_RenderContext.GetDevice();
+
         auto view = m_Scene.GetRegistry().view<sg::Mesh>();
 
         for (auto &entity : view)
@@ -49,11 +47,11 @@ namespace engine
         }
     }
 
-    void ForwardSubpass::Draw(CommandBuffer &command_buffer)
+    void ForwardSubpass::Draw(RenderContext &render_context, CommandBuffer &command_buffer)
     {
-        AllocateLights<ForwardLights>(m_Scene, MAX_FORWARD_LIGHT_COUNT);
+        AllocateLights<ForwardLights>(render_context, m_Scene, MAX_FORWARD_LIGHT_COUNT);
 
         command_buffer.BindLighting(m_LightingState, 0, 4);
-        GeometrySubpass::Draw(command_buffer);
+        GeometrySubpass::Draw(render_context, command_buffer);
     }
 }

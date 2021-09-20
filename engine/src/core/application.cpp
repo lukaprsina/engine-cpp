@@ -77,6 +77,7 @@ namespace engine
 
         m_Window = m_Platform->CreatePlatformWindow();
         m_Window2 = m_Platform->CreatePlatformWindow();
+        m_Window3 = m_Platform->CreatePlatformWindow();
 
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
@@ -85,10 +86,14 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
+        //TODO: get surface from window
         m_Surface = m_Window->CreateSurface(*m_Instance);
         m_Surface2 = m_Window2->CreateSurface(*m_Instance);
+        m_Surface3 = m_Window3->CreateSurface(*m_Instance);
+
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
         gpu.IsPresentSupported(m_Surface2, 0);
+        gpu.IsPresentSupported(m_Surface3, 0);
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
             gpu.GetMutableRequestedFeatures()
@@ -112,17 +117,21 @@ namespace engine
         m_Window->CreateRenderContext(*m_Device,
                                       m_Surface,
                                       present_mode_priority,
-                                      surface_format_priority,
-                                      1);
+                                      surface_format_priority);
 
         m_Window2->CreateRenderContext(*m_Device,
                                        m_Surface2,
                                        present_mode_priority,
-                                       surface_format_priority,
-                                       2);
+                                       surface_format_priority);
+
+        m_Window3->CreateRenderContext(*m_Device,
+                                       m_Surface3,
+                                       present_mode_priority,
+                                       surface_format_priority);
 
         m_Window->GetRenderContext().Prepare();
         m_Window2->GetRenderContext().Prepare();
+        m_Window3->GetRenderContext().Prepare();
 
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
@@ -138,23 +147,13 @@ namespace engine
             LoadScene(scene);
 
         m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window);
-        m_Scene2->AddFreeCamera(m_Window2->GetRenderContext().GetSurfaceExtent(), m_Window2);
 
-        auto scene_subpass = std::make_unique<ForwardSubpass>(m_Window->GetRenderContext(),
-                                                              std::move(vert_shader),
+        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
                                                               std::move(frag_shader),
                                                               *m_Scene);
 
-        auto scene_subpass2 = std::make_unique<ForwardSubpass>(m_Window2->GetRenderContext(),
-                                                               std::move(vert_shader),
-                                                               std::move(frag_shader),
-                                                               *m_Scene2);
-
-        m_RenderPipeline = std::make_unique<RenderPipeline>();
+        m_RenderPipeline = std::make_unique<RenderPipeline>(*m_Device);
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
-
-        m_RenderPipeline2 = std::make_unique<RenderPipeline>();
-        m_RenderPipeline2->AddSubpass(std::move(scene_subpass2));
 
         /* m_Gui = std::make_unique<Gui>(*this, m_Window);
 
@@ -214,14 +213,6 @@ namespace engine
             auto &camera = view.get<sg::FreeCamera>(entity);
             camera.Update(delta_time);
         }
-
-        auto view2 = m_Scene2->GetRegistry().view<sg::FreeCamera>();
-
-        for (auto &entity : view2)
-        {
-            auto &camera = view.get<sg::FreeCamera>(entity);
-            camera.Update(delta_time);
-        }
     }
 
     void Application::Draw(Window *window, CommandBuffer &command_buffer)
@@ -262,18 +253,9 @@ namespace engine
         SetViewportAndScissor(command_buffer,
                               window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
 
-        if (window->GetRenderContext().m_Test == 1)
-        {
-            if (m_RenderPipeline)
-                m_RenderPipeline->Draw(command_buffer,
-                                       window->GetRenderContext().GetActiveFrame().GetRenderTarget());
-        }
-        else if (window->GetRenderContext().m_Test == 2)
-        {
-            if (m_RenderPipeline2)
-                m_RenderPipeline2->Draw(command_buffer,
-                                        window->GetRenderContext().GetActiveFrame().GetRenderTarget());
-        }
+        if (m_RenderPipeline)
+            m_RenderPipeline->Draw(window->GetRenderContext(), command_buffer,
+                                   window->GetRenderContext().GetActiveFrame().GetRenderTarget());
 
         if (m_Gui)
             m_Gui->Draw(command_buffer);
@@ -354,9 +336,8 @@ namespace engine
         GLTFLoader loader(*m_Device);
 
         m_Scene = loader.ReadSceneFromFile(path);
-        m_Scene2 = loader.ReadSceneFromFile(path);
 
-        if (!m_Scene && !m_Scene2)
+        if (!m_Scene)
             throw std::runtime_error("Cannot load scene: " + path);
     }
 

@@ -161,5 +161,5 @@ namespace engine
 			ktxTexture_Destroy(texture);
 		}
 
-	} // namespace sg
-} // namespace engine
+	}
+}

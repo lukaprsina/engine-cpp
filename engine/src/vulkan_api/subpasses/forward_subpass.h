@@ -16,13 +16,12 @@ namespace engine
     class ForwardSubpass : public GeometrySubpass
     {
     public:
-        ForwardSubpass(RenderContext &render_context,
-                       ShaderSource &&vertex_shader,
+        ForwardSubpass(ShaderSource &&vertex_shader,
                        ShaderSource &&fragment_shader,
                        Scene &scene);
         ~ForwardSubpass();
 
-        virtual void Prepare() override;
-        virtual void Draw(CommandBuffer &command_buffer) override;
+        virtual void Prepare(Device &device) override;
+        virtual void Draw(RenderContext &render_context, CommandBuffer &command_buffer) override;
     };
 }

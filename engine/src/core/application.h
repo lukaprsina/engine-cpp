@@ -87,14 +87,12 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
-        std::unique_ptr<Device> m_Device2{};
         std::unique_ptr<Scene> m_Scene{};
-        std::unique_ptr<Scene> m_Scene2{};
         std::unique_ptr<Gui> m_Gui{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
-        std::unique_ptr<RenderPipeline> m_RenderPipeline2{};
         Window *m_Window;
         Window *m_Window2;
+        Window *m_Window3;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};
@@ -102,6 +100,7 @@ namespace engine
 
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
         VkSurfaceKHR m_Surface2{VK_NULL_HANDLE};
+        VkSurfaceKHR m_Surface3{VK_NULL_HANDLE};
     };
 
     std::unique_ptr<Application> CreateApplication(Platform *platform);

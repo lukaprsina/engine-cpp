@@ -39,14 +39,14 @@ namespace engine
 
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
+        WindowSettings &GetMutableSettings() { return m_Settings; }
         Input &GetInput() { return m_Input; }
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 
         RenderContext &CreateRenderContext(Device &device,
                                            VkSurfaceKHR surface,
                                            std::vector<VkPresentModeKHR> &present_mode_priority,
-                                           std::vector<VkSurfaceFormatKHR> &surface_format_priority,
-                                           int test);
+                                           std::vector<VkSurfaceFormatKHR> &surface_format_priority);
         RenderContext &GetRenderContext();
         void DeleteRenderContext();
 

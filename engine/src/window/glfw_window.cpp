@@ -19,45 +19,51 @@ namespace engine
             ENG_CORE_INFO("GLFW Error (code {}): {}", error, description);
         }
 
-        void WindowCloseCallback(GLFWwindow *window)
+        void WindowCloseCallback(GLFWwindow *glfw_window)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
-            WindowCloseEvent event;
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
+            WindowCloseEvent event(window);
+
             data.EventCallback(event);
         }
 
-        void WindowSizeCallback(GLFWwindow *window, int width, int height)
+        void WindowSizeCallback(GLFWwindow *glfw_window, int width, int height)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
 
             data.width = width;
             data.height = height;
 
-            WindowResizeEvent event(width, height);
+            WindowResizeEvent event(window, width, height);
             data.EventCallback(event);
         }
 
-        void WindowFocusCallback(GLFWwindow *window, int focused)
+        void WindowFocusCallback(GLFWwindow *glfw_window, int focused)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
 
-            WindowFocusedEvent event(focused);
+            WindowFocusedEvent event(window, focused);
             data.EventCallback(event);
         }
 
-        void WindowPositionCallback(GLFWwindow *window, int xPos, int yPos)
+        void WindowPositionCallback(GLFWwindow *glfw_window, int xPos, int yPos)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
             data.posx = xPos;
             data.posy = yPos;
 
-            WindowMovedEvent event(xPos, yPos);
+            WindowMovedEvent event(window, xPos, yPos);
             data.EventCallback(event);
         }
 
-        void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+        void KeyCallback(GLFWwindow *glfw_window, int key, int scancode, int action, int mods)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
             static uint32_t repeat_count = 0;
 
             switch (action)
@@ -65,14 +71,14 @@ namespace engine
             case GLFW_PRESS:
             {
                 repeat_count = 0;
-                KeyPressedEvent event(key, 0);
+                KeyPressedEvent event(window, key, 0);
                 data.EventCallback(event);
                 break;
             }
 
             case GLFW_RELEASE:
             {
-                KeyReleasedEvent event(key);
+                KeyReleasedEvent event(window, key);
                 data.EventCallback(event);
                 break;
             }
@@ -80,51 +86,54 @@ namespace engine
             case GLFW_REPEAT:
             {
                 repeat_count++;
-                KeyPressedEvent event(key, repeat_count);
+                KeyPressedEvent event(window, key, repeat_count);
                 data.EventCallback(event);
                 break;
             }
             }
         }
 
-        void CharCallback(GLFWwindow *window, uint32_t key)
+        void CharCallback(GLFWwindow *glfw_window, uint32_t key)
         {
         }
 
-        void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+        void MouseButtonCallback(GLFWwindow *glfw_window, int button, int action, int mods)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
 
             switch (action)
             {
             case GLFW_PRESS:
             {
-                MouseButtonPressedEvent event(button);
+                MouseButtonPressedEvent event(window, button);
                 data.EventCallback(event);
                 break;
             }
             case GLFW_RELEASE:
             {
-                MouseButtonReleasedEvent event(button);
+                MouseButtonReleasedEvent event(window, button);
                 data.EventCallback(event);
                 break;
             }
             }
         }
 
-        void ScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
+        void ScrollCallback(GLFWwindow *glfw_window, double xOffset, double yOffset)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
 
-            MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
+            MouseScrolledEvent event(window, static_cast<float>(xOffset), static_cast<float>(yOffset));
             data.EventCallback(event);
         }
 
-        void CursorPositionCallback(GLFWwindow *window, double xPos, double yPos)
+        void CursorPositionCallback(GLFWwindow *glfw_window, double xPos, double yPos)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto &data = window->GetMutableSettings();
 
-            MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
+            MouseMovedEvent event(window, static_cast<float>(xPos), static_cast<float>(yPos));
             data.EventCallback(event);
         }
     }
@@ -165,7 +174,7 @@ namespace engine
         SetSettings(settings);
         m_WindowedSettings = settings;
 
-        glfwSetWindowUserPointer(m_Handle, &m_Settings);
+        glfwSetWindowUserPointer(m_Handle, this);
 
         glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
         glfwSetWindowSizeCallback(m_Handle, WindowSizeCallback);

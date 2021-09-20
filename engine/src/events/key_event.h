@@ -158,8 +158,8 @@ namespace engine
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(int keycode)
-			: m_KeyCode(keycode) {}
+		KeyEvent(Window *window, int keycode)
+			: Event(window), m_KeyCode(keycode) {}
 
 		int m_KeyCode;
 	};
@@ -167,8 +167,8 @@ namespace engine
 	class KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(Window *window, int keycode, int repeatCount)
+			: KeyEvent(window, keycode), m_RepeatCount(repeatCount) {}
 
 		inline int GetRepeatCount() const { return m_RepeatCount; }
 
@@ -187,8 +187,8 @@ namespace engine
 	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keycode)
-			: KeyEvent(keycode) {}
+		KeyReleasedEvent(Window *window, int keycode)
+			: KeyEvent(window, keycode) {}
 
 		std::string ToString() const override
 		{

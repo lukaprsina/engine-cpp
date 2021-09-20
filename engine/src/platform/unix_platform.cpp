@@ -83,7 +83,7 @@ namespace engine
         else
             ENG_CORE_INFO("Window created!");
 
-        // TODO: set event callback to macro
+        // TODO: move to window
         window->SetEventCallback(std::bind(&Window::OnEvent, window.get(), std::placeholders::_1));
 
         return window.get();

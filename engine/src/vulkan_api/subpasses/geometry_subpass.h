@@ -33,18 +33,17 @@ namespace engine
     class GeometrySubpass : public Subpass
     {
     public:
-        GeometrySubpass(RenderContext &render_context,
-                        ShaderSource &&vertex_shader,
+        GeometrySubpass(ShaderSource &&vertex_shader,
                         ShaderSource &&fragment_shader,
                         Scene &scene);
         virtual ~GeometrySubpass();
 
-        virtual void Prepare() override;
-        virtual void Draw(CommandBuffer &command_buffer) override;
+        virtual void Prepare(Device &device) override;
+        virtual void Draw(RenderContext &render_context, CommandBuffer &command_buffer) override;
         void GetSortedNodes(std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
                             std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes);
 
-        void UpdateUniform(CommandBuffer &command_buffer, sg::Transform &transform, size_t thread_index = 0);
+        void UpdateUniform(RenderContext &render_context, CommandBuffer &command_buffer, sg::Transform &transform, size_t thread_index = 0);
 
         void DrawSubmesh(CommandBuffer &command_buffer,
                          sg::Submesh &sub_mesh,

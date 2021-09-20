@@ -2,6 +2,8 @@
 
 namespace engine
 {
+    class Window;
+
     enum class EventType
     {
         None = 0,
@@ -38,7 +40,9 @@ namespace engine
     class Event
     {
     public:
-        Event() = default;
+        Event(Window *window)
+            : m_Window(*window) {}
+
         virtual ~Event() = default;
         bool handled = false;
 
@@ -53,8 +57,11 @@ namespace engine
             return GetCategoryFlags() & category;
         }
 
+        Window &GetWindow() { return m_Window; }
+
     private:
         friend class EventDispatcher;
+        Window &m_Window;
     };
 
     class EventDispatcher

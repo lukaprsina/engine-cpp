@@ -31,5 +31,5 @@ namespace engine
 			virtual ~Stb() = default;
 		};
 
-	} // namespace sg
-} // namespace engine
+	}
+}
