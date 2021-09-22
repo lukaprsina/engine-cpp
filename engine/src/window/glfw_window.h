@@ -18,7 +18,7 @@ namespace engine
         static void Init();
         static void DeInit();
         void ProcessEvents() override;
-        VkSurfaceKHR CreateSurface(Instance &instance) override;
+        VkSurfaceKHR CreateSurface(Instance &instance, PhysicalDevice &physical_device) override;
         bool ShouldClose() const override;
         void Close() override;
         void *GetNativeWindow() override { return reinterpret_cast<void *>(m_Handle); }

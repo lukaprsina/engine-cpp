@@ -12,7 +12,6 @@ ENG_ENABLE_WARNINGS()
 namespace engine
 {
     Device::Device(PhysicalDevice &gpu,
-                   VkSurfaceKHR surface,
                    std::unordered_map<const char *, bool> requested_extensions)
         : m_Gpu(gpu), m_ResourceCache(*this)
     {
@@ -109,7 +108,9 @@ namespace engine
         for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties_count; ++queue_family_index)
         {
             const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
-            VkBool32 present_supported = gpu.IsPresentSupported(surface, queue_family_index);
+            // VkBool32 present_supported = gpu.IsPresentSupported(surface, queue_family_index);
+            VkBool32 present_supported{VK_TRUE};
+            // TODO
 
             m_QueueFamilies.emplace_back(*this, queue_family_index, queue_family_property, present_supported);
         }

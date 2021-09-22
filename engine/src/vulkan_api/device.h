@@ -13,7 +13,7 @@ namespace engine
     class Device
     {
     public:
-        Device(PhysicalDevice &gpu, VkSurfaceKHR surface,
+        Device(PhysicalDevice &gpu,
                std::unordered_map<const char *, bool> requested_extensions = {});
         ~Device();
 

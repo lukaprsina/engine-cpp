@@ -1026,11 +1026,11 @@ namespace engine
     const std::string Gui::default_font = "Roboto-Medium";
 
     Gui::Gui(Application &application,
-             Window &window,
+             Window *window,
              const float font_size,
              bool explicit_update)
         : m_Application(application), m_ExplicitUpdate(explicit_update),
-          m_Window(window)
+          m_Window(*window)
     {
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
@@ -1169,7 +1169,7 @@ namespace engine
             m_IndexBuffer = std::make_unique<core::Buffer>(m_Window.GetRenderContext().GetDevice(), 1, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
         }
 
-        auto glfw_window = reinterpret_cast<GLFWwindow *>(window.GetNativeWindow());
+        auto glfw_window = reinterpret_cast<GLFWwindow *>(m_Window.GetNativeWindow());
         ImGui_ImplGlfw_InitForVulkan(glfw_window, true);
     }
 

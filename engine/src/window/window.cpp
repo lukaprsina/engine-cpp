@@ -16,6 +16,14 @@ namespace engine
         m_Settings.EventCallback(event);
     }
 
+    Window::~Window()
+    {
+        if (m_Surface != VK_NULL_HANDLE)
+            vkDestroySurfaceKHR(m_Platform.GetApp().GetInstance().GetHandle(), m_Surface, nullptr);
+
+        m_RenderContext.reset();
+    }
+
     void Window::OnEvent(Event &event)
     {
         EventDispatcher dispatcher(event);
@@ -29,12 +37,11 @@ namespace engine
     }
 
     RenderContext &Window::CreateRenderContext(Device &device,
-                                               VkSurfaceKHR surface,
                                                std::vector<VkPresentModeKHR> &present_mode_priority,
                                                std::vector<VkSurfaceFormatKHR> &surface_format_priority)
     {
         m_RenderContext = std::make_unique<RenderContext>(device,
-                                                          surface,
+                                                          m_Surface,
                                                           present_mode_priority,
                                                           surface_format_priority,
                                                           m_Settings.width,

@@ -13,7 +13,7 @@ namespace engine
     {
     }
 
-    VkSurfaceKHR HeadlessWindow::CreateSurface(Instance &instance)
+    VkSurfaceKHR HeadlessWindow::CreateSurface(Instance &instance, PhysicalDevice &)
     {
         return VK_NULL_HANDLE;
     }

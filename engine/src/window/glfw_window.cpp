@@ -4,6 +4,7 @@
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
+#include "vulkan_api/physical_device.h"
 
 ENG_DISABLE_WARNINGS()
 #define GLFW_INCLUDE_NONE
@@ -233,7 +234,7 @@ namespace engine
         m_Dirty = false;
     }
 
-    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
+    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance, PhysicalDevice &physical_device)
     {
         ENG_ASSERT(instance.GetHandle() && "Create an instance before calling CreateSurface.");
         ENG_ASSERT(m_Handle && "Create a window before calling CreateSurface.");
@@ -241,13 +242,16 @@ namespace engine
         if (instance.GetHandle() == VK_NULL_HANDLE || !m_Handle)
             return VK_NULL_HANDLE;
 
-        VkSurfaceKHR surface = VK_NULL_HANDLE;
-        VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &surface);
+        VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &m_Surface);
 
         if (result != VK_SUCCESS)
             return VK_NULL_HANDLE;
 
-        return surface;
+        physical_device.IsPresentSupported(m_Surface, 0);
+
+        return m_Surface;
+
+        // TODO: loop through queues
     }
 
     bool GlfwWindow::ShouldClose() const

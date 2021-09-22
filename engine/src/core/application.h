@@ -92,15 +92,10 @@ namespace engine
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
         Window *m_Window;
         Window *m_Window2;
-        Window *m_Window3;
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};
         std::vector<const char *> m_ValidationLayers{};
-
-        VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
-        VkSurfaceKHR m_Surface2{VK_NULL_HANDLE};
-        VkSurfaceKHR m_Surface3{VK_NULL_HANDLE};
     };
 
     std::unique_ptr<Application> CreateApplication(Platform *platform);

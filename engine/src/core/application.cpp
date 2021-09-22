@@ -60,11 +60,7 @@ namespace engine
         m_Scene.reset();
         m_Gui.reset();
 
-        m_Window->DeleteRenderContext();
         m_Device.reset();
-
-        if (m_Surface != VK_NULL_HANDLE)
-            vkDestroySurfaceKHR(m_Instance->GetHandle(), m_Surface, nullptr);
 
         m_Instance.reset();
     }
@@ -77,7 +73,6 @@ namespace engine
 
         m_Window = m_Platform->CreatePlatformWindow();
         m_Window2 = m_Platform->CreatePlatformWindow();
-        m_Window3 = m_Platform->CreatePlatformWindow();
 
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
@@ -86,14 +81,10 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
-        //TODO: get surface from window
-        m_Surface = m_Window->CreateSurface(*m_Instance);
-        m_Surface2 = m_Window2->CreateSurface(*m_Instance);
-        m_Surface3 = m_Window3->CreateSurface(*m_Instance);
-
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
-        gpu.IsPresentSupported(m_Surface2, 0);
-        gpu.IsPresentSupported(m_Surface3, 0);
+
+        m_Window->CreateSurface(*m_Instance, gpu);
+        m_Window2->CreateSurface(*m_Instance, gpu);
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
             gpu.GetMutableRequestedFeatures()
@@ -102,7 +93,7 @@ namespace engine
         if (!IsHeadless() || m_Instance->IsExtensionEnabled(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME))
             AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-        m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
+        m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
 
         std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                              VK_PRESENT_MODE_FIFO_KHR,
@@ -113,25 +104,16 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        // TODO: move surface to window
         m_Window->CreateRenderContext(*m_Device,
-                                      m_Surface,
                                       present_mode_priority,
                                       surface_format_priority);
 
         m_Window2->CreateRenderContext(*m_Device,
-                                       m_Surface2,
-                                       present_mode_priority,
-                                       surface_format_priority);
-
-        m_Window3->CreateRenderContext(*m_Device,
-                                       m_Surface3,
                                        present_mode_priority,
                                        surface_format_priority);
 
         m_Window->GetRenderContext().Prepare();
         m_Window2->GetRenderContext().Prepare();
-        m_Window3->GetRenderContext().Prepare();
 
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
@@ -155,9 +137,9 @@ namespace engine
         m_RenderPipeline = std::make_unique<RenderPipeline>(*m_Device);
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
 
-        /* m_Gui = std::make_unique<Gui>(*this, m_Window);
+        m_Gui = std::make_unique<Gui>(*this, m_Window);
 
-        m_LayerStack.PushLayer(m_Gui.get()); */
+        m_LayerStack.PushLayer(m_Gui.get());
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnAttach();

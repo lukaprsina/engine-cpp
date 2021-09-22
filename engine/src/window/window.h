@@ -9,6 +9,7 @@ namespace engine
     class Platform;
     class Event;
     class Device;
+    class PhysicalDevice;
 
     struct WindowSettings
     {
@@ -28,10 +29,10 @@ namespace engine
     {
     public:
         Window(Platform &platform, WindowSettings &settings);
-        virtual ~Window() = default;
+        virtual ~Window();
 
         virtual void ProcessEvents(){};
-        virtual VkSurfaceKHR CreateSurface(Instance &instance) = 0;
+        virtual VkSurfaceKHR CreateSurface(Instance &instance, PhysicalDevice &physical_device) = 0;
         virtual bool ShouldClose() const = 0;
         virtual void Close() = 0;
         virtual void *GetNativeWindow() = 0;
@@ -44,7 +45,6 @@ namespace engine
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 
         RenderContext &CreateRenderContext(Device &device,
-                                           VkSurfaceKHR surface,
                                            std::vector<VkPresentModeKHR> &present_mode_priority,
                                            std::vector<VkSurfaceFormatKHR> &surface_format_priority);
         RenderContext &GetRenderContext();
@@ -54,6 +54,7 @@ namespace engine
         Platform &m_Platform;
         WindowSettings m_Settings;
         WindowSettings m_WindowedSettings;
+        VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
 
         Input m_Input;
         std::unique_ptr<RenderContext> m_RenderContext{};

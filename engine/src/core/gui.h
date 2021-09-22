@@ -52,7 +52,7 @@ namespace engine
     {
     public:
         Gui(Application &application,
-            Window &window,
+            Window *window,
             const float font_size = 21.0f,
             bool explicit_update = false);
         ~Gui();
