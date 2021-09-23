@@ -45,7 +45,7 @@ namespace engine
     {
         ENG_CORE_INFO("Starting the main loop.");
 
-        while (!m_App->GetWindow()->ShouldClose())
+        while (!m_App->ShouldClose())
         {
             for (auto &window_pair : m_Windows)
             {

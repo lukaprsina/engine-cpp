@@ -67,7 +67,7 @@ namespace engine
 
     bool Application::Prepare()
     {
-        m_Timer.Start();
+        /* m_Timer.Start();
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
 
@@ -142,7 +142,7 @@ namespace engine
         m_LayerStack.PushLayer(m_Gui.get());
 
         for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnAttach();
+            layer->OnAttach(); */
 
         return true;
     }

@@ -179,6 +179,7 @@ set(VULKAN_API_FILES
     src/scene/components/perspective_camera.cpp
     src/scene/script.cpp
     src/scene/scripts/free_camera.cpp
+    src/core/layer.cpp
     src/core/layer_stack.cpp
     src/core/gui.cpp)
 

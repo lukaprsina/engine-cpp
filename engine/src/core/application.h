@@ -36,26 +36,26 @@ namespace engine
         bool OnResize(WindowResizeEvent &event);
         bool OnKeyPressed(KeyPressedEvent &event);
 
-        bool Prepare();
+        virtual bool Prepare();
         void Step(Window *window);
         void Update(Window *window, float delta_time);
         void UpdateScene(float delta_time);
         void Draw(Window *window, CommandBuffer &command_buffer);
         void Finish();
+        bool ShouldClose() { return false; }
 
         void LoadScene(const std::string &path);
 
         void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
 
-        void SetName(const std::string &name)
-        {
-            m_Name = name;
-        }
+        void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; };
+
         Platform &GetPlatform() { return *m_Platform; };
         Instance &GetInstance() { return *m_Instance; };
         Device &GetDevice() { return *m_Device; };
         Window *GetWindow() { return m_Window; };
+        LayerStack &GetLayerStack() { return m_LayerStack; };
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
