@@ -11,7 +11,7 @@ void Game::OnAttach()
 }
 
 Game::Game(engine::Application *application)
-    : m_App(application)
+    : Layer(application)
 {
 }
 
@@ -24,6 +24,7 @@ bool Sandbox::Prepare()
 {
     m_Game = std::make_unique<Game>(this);
     GetLayerStack().PushLayer(m_Game.get());
+
     Application::Prepare();
     return true;
 }

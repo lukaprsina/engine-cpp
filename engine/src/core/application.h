@@ -39,22 +39,18 @@ namespace engine
         virtual bool Prepare();
         void Step(Layer *layer);
         void Update(Layer *layer, float delta_time);
-        void UpdateScene(float delta_time);
+        void UpdateScene(Layer *layer, float delta_time);
         void Draw(Layer *layer, CommandBuffer &command_buffer);
         void Finish();
         bool ShouldClose() { return false; }
 
-        void LoadScene(const std::string &path);
-
         void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
-
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; };
 
         Platform &GetPlatform() { return *m_Platform; };
         Instance &GetInstance() { return *m_Instance; };
         Device &GetDevice() { return *m_Device; };
-        Window *GetWindow() { return m_Window; };
         LayerStack &GetLayerStack() { return m_LayerStack; };
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
@@ -87,11 +83,11 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
-        std::unique_ptr<Scene> m_Scene{};
-        std::unique_ptr<Gui> m_Gui{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
+        /* std::unique_ptr<Scene> m_Scene{};
+        std::unique_ptr<Gui> m_Gui{};
         Window *m_Window;
-        Window *m_Window2;
+        Window *m_Window2; */
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};

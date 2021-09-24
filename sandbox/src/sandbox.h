@@ -13,7 +13,6 @@ public:
     void OnAttach();
 
 private:
-    engine::Application *m_App;
     engine::Window *m_Window;
 };
 

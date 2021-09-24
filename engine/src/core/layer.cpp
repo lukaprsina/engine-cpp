@@ -5,7 +5,8 @@
 
 namespace engine
 {
-    Layer::Layer()
+    Layer::Layer(Application *application)
+        : m_Application(application)
     {
     }
 

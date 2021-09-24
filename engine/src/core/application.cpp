@@ -57,8 +57,8 @@ namespace engine
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnDetach();
 
-        m_Scene.reset();
-        m_Gui.reset();
+        /* m_Scene.reset();
+        m_Gui.reset(); */
 
         m_Device.reset();
 
@@ -67,14 +67,9 @@ namespace engine
 
     bool Application::Prepare()
     {
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnAttach();
-        /* m_Timer.Start();
+        m_Timer.Start();
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
-
-        m_Window = m_Platform->CreatePlatformWindow();
-        m_Window2 = m_Platform->CreatePlatformWindow();
 
         m_Instance = std::make_unique<Instance>(m_Name,
                                                 m_InstanceExtensions,
@@ -85,9 +80,6 @@ namespace engine
 
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
-        m_Window->CreateSurface(*m_Instance, gpu);
-        m_Window2->CreateSurface(*m_Instance, gpu);
-
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
             gpu.GetMutableRequestedFeatures()
                 .textureCompressionASTC_LDR = VK_TRUE;
@@ -97,7 +89,12 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
 
-        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
+        for (Layer *layer : m_LayerStack.GetLayers())
+            layer->OnAttach();
+
+        return true;
+
+        /* std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                              VK_PRESENT_MODE_FIFO_KHR,
                                                              VK_PRESENT_MODE_MAILBOX_KHR});
 
@@ -105,17 +102,6 @@ namespace engine
                                                                  {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
-
-        m_Window->CreateRenderContext(*m_Device,
-                                      present_mode_priority,
-                                      surface_format_priority);
-
-        m_Window2->CreateRenderContext(*m_Device,
-                                       present_mode_priority,
-                                       surface_format_priority);
-
-        m_Window->GetRenderContext().Prepare();
-        m_Window2->GetRenderContext().Prepare();
 
         ShaderSource vert_shader("base.vert");
         ShaderSource frag_shader("base.frag");
@@ -130,7 +116,7 @@ namespace engine
         else
             LoadScene(scene);
 
-        m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window);
+        m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window); 
 
         auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
                                                               std::move(frag_shader),
@@ -141,12 +127,7 @@ namespace engine
 
         m_Gui = std::make_unique<Gui>(*this, m_Window);
 
-        m_LayerStack.PushLayer(m_Gui.get());
-
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnAttach(); */
-
-        return true;
+        m_LayerStack.PushLayer(m_Gui.get()); */
     }
 
     void Application::Step(Layer *layer)
@@ -176,7 +157,7 @@ namespace engine
 
     void Application::Update(Layer *layer, float delta_time)
     {
-        UpdateScene(delta_time);
+        UpdateScene(layer, delta_time);
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
@@ -189,9 +170,13 @@ namespace engine
         render_context.Submit(command_buffer);
     }
 
-    void Application::UpdateScene(float delta_time)
+    void Application::UpdateScene(Layer *layer, float delta_time)
     {
-        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+        Scene *scene = layer->GetScene();
+        if (!scene)
+            return;
+
+        auto view = scene->GetRegistry().view<sg::FreeCamera>();
 
         for (auto &entity : view)
         {
@@ -289,26 +274,26 @@ namespace engine
 
     bool Application::OnResize(WindowResizeEvent &event)
     {
-        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+        /* auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
         for (auto &entity : view)
         {
             auto &free_camera = view.get<sg::FreeCamera>(entity);
             free_camera.Resize(event.GetWidth(), event.GetHeight());
-        }
+        } */
 
         return false;
     }
 
     bool Application::OnKeyPressed(KeyPressedEvent &event)
     {
-        bool alt_enter = m_Window->GetInput().IsKeyPressed(Key::LeftAlt) && m_Window->GetInput().IsKeyPressed(Key::Enter);
+        /* bool alt_enter = m_Window->GetInput().IsKeyPressed(Key::LeftAlt) && m_Window->GetInput().IsKeyPressed(Key::Enter);
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
         {
             auto window_settings = m_Window->GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
             m_Window->SetSettings(window_settings);
-        }
+        } */
 
         return false;
     }
@@ -316,16 +301,6 @@ namespace engine
     void Application::ParseOptions(std::vector<std::string> &arguments)
     {
         m_Options.ParseOptions(m_Usage, arguments);
-    }
-
-    void Application::LoadScene(const std::string &path)
-    {
-        GLTFLoader loader(*m_Device);
-
-        m_Scene = loader.ReadSceneFromFile(path);
-
-        if (!m_Scene)
-            throw std::runtime_error("Cannot load scene: " + path);
     }
 
     void Application::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const

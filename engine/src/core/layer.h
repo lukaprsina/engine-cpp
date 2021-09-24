@@ -13,7 +13,7 @@ namespace engine
 	class Layer
 	{
 	public:
-		Layer();
+		Layer(Application *application);
 		virtual ~Layer() = default;
 
 		virtual void OnAttach() {}
