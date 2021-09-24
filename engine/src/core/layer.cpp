@@ -5,6 +5,10 @@
 
 namespace engine
 {
+    Layer::Layer()
+    {
+    }
+
     RenderContext &Layer::CreateRenderContext(Device &device,
                                               std::vector<VkPresentModeKHR> &present_mode_priority,
                                               std::vector<VkSurfaceFormatKHR> &surface_format_priority)

@@ -3,18 +3,27 @@
 #include "core/log.h"
 #include "vulkan_api/render_context.h"
 
+void Game::OnAttach()
+{
+    m_Window = GetApp()->GetPlatform().CreatePlatformWindow();
+    SetWindow(m_Window);
+    ENG_TRACE("Hello, world!");
+}
+
+Game::Game(engine::Application *application)
+    : m_App(application)
+{
+}
+
 Sandbox::Sandbox(engine::Platform *platform)
     : engine::Application(platform)
 {
 }
 
-void Game::OnAttach()
-{
-    ENG_TRACE("Hello, world!");
-}
-
 bool Sandbox::Prepare()
 {
+    m_Game = std::make_unique<Game>(this);
     GetLayerStack().PushLayer(m_Game.get());
+    Application::Prepare();
     return true;
 }

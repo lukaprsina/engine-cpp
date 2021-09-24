@@ -3,6 +3,7 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
+#include "core/layer_stack.h"
 
 #include <filesystem>
 
@@ -47,19 +48,21 @@ namespace engine
 
         while (!m_App->ShouldClose())
         {
-            for (auto &window_pair : m_Windows)
+            for (Layer *layer : m_App->GetLayerStack().GetLayers())
             {
-                auto *window = window_pair.second.get();
-                Run(window);
-                window->ProcessEvents();
+                if (layer && layer->GetWindow())
+                {
+                    Run(layer);
+                    layer->GetWindow()->ProcessEvents();
+                }
             }
         }
     }
 
-    void Platform::Run(Window *window)
+    void Platform::Run(Layer *layer)
     {
-        if (!window->GetSettings().minimized)
-            m_App->Step(window);
+        if (!layer->GetWindow()->GetSettings().minimized)
+            m_App->Step(layer);
     }
 
     void Platform::Terminate(ExitCode)

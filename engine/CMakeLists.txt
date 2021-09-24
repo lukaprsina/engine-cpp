@@ -119,8 +119,7 @@ set(VULKAN_API_FILES
     src/vulkan_api/initializers.h
     src/core/layer.h
     src/core/layer_stack.h
-    src/core/gui.h
-    # Source files
+    # src/core/gui.h Source files
     src/vulkan_api/instance.cpp
     src/vulkan_api/physical_device.cpp
     src/vulkan_api/device.cpp
@@ -181,7 +180,8 @@ set(VULKAN_API_FILES
     src/scene/scripts/free_camera.cpp
     src/core/layer.cpp
     src/core/layer_stack.cpp
-    src/core/gui.cpp)
+    # src/core/gui.cpp
+)
 
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})

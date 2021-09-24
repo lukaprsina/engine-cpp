@@ -37,10 +37,10 @@ namespace engine
         bool OnKeyPressed(KeyPressedEvent &event);
 
         virtual bool Prepare();
-        void Step(Window *window);
-        void Update(Window *window, float delta_time);
+        void Step(Layer *layer);
+        void Update(Layer *layer, float delta_time);
         void UpdateScene(float delta_time);
-        void Draw(Window *window, CommandBuffer &command_buffer);
+        void Draw(Layer *layer, CommandBuffer &command_buffer);
         void Finish();
         bool ShouldClose() { return false; }
 

@@ -8,23 +8,26 @@ namespace engine
 	class Scene;
 	class Window;
 	class Device;
+	class Application;
 
 	class Layer
 	{
 	public:
-		Layer() = default;
+		Layer();
 		virtual ~Layer() = default;
 
-		virtual void OnAttach(){};
+		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(float delta_time) = 0;
+		virtual void OnUpdate(float delta_time) {}
 		virtual void OnEvent(Event &event) {}
 
-		void SetActiveScene(Scene *scene) { m_Scene = scene; }
-		Scene *GetActiveScene() { return m_Scene; }
+		Application *GetApp() { return m_Application; }
 
-		void SetActiveWindow(Window *Window) { m_Window = Window; }
-		Window *GetActiveWindow() { return m_Window; }
+		void SetScene(Scene *scene) { m_Scene = scene; }
+		Scene *GetScene() { return m_Scene; }
+
+		void SetWindow(Window *Window) { m_Window = Window; }
+		Window *GetWindow() { return m_Window; }
 
 		RenderContext &CreateRenderContext(Device &device,
 										   std::vector<VkPresentModeKHR> &present_mode_priority,
@@ -33,6 +36,7 @@ namespace engine
 		void DeleteRenderContext();
 
 	private:
+		Application *m_Application;
 		std::unique_ptr<RenderContext> m_RenderContext{};
 		Scene *m_Scene;
 		Window *m_Window;

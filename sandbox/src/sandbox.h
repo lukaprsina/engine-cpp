@@ -9,9 +9,12 @@
 class Game : public engine::Layer
 {
 public:
+    Game(engine::Application *application);
     void OnAttach();
 
 private:
+    engine::Application *m_App;
+    engine::Window *m_Window;
 };
 
 class Sandbox : public engine::Application

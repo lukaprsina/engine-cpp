@@ -14,6 +14,7 @@ namespace engine
     };
 
     class Event;
+    class Layer;
 
     class Platform
     {
@@ -25,7 +26,7 @@ namespace engine
         virtual bool Prepare();
         virtual void MainLoop();
         virtual void Terminate(ExitCode code);
-        void Run(Window *window);
+        void Run(Layer *layer);
 
         virtual Window *CreatePlatformWindow() = 0;
         Window &GetWindow(void *handle) { return *m_Windows.at(handle); };
@@ -47,6 +48,7 @@ namespace engine
     protected:
         std::unique_ptr<Application> m_App{};
         std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
+        std::vector<Layer *> m_Layers;
         Timer m_Timer{};
 
     private:

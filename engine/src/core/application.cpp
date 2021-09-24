@@ -67,6 +67,8 @@ namespace engine
 
     bool Application::Prepare()
     {
+        for (Layer *layer : m_LayerStack.GetLayers())
+            layer->OnAttach();
         /* m_Timer.Start();
         AddInstanceExtension(m_Platform->GetSurfaceExtension());
         DebugUtilsSettings debug_utils_settings;
@@ -147,14 +149,14 @@ namespace engine
         return true;
     }
 
-    void Application::Step(Window *window)
+    void Application::Step(Layer *layer)
     {
         auto delta_time = static_cast<float>(m_Timer.Tick());
 
         if (m_FrameCount == 0)
             delta_time = 0.01667f;
 
-        Update(window, delta_time);
+        Update(layer, delta_time);
 
         auto elapsed_time = static_cast<float>(m_Timer.Elapsed<Timer::Seconds>());
 
@@ -172,18 +174,19 @@ namespace engine
         m_FrameCount++;
     }
 
-    void Application::Update(Window *window, float delta_time)
+    void Application::Update(Layer *layer, float delta_time)
     {
         UpdateScene(delta_time);
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
 
-        auto &command_buffer = window->GetRenderContext().Begin();
+        RenderContext &render_context = layer->GetRenderContext();
+        auto &command_buffer = render_context.Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Draw(window, command_buffer);
+        Draw(layer, command_buffer);
         command_buffer.End();
-        window->GetRenderContext().Submit(command_buffer);
+        render_context.Submit(command_buffer);
     }
 
     void Application::UpdateScene(float delta_time)
@@ -197,9 +200,10 @@ namespace engine
         }
     }
 
-    void Application::Draw(Window *window, CommandBuffer &command_buffer)
+    void Application::Draw(Layer *layer, CommandBuffer &command_buffer)
     {
-        auto &views = window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetViews();
+        auto &render_context = layer->GetRenderContext();
+        auto &views = render_context.GetActiveFrame().GetRenderTarget().GetViews();
 
         {
             // Image 0 is the swapchain
@@ -232,15 +236,16 @@ namespace engine
             command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
         }
 
+        auto &render_target = render_context.GetActiveFrame().GetRenderTarget();
         SetViewportAndScissor(command_buffer,
-                              window->GetRenderContext().GetActiveFrame().GetRenderTarget().GetExtent());
+                              render_target.GetExtent());
 
         if (m_RenderPipeline)
-            m_RenderPipeline->Draw(window->GetRenderContext(), command_buffer,
-                                   window->GetRenderContext().GetActiveFrame().GetRenderTarget());
+            m_RenderPipeline->Draw(render_context, command_buffer,
+                                   render_target);
 
-        if (m_Gui)
-            m_Gui->Draw(command_buffer);
+        /* if (m_Gui)
+            m_Gui->Draw(command_buffer); */
 
         command_buffer.EndRenderPass();
 

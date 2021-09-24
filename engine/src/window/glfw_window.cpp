@@ -23,7 +23,7 @@ namespace engine
         void WindowCloseCallback(GLFWwindow *glfw_window)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
             WindowCloseEvent event(window);
 
             data.EventCallback(event);
@@ -32,7 +32,7 @@ namespace engine
         void WindowSizeCallback(GLFWwindow *glfw_window, int width, int height)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
 
             data.width = width;
             data.height = height;
@@ -44,7 +44,7 @@ namespace engine
         void WindowFocusCallback(GLFWwindow *glfw_window, int focused)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
 
             WindowFocusedEvent event(window, focused);
             data.EventCallback(event);
@@ -53,7 +53,7 @@ namespace engine
         void WindowPositionCallback(GLFWwindow *glfw_window, int xPos, int yPos)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
             data.posx = xPos;
             data.posy = yPos;
 
@@ -64,7 +64,7 @@ namespace engine
         void KeyCallback(GLFWwindow *glfw_window, int key, int scancode, int action, int mods)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
             static uint32_t repeat_count = 0;
 
             switch (action)
@@ -101,7 +101,7 @@ namespace engine
         void MouseButtonCallback(GLFWwindow *glfw_window, int button, int action, int mods)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
 
             switch (action)
             {
@@ -123,7 +123,7 @@ namespace engine
         void ScrollCallback(GLFWwindow *glfw_window, double xOffset, double yOffset)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
 
             MouseScrolledEvent event(window, static_cast<float>(xOffset), static_cast<float>(yOffset));
             data.EventCallback(event);
@@ -132,7 +132,7 @@ namespace engine
         void CursorPositionCallback(GLFWwindow *glfw_window, double xPos, double yPos)
         {
             Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
-            auto &data = window->GetMutableSettings();
+            auto data = window->GetSettings();
 
             MouseMovedEvent event(window, static_cast<float>(xPos), static_cast<float>(yPos));
             data.EventCallback(event);
