@@ -27,6 +27,17 @@ namespace engine
     {
     }
 
+    void Scene::Update(float delta_time)
+    {
+        auto view = m_Registry.view<sg::FreeCamera>();
+
+        for (auto &entity : view)
+        {
+            auto &camera = view.get<sg::FreeCamera>(entity);
+            camera.Update(delta_time);
+        }
+    }
+
     Entity Scene::CreateEntity()
     {
         Entity entity{m_Registry.create(), this};

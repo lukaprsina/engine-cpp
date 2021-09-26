@@ -27,6 +27,8 @@ namespace engine
         Scene(const std::string &name);
         ~Scene();
 
+        void Update(float delta_time);
+
         Entity CreateEntity();
 
         void AddFreeCamera(VkExtent2D extent, Window *window);

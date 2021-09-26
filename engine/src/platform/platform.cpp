@@ -48,21 +48,15 @@ namespace engine
 
         while (!m_App->ShouldClose())
         {
-            for (Layer *layer : m_App->GetLayerStack().GetLayers())
+            m_App->Step();
+
+            for (auto &window_pair : m_Windows)
             {
-                if (layer && layer->GetWindow())
-                {
-                    Run(layer);
-                    layer->GetWindow()->ProcessEvents();
-                }
+                auto &window = window_pair.second;
+                m_App->Draw(window.get());
+                window->ProcessEvents();
             }
         }
-    }
-
-    void Platform::Run(Layer *layer)
-    {
-        if (!layer->GetWindow()->GetSettings().minimized)
-            m_App->Step(layer);
     }
 
     void Platform::Terminate(ExitCode)

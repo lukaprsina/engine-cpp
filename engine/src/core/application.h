@@ -37,30 +37,32 @@ namespace engine
         bool OnKeyPressed(KeyPressedEvent &event);
 
         virtual bool Prepare();
-        void Step(Layer *layer);
-        void Update(Layer *layer, float delta_time);
-        void UpdateScene(Layer *layer, float delta_time);
-        void Draw(Layer *layer, CommandBuffer &command_buffer);
+        void Step();
+        void Update(float delta_time);
+
+        void Draw(Window *window);
         void Finish();
         bool ShouldClose() { return false; }
 
+        Scene *LoadScene(std::string name);
         void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
         void SetName(const std::string &name) { m_Name = name; }
-        std::string GetName() const { return m_Name; };
+        std::string GetName() const { return m_Name; }
 
-        Platform &GetPlatform() { return *m_Platform; };
-        Instance &GetInstance() { return *m_Instance; };
-        Device &GetDevice() { return *m_Device; };
-        LayerStack &GetLayerStack() { return m_LayerStack; };
+        Platform &GetPlatform() { return *m_Platform; }
+        Instance &GetInstance() { return *m_Instance; }
+        Device &GetDevice() { return *m_Device; }
+        LayerStack &GetLayerStack() { return m_LayerStack; }
+        std::vector<Scene *> &GetScenes() { return m_Scenes; }
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
 
         void ParseOptions(std::vector<std::string> &arguments);
-        Options GetOptions() const { return m_Options; };
+        Options GetOptions() const { return m_Options; }
 
-        void SetHeadless(bool headless) { m_Headless = headless; };
-        bool IsHeadless() const { return m_Headless; };
+        void SetHeadless(bool headless) { m_Headless = headless; }
+        bool IsHeadless() const { return m_Headless; }
 
         void AddInstanceExtension(const char *extension, bool optional = false) { m_InstanceExtensions[extension] = optional; }
         const std::unordered_map<const char *, bool> GetInstanceExtensions() { return m_InstanceExtensions; }
@@ -84,6 +86,7 @@ namespace engine
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
+        std::vector<Scene *> m_Scenes{};
         /* std::unique_ptr<Scene> m_Scene{};
         std::unique_ptr<Gui> m_Gui{};
         Window *m_Window;

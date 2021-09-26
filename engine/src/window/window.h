@@ -9,6 +9,7 @@ namespace engine
     class Event;
     class Device;
     class PhysicalDevice;
+    class RenderContext;
 
     struct WindowSettings
     {
@@ -43,12 +44,20 @@ namespace engine
         Input &GetInput() { return m_Input; }
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 
+        RenderContext &CreateRenderContext(Device &device,
+                                           std::vector<VkPresentModeKHR> &present_mode_priority,
+                                           std::vector<VkSurfaceFormatKHR> &surface_format_priority);
+        RenderContext &GetRenderContext();
+        void DeleteRenderContext();
+        bool IsRenderContextValid() { return static_cast<bool>(m_RenderContext); }
+
     protected:
         Platform &m_Platform;
         WindowSettings m_Settings;
         WindowSettings m_WindowedSettings;
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
         Input m_Input;
+        std::unique_ptr<RenderContext> m_RenderContext{};
 
         bool m_Dirty{false};
     };

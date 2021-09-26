@@ -89,6 +89,16 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
 
+        ShaderSource vert_shader("base.vert");
+        ShaderSource frag_shader("base.frag");
+
+        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
+                                                              std::move(frag_shader),
+                                                              *m_Scenes[0]);
+
+        m_RenderPipeline = std::make_unique<RenderPipeline>(*m_Device);
+        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
+
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnAttach();
 
@@ -103,8 +113,6 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        ShaderSource vert_shader("base.vert");
-        ShaderSource frag_shader("base.frag");
 
         std::string scene;
 
@@ -116,28 +124,21 @@ namespace engine
         else
             LoadScene(scene);
 
-        m_Scene->AddFreeCamera(m_Window->GetRenderContext().GetSurfaceExtent(), m_Window); 
-
-        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
-                                                              std::move(frag_shader),
-                                                              *m_Scene);
-
-        m_RenderPipeline = std::make_unique<RenderPipeline>(*m_Device);
-        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
+        
 
         m_Gui = std::make_unique<Gui>(*this, m_Window);
 
         m_LayerStack.PushLayer(m_Gui.get()); */
     }
 
-    void Application::Step(Layer *layer)
+    void Application::Step()
     {
         auto delta_time = static_cast<float>(m_Timer.Tick());
 
         if (m_FrameCount == 0)
             delta_time = 0.01667f;
 
-        Update(layer, delta_time);
+        Update(delta_time);
 
         auto elapsed_time = static_cast<float>(m_Timer.Elapsed<Timer::Seconds>());
 
@@ -155,39 +156,20 @@ namespace engine
         m_FrameCount++;
     }
 
-    void Application::Update(Layer *layer, float delta_time)
+    void Application::Update(float delta_time)
     {
-        UpdateScene(layer, delta_time);
+        for (Scene *scene : m_Scenes)
+            scene->Update(delta_time);
 
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnUpdate(delta_time);
+    }
 
-        RenderContext &render_context = layer->GetRenderContext();
+    void Application::Draw(Window *window)
+    {
+        auto &render_context = window->GetRenderContext();
         auto &command_buffer = render_context.Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Draw(layer, command_buffer);
-        command_buffer.End();
-        render_context.Submit(command_buffer);
-    }
-
-    void Application::UpdateScene(Layer *layer, float delta_time)
-    {
-        Scene *scene = layer->GetScene();
-        if (!scene)
-            return;
-
-        auto view = scene->GetRegistry().view<sg::FreeCamera>();
-
-        for (auto &entity : view)
-        {
-            auto &camera = view.get<sg::FreeCamera>(entity);
-            camera.Update(delta_time);
-        }
-    }
-
-    void Application::Draw(Layer *layer, CommandBuffer &command_buffer)
-    {
-        auto &render_context = layer->GetRenderContext();
         auto &views = render_context.GetActiveFrame().GetRenderTarget().GetViews();
 
         {
@@ -244,12 +226,23 @@ namespace engine
 
             command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
         }
+
+        command_buffer.End();
+        render_context.Submit(command_buffer);
     }
 
     void Application::Finish()
     {
         auto execution_time = m_Timer.Stop();
         ENG_CORE_INFO("Closing Application. (Runtime: {:.1f})", execution_time);
+    }
+
+    Scene *Application::LoadScene(std::string name)
+    {
+        GLTFLoader loader(*m_Device);
+        auto scene = loader.ReadSceneFromFile(name);
+        m_Scenes.emplace_back(scene.get());
+        return scene.get();
     }
 
     void Application::OnEvent(Event &event)

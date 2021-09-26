@@ -4,7 +4,6 @@
 
 namespace engine
 {
-	class RenderContext;
 	class Scene;
 	class Window;
 	class Device;
@@ -29,15 +28,8 @@ namespace engine
 		void SetWindow(Window *Window) { m_Window = Window; }
 		Window *GetWindow() { return m_Window; }
 
-		RenderContext &CreateRenderContext(Device &device,
-										   std::vector<VkPresentModeKHR> &present_mode_priority,
-										   std::vector<VkSurfaceFormatKHR> &surface_format_priority);
-		RenderContext &GetRenderContext();
-		void DeleteRenderContext();
-
 	private:
 		Application *m_Application;
-		std::unique_ptr<RenderContext> m_RenderContext{};
 		Scene *m_Scene;
 		Window *m_Window;
 	};

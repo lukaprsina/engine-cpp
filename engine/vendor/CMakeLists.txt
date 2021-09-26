@@ -285,6 +285,8 @@ create_dependency(PATH "tinygltf" LIB "tinygltf")
 if(${tinygltf_FOUND})
   target_link_libraries(engine PRIVATE ${tinygltf_LIBRARIES})
   target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIRS})
+  target_link_libraries(sandbox PRIVATE ${tinygltf_LIBRARIES})
+  target_include_directories(sandbox PRIVATE ${tinygltf_INCLUDE_DIRS})
 endif()
 
 # imgui
