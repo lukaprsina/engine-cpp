@@ -89,16 +89,6 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
 
-        ShaderSource vert_shader("base.vert");
-        ShaderSource frag_shader("base.frag");
-
-        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
-                                                              std::move(frag_shader),
-                                                              *m_Scenes[0]);
-
-        m_RenderPipeline = std::make_unique<RenderPipeline>(*m_Device);
-        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
-
         for (Layer *layer : m_LayerStack.GetLayers())
             layer->OnAttach();
 
@@ -207,9 +197,8 @@ namespace engine
         SetViewportAndScissor(command_buffer,
                               render_target.GetExtent());
 
-        if (m_RenderPipeline)
-            m_RenderPipeline->Draw(render_context, command_buffer,
-                                   render_target);
+        m_Scenes[0]->Draw(render_context, command_buffer,
+                          render_target);
 
         /* if (m_Gui)
             m_Gui->Draw(command_buffer); */

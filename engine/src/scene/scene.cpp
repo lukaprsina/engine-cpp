@@ -1,6 +1,10 @@
 #include "scene/scene.h"
 
 #include "scene/entity.h"
+#include "vulkan_api/rendering/render_pipeline.h"
+#include "vulkan_api/render_context.h"
+#include "vulkan_api/subpasses/forward_subpass.h"
+#include "vulkan_api/device.h"
 #include "window/window.h"
 #include "scene/components/image.h"
 #include "scene/scripts/free_camera.h"
@@ -38,6 +42,28 @@ namespace engine
         }
     }
 
+    void Scene::CreateRenderPipeline(Device &device)
+    {
+        ShaderSource vert_shader("base.vert");
+        ShaderSource frag_shader("base.frag");
+
+        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
+                                                              std::move(frag_shader),
+                                                              *this);
+
+        /* m_RenderPipeline.reset();
+        m_RenderPipeline = std::make_unique<RenderPipeline>(device);
+        m_RenderPipeline->AddSubpass(std::move(scene_subpass)); */
+    }
+
+    void Scene::Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target,
+                     VkSubpassContents contents)
+    {
+        if (m_RenderPipeline)
+            m_RenderPipeline->Draw(render_context, command_buffer,
+                                   render_target);
+    }
+
     Entity Scene::CreateEntity()
     {
         Entity entity{m_Registry.create(), this};
@@ -47,6 +73,7 @@ namespace engine
     void Scene::AddFreeCamera(VkExtent2D extent, Window *window)
     {
         m_DefaultCamera = m_Cameras[0].get();
+        bool test = m_DefaultCamera->HasComponent<sg::FreeCamera>();
         auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this, window);
         free_camera_script.Resize(extent.width, extent.height);
         ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());

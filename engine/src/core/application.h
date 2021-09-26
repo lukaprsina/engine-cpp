@@ -16,7 +16,6 @@ namespace engine
     class Device;
     class Scene;
     class RenderTarget;
-    class RenderPipeline;
     class CommandBuffer;
     class Gui;
 
@@ -85,7 +84,6 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
-        std::unique_ptr<RenderPipeline> m_RenderPipeline{};
         std::vector<Scene *> m_Scenes{};
         /* std::unique_ptr<Scene> m_Scene{};
         std::unique_ptr<Gui> m_Gui{};

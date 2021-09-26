@@ -28,7 +28,7 @@ namespace engine
         CommandBuffer &RequestCommandBuffer();
 
         VkDevice GetHandle() const { return m_Handle; }
-        PhysicalDevice GetGPU() const { return m_Gpu; }
+        PhysicalDevice &GetGPU() const { return m_Gpu; }
         VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
         ResourceCache &GetResourceCache() { return m_ResourceCache; }
         CommandPool &GetCommandPool() { return *m_CommandPool; }
