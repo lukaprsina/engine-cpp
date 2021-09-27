@@ -1,7 +1,6 @@
 {"submodules":["volk",
 "stb",
 "docopt",
-"glfw",
 "spdlog",
 "vma",
 "entt",
@@ -12,4 +11,5 @@
 "astc-encoder",
 "tinygltf",
 "imgui"],"external":["vulkan",
+"glfw",
 "glm"],"submodule_missing":[],"external_missing":[]}

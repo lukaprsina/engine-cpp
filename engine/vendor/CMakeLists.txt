@@ -141,14 +141,9 @@ endif()
 # instead of bundled" ON)
 
 create_dependency(
-  PATH
-  "spdlog"
-  INCLUDE
-  "include"
-  LIB
-  "spdlog"
-  PACKAGE
-  "spdlog")
+  PATH "spdlog" INCLUDE "include" LIB "spdlog"
+  # PACKAGE "spdlog"
+)
 if(${spdlog_FOUND})
   # target_compile_definitions(engine PRIVATE SPDLOG_FMT_EXTERNAL)
   target_include_directories(engine PRIVATE ${spdlog_INCLUDE_DIRS})
