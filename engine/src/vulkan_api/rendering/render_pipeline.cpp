@@ -18,6 +18,10 @@ namespace engine
         m_ClearValue[1].depthStencil = {0.0f, ~0U};
     }
 
+    RenderPipeline::~RenderPipeline()
+    {
+    }
+
     void RenderPipeline::AddSubpass(std::unique_ptr<Subpass> &&subpass)
     {
         subpass->Prepare(m_Device);

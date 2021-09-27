@@ -40,7 +40,8 @@ void Game::OnAttach()
 
     window->CreateSurface(GetApp()->GetInstance(), GetApp()->GetDevice().GetGPU());
     window->CreateRenderContext(GetApp()->GetDevice(), present_mode_priority, surface_format_priority);
-    // scene->AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
+    window->GetRenderContext().Prepare();
+    scene->AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
     scene->CreateRenderPipeline(GetApp()->GetDevice());
 }
 

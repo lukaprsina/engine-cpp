@@ -51,9 +51,8 @@ namespace engine
                                                               std::move(frag_shader),
                                                               *this);
 
-        /* m_RenderPipeline.reset();
         m_RenderPipeline = std::make_unique<RenderPipeline>(device);
-        m_RenderPipeline->AddSubpass(std::move(scene_subpass)); */
+        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
     }
 
     void Scene::Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target,

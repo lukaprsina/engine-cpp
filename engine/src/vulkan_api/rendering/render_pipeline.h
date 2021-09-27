@@ -12,7 +12,7 @@ namespace engine
     {
     public:
         RenderPipeline(Device &device, std::vector<std::unique_ptr<Subpass>> &&subpasses = {});
-        ~RenderPipeline() = default;
+        ~RenderPipeline();
 
         void AddSubpass(std::unique_ptr<Subpass> &&subpass);
 
@@ -22,8 +22,8 @@ namespace engine
     private:
         Device &m_Device;
         std::vector<std::unique_ptr<Subpass>> m_Subpasses{};
-        std::vector<LoadStoreInfo> m_LoadStore{};
-        std::vector<VkClearValue> m_ClearValue{};
+        std::vector<LoadStoreInfo> m_LoadStore = std::vector<LoadStoreInfo>(2);
+        std::vector<VkClearValue> m_ClearValue = std::vector<VkClearValue>(2);
         size_t m_ActiveSubpassIndex{0};
     };
 }

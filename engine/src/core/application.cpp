@@ -148,7 +148,7 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
-        for (Scene *scene : m_Scenes)
+        for (auto &scene : m_Scenes)
             scene->Update(delta_time);
 
         for (Layer *layer : m_LayerStack.GetLayers())
@@ -230,8 +230,8 @@ namespace engine
     {
         GLTFLoader loader(*m_Device);
         auto scene = loader.ReadSceneFromFile(name);
-        m_Scenes.emplace_back(scene.get());
-        return scene.get();
+        m_Scenes.emplace_back(std::move(scene));
+        return m_Scenes.back().get();
     }
 
     void Application::OnEvent(Event &event)
