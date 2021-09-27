@@ -38,13 +38,9 @@ namespace engine
         virtual bool Prepare();
         void Step();
         void Update(float delta_time);
-
-        void Draw(Window *window);
         void Finish();
-        bool ShouldClose() { return false; }
 
         Scene *LoadScene(std::string name);
-        void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; }
 

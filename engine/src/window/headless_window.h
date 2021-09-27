@@ -15,6 +15,7 @@ namespace engine
         VkSurfaceKHR CreateSurface(Instance &instance, PhysicalDevice &) override;
         bool ShouldClose() const override;
         void Close() override;
+        void Destroy() override{};
         void *GetNativeWindow() override { return nullptr; }
 
     private:

@@ -10,6 +10,9 @@ namespace engine
     class Device;
     class PhysicalDevice;
     class RenderContext;
+    class Scene;
+    class CommandBuffer;
+    class RenderTarget;
 
     struct WindowSettings
     {
@@ -33,11 +36,16 @@ namespace engine
 
         virtual void ProcessEvents(){};
         virtual VkSurfaceKHR CreateSurface(Instance &instance, PhysicalDevice &physical_device) = 0;
+        void Draw();
+        void Render(CommandBuffer &command_buffer, RenderTarget &render_target);
+        void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
         virtual bool ShouldClose() const = 0;
+        virtual void Destroy() = 0;
         virtual void Close() = 0;
         virtual void *GetNativeWindow() = 0;
         void OnEvent(Event &event);
 
+        void AddScene(Scene *scene);
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
         VkSurfaceKHR GetSurface() { return m_Surface; }
@@ -58,6 +66,7 @@ namespace engine
         VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
         Input m_Input;
         std::unique_ptr<RenderContext> m_RenderContext{};
+        std::vector<Scene *> m_Scenes{};
 
         bool m_Dirty{false};
     };

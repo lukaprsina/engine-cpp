@@ -264,6 +264,11 @@ namespace engine
         glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
     }
 
+    void GlfwWindow::Destroy()
+    {
+        glfwDestroyWindow(m_Handle);
+    }
+
     void GlfwWindow::DeInit()
     {
         glfwTerminate();

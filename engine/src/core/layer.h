@@ -22,7 +22,7 @@ namespace engine
 
 		Application *GetApp() { return m_Application; }
 
-		void SetScene(Scene *scene) { m_Scene = scene; }
+		void SetScene(Scene *scene);
 		Scene *GetScene() { return m_Scene; }
 
 		void SetWindow(Window *Window) { m_Window = Window; }

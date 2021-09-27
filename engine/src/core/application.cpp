@@ -155,8 +155,10 @@ namespace engine
             layer->OnUpdate(delta_time);
     }
 
-    void Application::Draw(Window *window)
+    /* void Application::Draw(Window *window)
     {
+        // TODO: maybe move to window
+
         auto &render_context = window->GetRenderContext();
         auto &command_buffer = render_context.Begin();
         command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -197,11 +199,7 @@ namespace engine
         SetViewportAndScissor(command_buffer,
                               render_target.GetExtent());
 
-        m_Scenes[0]->Draw(render_context, command_buffer,
-                          render_target);
-
-        /* if (m_Gui)
-            m_Gui->Draw(command_buffer); */
+        window->Render(command_buffer, render_target);
 
         command_buffer.EndRenderPass();
 
@@ -218,7 +216,7 @@ namespace engine
 
         command_buffer.End();
         render_context.Submit(command_buffer);
-    }
+    }*/
 
     void Application::Finish()
     {
@@ -283,19 +281,5 @@ namespace engine
     void Application::ParseOptions(std::vector<std::string> &arguments)
     {
         m_Options.ParseOptions(m_Usage, arguments);
-    }
-
-    void Application::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const
-    {
-        VkViewport viewport{};
-        viewport.width = static_cast<float>(extent.width);
-        viewport.height = static_cast<float>(extent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        command_buffer.SetViewport(0, {viewport});
-
-        VkRect2D scissor{};
-        scissor.extent = extent;
-        command_buffer.SetScissor(0, {scissor});
     }
 }

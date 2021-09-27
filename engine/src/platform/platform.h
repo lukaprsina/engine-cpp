@@ -25,6 +25,7 @@ namespace engine
         virtual bool Initialize(std::unique_ptr<Application> &&app);
         virtual bool Prepare();
         virtual void MainLoop();
+        virtual bool ShouldClose();
         virtual void Terminate(ExitCode code);
 
         virtual Window *CreatePlatformWindow() = 0;
@@ -47,6 +48,7 @@ namespace engine
     protected:
         std::unique_ptr<Application> m_App{};
         std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
+        std::vector<void *> m_ClosedWindows{};
         std::vector<Layer *> m_Layers;
         Timer m_Timer{};
 

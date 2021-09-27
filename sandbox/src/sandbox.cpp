@@ -50,6 +50,9 @@ bool Sandbox::Prepare()
     m_Game = std::make_unique<Game>(this);
     GetLayerStack().PushLayer(m_Game.get());
 
+    m_PopUp = std::make_unique<Game>(this);
+    GetLayerStack().PushLayer(m_PopUp.get());
+
     Application::Prepare();
     return true;
 }

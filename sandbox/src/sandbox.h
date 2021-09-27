@@ -21,6 +21,7 @@ public:
 
 private:
     std::unique_ptr<engine::Layer> m_Game;
+    std::unique_ptr<engine::Layer> m_PopUp;
 };
 
 std::unique_ptr<engine::Application> engine::CreateApplication(engine::Platform *platform)

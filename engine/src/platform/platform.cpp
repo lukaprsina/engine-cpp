@@ -46,17 +46,39 @@ namespace engine
     {
         ENG_CORE_INFO("Starting the main loop.");
 
-        while (!m_App->ShouldClose())
+        while (!ShouldClose())
         {
             m_App->Step();
 
             for (auto &window_pair : m_Windows)
             {
                 auto &window = window_pair.second;
-                m_App->Draw(window.get());
+                window->Draw();
                 window->ProcessEvents();
             }
         }
+    }
+
+    bool Platform::ShouldClose()
+    {
+        bool should_continue = false;
+
+        for (auto &window_pair : m_Windows)
+        {
+            auto &window = window_pair.second;
+            if (window->ShouldClose())
+                m_ClosedWindows.emplace_back(window_pair.first);
+
+            else
+                should_continue = true;
+        }
+
+        for (void *window_handle : m_ClosedWindows)
+            m_Windows.erase(window_handle);
+
+        m_ClosedWindows.clear();
+
+        return !should_continue;
     }
 
     void Platform::Terminate(ExitCode)

@@ -72,7 +72,6 @@ namespace engine
     void Scene::AddFreeCamera(VkExtent2D extent, Window *window)
     {
         m_DefaultCamera = m_Cameras[0].get();
-        bool test = m_DefaultCamera->HasComponent<sg::FreeCamera>();
         auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this, window);
         free_camera_script.Resize(extent.width, extent.height);
         ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());
