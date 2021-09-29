@@ -11,6 +11,7 @@ namespace engine
     class PhysicalDevice;
     class RenderContext;
     class Scene;
+    class Layer;
     class CommandBuffer;
     class RenderTarget;
 
@@ -46,6 +47,8 @@ namespace engine
         void OnEvent(Event &event);
 
         void AddScene(Scene *scene);
+        void AddLayer(Layer *layer);
+
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
         VkSurfaceKHR GetSurface() { return m_Surface; }
@@ -67,6 +70,7 @@ namespace engine
         Input m_Input;
         std::unique_ptr<RenderContext> m_RenderContext{};
         std::vector<Scene *> m_Scenes{};
+        std::vector<Layer *> m_Layers{};
 
         bool m_Dirty{false};
     };

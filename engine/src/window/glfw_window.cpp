@@ -1,6 +1,7 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
+#include "scene/scene.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
@@ -261,6 +262,9 @@ namespace engine
 
     void GlfwWindow::Close()
     {
+        for (Layer *layer : m_Layers)
+            layer->OnWindowClose(*this);
+
         glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
     }
 

@@ -67,7 +67,10 @@ namespace engine
         {
             auto &window = window_pair.second;
             if (window->ShouldClose())
+            {
+                window->Close();
                 m_ClosedWindows.emplace_back(window_pair.first);
+            }
 
             else
                 should_continue = true;

@@ -25,7 +25,7 @@
 namespace engine
 {
     Application::Application(Platform *platform)
-        : m_Platform(platform)
+        : m_Platform(platform), m_LayerStack(*this)
     {
         Log::Init();
         // Log::GetCoreLogger()->set_level(spdlog::level::warn);

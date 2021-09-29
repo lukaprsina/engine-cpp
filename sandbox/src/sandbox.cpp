@@ -11,13 +11,22 @@
 #include "vulkan_api/subpasses/forward_subpass.h"
 #include "vulkan_api/rendering/render_pipeline.h"
 
-Game::Game(engine::Application *application)
-    : Layer(application)
+Sandbox::Sandbox(engine::Platform *platform)
+    : engine::Application(platform)
 {
 }
 
-Sandbox::Sandbox(engine::Platform *platform)
-    : engine::Application(platform)
+void Sandbox::DestroyLayer(engine::Layer *layer)
+{
+    if (m_Game.get() == layer)
+        m_Game.reset();
+
+    if (m_PopUp.get() == layer)
+        m_PopUp.reset();
+}
+
+Game::Game(engine::Application *application)
+    : Layer(application)
 {
 }
 

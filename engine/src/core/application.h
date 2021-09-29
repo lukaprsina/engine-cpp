@@ -50,6 +50,8 @@ namespace engine
         LayerStack &GetLayerStack() { return m_LayerStack; }
         std::vector<std::unique_ptr<Scene>> &GetScenes() { return m_Scenes; }
 
+        virtual void DestroyLayer(Layer *layer) {}
+
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
 

@@ -13,19 +13,20 @@ namespace engine
 	{
 	public:
 		Layer(Application *application);
-		virtual ~Layer() = default;
+		virtual ~Layer();
 
 		virtual void OnAttach() {}
-		virtual void OnDetach() {}
+		virtual void OnDetach();
 		virtual void OnUpdate(float delta_time) {}
 		virtual void OnEvent(Event &event) {}
+		virtual void OnWindowClose(Window &window);
 
 		Application *GetApp() { return m_Application; }
 
 		void SetScene(Scene *scene);
 		Scene *GetScene() { return m_Scene; }
 
-		void SetWindow(Window *Window) { m_Window = Window; }
+		void SetWindow(Window *Window);
 		Window *GetWindow() { return m_Window; }
 
 	private:

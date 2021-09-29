@@ -8,6 +8,7 @@
 #include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/subpasses/forward_subpass.h"
 #include "scene/scene.h"
+#include "core/application.h"
 
 namespace engine
 {
@@ -118,6 +119,11 @@ namespace engine
     void Window::AddScene(Scene *scene)
     {
         m_Scenes.emplace_back(scene);
+    }
+
+    void Window::AddLayer(Layer *layer)
+    {
+        m_Layers.emplace_back(layer);
     }
 
     void Window::SetSettings(WindowSettings &settings)

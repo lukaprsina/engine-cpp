@@ -4,9 +4,12 @@
 
 namespace engine
 {
+	class Application;
+
 	class LayerStack
 	{
 	public:
+		LayerStack(Application &application);
 		void PushLayer(Layer *layer);
 		void PopLayer(Layer *layer);
 
@@ -19,6 +22,7 @@ namespace engine
 		std::vector<Layer *> &GetLayers() { return m_Layers; }
 
 	private:
+		Application &m_Application;
 		std::vector<Layer *> m_Layers;
 	};
 }

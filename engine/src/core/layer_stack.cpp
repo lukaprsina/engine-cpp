@@ -1,7 +1,14 @@
 #include "core/layer_stack.h"
 
+#include "core/application.h"
+
 namespace engine
 {
+	LayerStack::LayerStack(Application &application)
+		: m_Application(application)
+	{
+	}
+
 	void LayerStack::PushLayer(Layer *layer)
 	{
 		m_Layers.emplace_back(layer);
@@ -9,6 +16,9 @@ namespace engine
 
 	void LayerStack::PopLayer(Layer *layer)
 	{
+		layer->OnDetach();
+		m_Application.DestroyLayer(layer);
+
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
 		{
