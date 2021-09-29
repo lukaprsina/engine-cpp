@@ -209,4 +209,10 @@ else()
   target_compile_options(engine PRIVATE -Wall) # -Weffc++)
 endif()
 
+if(ENG_SHIPPING)
+  file(GLOB MY_PUBLIC_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+       ${CMAKE_CURRENT_SOURCE_DIR}/assets)
+  file(COPY ${MY_PUBLIC_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/engine)
+endif()
+
 add_subdirectory(vendor)

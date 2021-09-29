@@ -16,10 +16,30 @@ namespace engine
 
     Platform::Platform(const std::string name, const std::vector<std::string> &arguments)
     {
-        auto source_directory = std::filesystem::canonical(ENG_BASE_DIRECTORY);
+        auto source_directory = std::filesystem::path(ENG_BASE_DIRECTORY);
+        std::cout << "Source: " << source_directory.generic_string() << std::endl;
 
-        Platform::SetSourceDirectory(source_directory / m_EngineName);
+        auto base_directory = std::filesystem::current_path();
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+#ifdef ENG_SHIPPING
+        if (source_directory == base_directory)
+        {
+            std::cout << "From source" << std::endl;
+            base_directory /= m_EngineName;
+        }
+        else
+        {
+            base_directory = base_directory.parent_path();
+            std::cout << "Not from source" << std::endl;
+        }
+#else
+        base_directory /= m_EngineName;
+#endif
 
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
+        Platform::SetSourceDirectory(base_directory);
+        Platform::SetExternalStorageDirectory(base_directory);
         Platform::SetArguments(arguments);
     }
 

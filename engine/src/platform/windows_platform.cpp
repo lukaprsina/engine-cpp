@@ -47,7 +47,7 @@ namespace engine
             WideCharToMultiByte(CP_UTF8, 0, &wstr[0], wstr_len, &str[0], str_len, NULL, NULL);
 
             return str;
-        }        
+        }
 
         inline std::vector<std::string> GetArgs()
         {
@@ -72,8 +72,8 @@ namespace engine
         {
             TCHAR szFileName[MAX_PATH];
             GetModuleFileName(NULL, szFileName, MAX_PATH);
-            
-            return std::string{ szFileName };
+
+            return std::string{szFileName};
         }
 
         inline std::filesystem::path GetRootFolder()
@@ -84,7 +84,7 @@ namespace engine
     }
 
     WindowsPlatform::WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-        PSTR lpCmdLine, INT nCmdShow)
+                                     PSTR lpCmdLine, INT nCmdShow)
         : Platform(GetName(), GetArgs())
     {
         auto args = GetArgs();
@@ -98,7 +98,6 @@ namespace engine
         freopen_s(&fp, "conout$", "w", stdout);
         freopen_s(&fp, "conout$", "w", stderr);
 
-        // TODO: search for build
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
         Platform::SetExternalStorageDirectory(GetRootFolder());
     }
@@ -111,15 +110,35 @@ namespace engine
     void WindowsPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
+        void *handle;
 
-        if (m_App->IsHeadless())
         {
-            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
+            std::unique_ptr<Window> window;
+
+            if (m_App->IsHeadless())
+                window = std::make_unique<HeadlessWindow>(*this, settings);
+
+            else
+            {
+                GlfwWindow::Init();
+                window = std::make_unique<GlfwWindow>(*this, settings);
+            }
+
+            handle = window->GetNativeWindow();
+            m_Windows.emplace(handle, std::move(window));
         }
+
+        auto &window = m_Windows.at(handle);
+
+        if (!window)
+            throw std::runtime_error("Can't create window!");
         else
-        {
-            m_Window = std::make_unique<GlfwWindow>(*this, settings);
-        }
+            ENG_CORE_INFO("Window created!");
+
+        // TODO: move to window
+        window->SetEventCallback(std::bind(&Window::OnEvent, window.get(), std::placeholders::_1));
+
+        return window.get();
     }
 
     const char *WindowsPlatform::GetSurfaceExtension()
