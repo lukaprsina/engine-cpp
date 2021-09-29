@@ -50,8 +50,6 @@ namespace engine
         LayerStack &GetLayerStack() { return m_LayerStack; }
         std::vector<std::unique_ptr<Scene>> &GetScenes() { return m_Scenes; }
 
-        virtual void DestroyLayer(Layer *layer) {}
-
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
 
@@ -83,10 +81,6 @@ namespace engine
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
         std::vector<std::unique_ptr<Scene>> m_Scenes{};
-        /* std::unique_ptr<Scene> m_Scene{};
-        std::unique_ptr<Gui> m_Gui{};
-        Window *m_Window;
-        Window *m_Window2; */
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};

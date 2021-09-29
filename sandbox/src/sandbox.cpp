@@ -16,15 +16,6 @@ Sandbox::Sandbox(engine::Platform *platform)
 {
 }
 
-void Sandbox::DestroyLayer(engine::Layer *layer)
-{
-    if (m_Game.get() == layer)
-        m_Game.reset();
-
-    if (m_PopUp.get() == layer)
-        m_PopUp.reset();
-}
-
 Game::Game(engine::Application *application)
     : Layer(application)
 {
@@ -56,12 +47,8 @@ void Game::OnAttach()
 
 bool Sandbox::Prepare()
 {
-    m_Game = std::make_unique<Game>(this);
-    GetLayerStack().PushLayer(m_Game.get());
-
-    m_PopUp = std::make_unique<Game>(this);
-    GetLayerStack().PushLayer(m_PopUp.get());
-
+    GetLayerStack().PushLayer("Game", std::make_shared<Game>(this));
+    GetLayerStack().PushLayer("PopUp", std::make_shared<Game>(this));
     Application::Prepare();
     return true;
 }

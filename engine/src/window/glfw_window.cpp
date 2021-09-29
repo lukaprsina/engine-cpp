@@ -262,9 +262,6 @@ namespace engine
 
     void GlfwWindow::Close()
     {
-        for (Layer *layer : m_Layers)
-            layer->OnWindowClose(*this);
-
         glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
     }
 

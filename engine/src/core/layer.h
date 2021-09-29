@@ -8,6 +8,10 @@ namespace engine
 	class Window;
 	class Device;
 	class Application;
+	class WindowCloseEvent;
+	class WindowResizeEvent;
+	class KeyPressedEvent;
+	class Event;
 
 	class Layer
 	{
@@ -18,8 +22,10 @@ namespace engine
 		virtual void OnAttach() {}
 		virtual void OnDetach();
 		virtual void OnUpdate(float delta_time) {}
-		virtual void OnEvent(Event &event) {}
-		virtual void OnWindowClose(Window &window);
+		virtual void OnEvent(Event &event);
+		virtual bool OnWindowClose(WindowCloseEvent &event);
+		virtual bool OnResize(WindowResizeEvent &event);
+		virtual bool OnKeyPressed(KeyPressedEvent &event);
 
 		Application *GetApp() { return m_Application; }
 

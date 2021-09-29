@@ -9,15 +9,14 @@ namespace engine
 	{
 	}
 
-	void LayerStack::PushLayer(Layer *layer)
+	void LayerStack::PushLayer(const std::string &name, const std::shared_ptr<Layer> layer)
 	{
-		m_Layers.emplace_back(layer);
+		m_Layers[name] = layer;
 	}
 
-	void LayerStack::PopLayer(Layer *layer)
+	/* void LayerStack::PopLayer(Layer *layer)
 	{
 		layer->OnDetach();
-		m_Application.DestroyLayer(layer);
 
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
@@ -68,5 +67,5 @@ namespace engine
 
 			m_Layers.insert(m_Layers.begin() + distance - count, layer);
 		}
-	}
+	} */
 }

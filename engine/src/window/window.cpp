@@ -113,6 +113,14 @@ namespace engine
     void Window::OnEvent(Event &event)
     {
         EventDispatcher dispatcher(event);
+
+        for (auto it = m_Layers.rbegin(); it != m_Layers.rend(); ++it)
+        {
+            if (event.handled)
+                break;
+            (*it)->OnEvent(event);
+        }
+
         m_Platform.GetApp().OnEvent(event);
     }
 

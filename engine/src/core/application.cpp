@@ -54,8 +54,8 @@ namespace engine
         if (m_Device)
             m_Device->WaitIdle();
 
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnDetach();
+        for (auto &layer : m_LayerStack.GetLayers())
+            layer.second->OnDetach();
 
         /* m_Scene.reset();
         m_Gui.reset(); */
@@ -89,8 +89,11 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
 
-        for (Layer *layer : m_LayerStack.GetLayers())
+        for (auto &layer_pair : m_LayerStack.GetLayers())
+        {
+            Layer *layer = layer_pair.second.get();
             layer->OnAttach();
+        }
 
         return true;
 
@@ -151,72 +154,9 @@ namespace engine
         for (auto &scene : m_Scenes)
             scene->Update(delta_time);
 
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnUpdate(delta_time);
+        for (auto &layer : m_LayerStack.GetLayers())
+            layer.second->OnUpdate(delta_time);
     }
-
-    /* void Application::Draw(Window *window)
-    {
-        // TODO: maybe move to window
-
-        auto &render_context = window->GetRenderContext();
-        auto &command_buffer = render_context.Begin();
-        command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        auto &views = render_context.GetActiveFrame().GetRenderTarget().GetViews();
-
-        {
-            // Image 0 is the swapchain
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-
-            // Skip 1 as it is handled later as a depth-stencil attachment
-            for (size_t i = 2; i < views.size(); ++i)
-            {
-                command_buffer.CreateImageMemoryBarrier(views.at(i), memory_barrier);
-            }
-        }
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
-        }
-
-        auto &render_target = render_context.GetActiveFrame().GetRenderTarget();
-        SetViewportAndScissor(command_buffer,
-                              render_target.GetExtent());
-
-        window->Render(command_buffer, render_target);
-
-        command_buffer.EndRenderPass();
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-            memory_barrier.src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-        }
-
-        command_buffer.End();
-        render_context.Submit(command_buffer);
-    }*/
 
     void Application::Finish()
     {
@@ -234,13 +174,6 @@ namespace engine
 
     void Application::OnEvent(Event &event)
     {
-        for (auto it = m_LayerStack.GetLayers().rbegin(); it != m_LayerStack.GetLayers().rend(); ++it)
-        {
-            if (event.handled)
-                break;
-            (*it)->OnEvent(event);
-        }
-
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_EVENT_FN(Application::OnResize));

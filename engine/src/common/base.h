@@ -6,7 +6,6 @@
 #define ENG_BIT(x) (1 << x)
 
 #define ENG_BIND_EVENT_FN(fn) [this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-#define ENG_BIND_EVENT_FN_PTR(fn, ptr) [&](auto &&...args) -> decltype(auto) { return ptr->fn(std::forward<decltype(args)>(args)...); }
 
 #if !defined(NDEBUG) || defined(DEBUG) || defined(_DEBUG)
 #define ENG_DEBUG
@@ -23,6 +22,13 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+
+#define ENG_LOAD_APP(application)                                                              \
+    std::unique_ptr<engine::Application> engine::CreateApplication(engine::Platform *platform) \
+    {                                                                                          \
+        auto app = std::make_unique<application>(platform);                                    \
+        return std::move(app);                                                                 \
+    }
 
 ENG_DISABLE_WARNINGS()
 #include <glm/gtx/hash.hpp>
