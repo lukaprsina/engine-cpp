@@ -4,8 +4,8 @@ set(SANDBOX_FILES
     # Source files
     src/sandbox.cpp)
 
+    list(APPEND PROJECT_FILES ${SANDBOX_FILES})
+
 add_library(sandbox STATIC ${SANDBOX_FILES})
-target_include_directories(
-  sandbox
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-  PUBLIC ${CMAKE_SOURCE_DIR}/engine/src)
+target_link_libraries(sandbox PRIVATE engine)
+target_link_libraries(engine_framework PRIVATE sandbox)

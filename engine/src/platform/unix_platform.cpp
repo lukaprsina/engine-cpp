@@ -46,6 +46,7 @@ namespace engine
         : Platform(argv[0], std::vector<std::string>(argv + 1, argv + argc)),
           m_Type(type)
     {
+        ConfigurePaths();
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
         Platform::SetExternalStorageDirectory(GetRootFolder());
     }

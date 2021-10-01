@@ -15,12 +15,22 @@ namespace engine
     std::filesystem::path Platform::s_TempDirectory = {};
 
     Platform::Platform(const std::string name, const std::vector<std::string> &arguments)
+        : m_Name(name)
+    {
+        Platform::SetArguments(arguments);
+    }
+
+    void Platform::ConfigurePaths()
     {
         auto source_directory = std::filesystem::path(ENG_BASE_DIRECTORY);
         std::cout << "Source: " << source_directory.generic_string() << std::endl;
 
         auto base_directory = std::filesystem::current_path();
         std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
+        base_directory = std::filesystem::canonical(base_directory);
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
 #ifdef ENG_SHIPPING
         if (source_directory == base_directory)
         {
@@ -39,8 +49,6 @@ namespace engine
         std::cout << "Base: " << base_directory.generic_string() << std::endl;
 
         Platform::SetSourceDirectory(base_directory);
-        Platform::SetExternalStorageDirectory(base_directory);
-        Platform::SetArguments(arguments);
     }
 
     bool Platform::Initialize(std::unique_ptr<Application> &&app)

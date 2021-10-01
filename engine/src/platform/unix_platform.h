@@ -16,7 +16,7 @@ namespace engine
         UnixPlatform(const UnixType &type, int argc, char *argv[]);
         ~UnixPlatform() = default;
 
-        virtual bool Initialize(std::unique_ptr<Application> &&app) override;
+        bool Initialize(std::unique_ptr<Application> &&app) override;
         Window *CreatePlatformWindow() override;
         void Terminate(ExitCode) override;
         const char *GetSurfaceExtension() override;

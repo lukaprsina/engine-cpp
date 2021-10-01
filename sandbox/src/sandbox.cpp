@@ -29,8 +29,8 @@ void Game::OnAttach()
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
 
-    std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
-                                                         VK_PRESENT_MODE_FIFO_KHR,
+    std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
+                                                         VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                          VK_PRESENT_MODE_MAILBOX_KHR});
 
     std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},

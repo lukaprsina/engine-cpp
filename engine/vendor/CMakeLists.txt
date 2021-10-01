@@ -6,7 +6,7 @@ set(SUBMODULE_MISSING_LIST "")
 set(EXTERNAL_MISSING_LIST "")
 
 macro(create_dependency)
-  set(options NO_CMAKE INTERFACE)
+  set(options NO_CMAKE INTERFACE PUBLIC)
   set(oneValueArgs PATH INCLUDE LIB PACKAGE)
   set(multiValueArgs SOURCES)
 
@@ -59,6 +59,7 @@ macro(create_dependency)
     list(APPEND SUBMODULE_MISSING_LIST ${TARGET_PATH})
   endif()
 
+  # also build path
   message(
     ${TARGET_PATH}
     ": "
@@ -69,6 +70,16 @@ macro(create_dependency)
     ${${TARGET_PATH}_LIBRARIES}
     "\n"
     ${TARGET_SOURCES})
+
+    if(${${TARGET_PATH}_FOUND})
+      if(${TARGET_PUBLIC})
+        target_include_directories(engine PUBLIC ${${TARGET_PATH}_INCLUDE_DIRS})
+        target_link_libraries(engine PUBLIC ${${TARGET_PATH}_LIBRARIES})
+      else()
+        target_include_directories(engine PRIVATE ${${TARGET_PATH}_INCLUDE_DIRS})
+        target_link_libraries(engine PRIVATE ${${TARGET_PATH}_LIBRARIES})
+      endif()
+    endif()
 endmacro()
 
 # vulkan
@@ -80,19 +91,18 @@ create_dependency(
   LIB
   "Vulkan-Headers"
   PACKAGE
-  "Vulkan")
+  "Vulkan"
+  PUBLIC)
 # Don't link and include vulkan directly, but through volk'
 
 # volk
 set(VOLK_PULL_IN_VULKAN OFF)
 set(VOLK_STATIC_DEFINES ${ENG_PLATFORM})
 
-create_dependency(PATH "volk" LIB "volk")
+create_dependency(PATH "volk" LIB "volk" PUBLIC)
 if(${volk_FOUND})
   target_include_directories(${volk_LIBRARIES} PUBLIC ${vulkan_INCLUDE_DIRS})
   target_link_libraries(${volk_LIBRARIES} PUBLIC ${vulkan_LIBRARIES})
-  target_include_directories(sandbox PUBLIC ${volk_INCLUDE_DIRS})
-  target_link_libraries(sandbox PUBLIC ${volk_LIBRARIES})
 endif()
 
 # stb
@@ -104,13 +114,7 @@ if(${stb_FOUND})
 endif()
 
 # docopt
-create_dependency(PATH "docopt" LIB "docopt")
-if(${docopt_FOUND})
-  target_include_directories(sandbox PRIVATE ${docopt_INCLUDE_DIRS})
-  target_link_libraries(sandbox PRIVATE ${docopt_LIBRARIES})
-  target_include_directories(engine PRIVATE ${docopt_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE ${docopt_LIBRARIES})
-endif()
+create_dependency(PATH "docopt" LIB "docopt" PUBLIC)
 
 # glfw
 set(GLFW_BUILD_DOCS OFF)
@@ -126,18 +130,13 @@ create_dependency(
   "glfw"
   PACKAGE
   "GLFW")
-if(${glfw_FOUND})
-  target_include_directories(engine PRIVATE ${glfw_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE ${glfw_LIBRARIES})
-endif()
 
 # glm
-create_dependency(PATH "glm" LIB "glm" PACKAGE "GLM")
+create_dependency(PATH "glm" LIB "glm" PACKAGE "GLM" PUBLIC)
 if(${glm_FOUND})
   target_compile_definitions(
-    sandbox PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
+    engine PUBLIC GLM_FORCE_SWIZZLE GLM_FORCE_RADIANS GLM_FORCE_CTOR_INIT
                    GLM_ENABLE_EXPERIMENTAL GLM_FORCE_DEPTH_ZERO_TO_ONE)
-  target_include_directories(sandbox PUBLIC ${glm_INCLUDE_DIRS})
 endif()
 
 # spdlog TODO definitions set(SPDLOG_FMT_EXTERNAL "Use external fmt library
@@ -151,27 +150,14 @@ create_dependency(
   LIB
   "spdlog"
   PACKAGE
-  "spdlog")
-if(${spdlog_FOUND})
-  target_include_directories(sandbox PRIVATE ${spdlog_INCLUDE_DIRS})
-  target_link_libraries(sandbox PRIVATE ${spdlog_LIBRARIES})
-  target_include_directories(engine PRIVATE ${spdlog_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE ${spdlog_LIBRARIES})
-endif()
+  "spdlog"
+  PUBLIC)
 
 # vma
-create_dependency(PATH "vma" INCLUDE "include")
-if(${vma_FOUND})
-  target_include_directories(sandbox PUBLIC ${vma_INCLUDE_DIRS})
-  target_include_directories(engine PRIVATE ${vma_INCLUDE_DIRS})
-endif()
+create_dependency(PATH "vma" INCLUDE "include" PUBLIC)
 
 # entt
-create_dependency(PATH "entt" INCLUDE "src" LIB "EnTT::EnTT")
-if(${entt_FOUND})
-  target_link_libraries(sandbox PRIVATE ${entt_LIBRARIES})
-  target_link_libraries(engine PRIVATE ${entt_LIBRARIES})
-endif()
+create_dependency(PATH "entt" INCLUDE "src" LIB "EnTT::EnTT" PUBLIC)
 
 # glslang
 set(BUILD_EXTERNAL "Build external dependencies in /External" OFF)
@@ -198,8 +184,7 @@ endif()
 
 # spirv-cross
 create_dependency(PATH "spirv-cross")
-if(${spirv-cross_FOUND})
-  target_include_directories(engine PRIVATE ${spirv-cross_INCLUDE_DIRS})
+if(${spirv-cross_FOUND})  
   target_link_libraries(
     engine
     PRIVATE spirv-cross-glsl
@@ -209,7 +194,6 @@ if(${spirv-cross_FOUND})
             spirv-cross-hlsl
             spirv-cross-util
             spirv-cross-c)
-  target_link_libraries(engine PRIVATE ${spirv-cross_LIBRARIES})
 endif()
 
 # thread_pool
@@ -217,8 +201,6 @@ create_dependency(PATH "thread_pool" NO_CMAKE INTERFACE)
 if(${thread_pool_FOUND})
   target_compile_definitions(
     engine PRIVATE _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING)
-
-  target_include_directories(engine PRIVATE ${thread_pool_INCLUDE_DIRS})
 endif()
 
 # ktx
@@ -226,10 +208,6 @@ set(KTX_FEATURE_STATIC_LIBRARY ON)
 set(KTX_FEATURE_TESTS OFF)
 
 create_dependency(PATH "ktx" INCLUDE "include" LIB "ktx")
-if(${ktx_FOUND})
-  target_include_directories(engine PRIVATE ${ktx_INCLUDE_DIRS})
-  target_link_libraries(engine PRIVATE ${ktx_LIBRARIES})
-endif()
 
 # astc-encoder
 set(ASTC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/astc-encoder)
@@ -271,23 +249,14 @@ create_dependency(
   ${ASTC_SOURCES}
   NO_CMAKE)
 if(${astc-encoder_FOUND})
-  target_include_directories(${astc-encoder_LIBRARIES}
-                             PUBLIC ${astc-encoder_INCLUDE_DIRS})
   target_compile_definitions(${astc-encoder_LIBRARIES}
                              PRIVATE -DNO_STB_IMAGE_IMPLEMENTATION)
-  target_link_libraries(engine PRIVATE ${astc-encoder_LIBRARIES})
 endif()
 
 # tinygltf
 set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF)
 
-create_dependency(PATH "tinygltf" LIB "tinygltf")
-if(${tinygltf_FOUND})
-  target_link_libraries(engine PRIVATE ${tinygltf_LIBRARIES})
-  target_include_directories(engine PRIVATE ${tinygltf_INCLUDE_DIRS})
-  target_link_libraries(sandbox PRIVATE ${tinygltf_LIBRARIES})
-  target_include_directories(sandbox PRIVATE ${tinygltf_INCLUDE_DIRS})
-endif()
+create_dependency(PATH "tinygltf" LIB "tinygltf" PUBLIC)
 
 # imgui
 set(IMGUI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
@@ -330,14 +299,14 @@ create_dependency(
   ${IMGUI_SOURCES}
   LIB
   "imgui"
-  NO_CMAKE)
+  NO_CMAKE
+  PUBLIC)
 if(${imgui_FOUND})
   target_include_directories(
     ${imgui_LIBRARIES} PUBLIC ${imgui_INCLUDE_DIRS} ${vulkan_INCLUDE_DIRS}
                               ${glfw_INCLUDE_DIRS})
   target_link_libraries(${imgui_LIBRARIES} PUBLIC ${vulkan_LIBRARIES}
                                                   ${glfw_LIBRARIES})
-  target_link_libraries(engine PUBLIC ${imgui_LIBRARIES})
 endif()
 
 message("SUBMODULE_LIST=" ${SUBMODULE_LIST})

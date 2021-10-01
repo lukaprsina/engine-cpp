@@ -113,6 +113,7 @@ os.chdir(base_directory)
 config = base_directory / "engine/vendor/config.json"
 
 if (not config.exists()):
+    print("Please run CMake Configure from your IDE or terminal and run this script again.")
     sys.exit()
 else:
     CheckDependencies()

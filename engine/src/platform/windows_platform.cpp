@@ -98,6 +98,8 @@ namespace engine
         freopen_s(&fp, "conout$", "w", stdout);
         freopen_s(&fp, "conout$", "w", stderr);
 
+        ConfigurePaths();
+
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
         Platform::SetExternalStorageDirectory(GetRootFolder());
     }
@@ -107,7 +109,7 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    void WindowsPlatform::CreatePlatformWindow()
+    Window *WindowsPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
         void *handle;

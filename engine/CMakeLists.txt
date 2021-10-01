@@ -41,7 +41,7 @@ set(PLATFORM_FILES
     # Header Files
     src/platform/platform.h
     # Source Files
-    src/entrypoint.cpp src/platform/platform.cpp)
+    src/platform/platform.cpp)
 
 set(WINDOWS_FILES
     # Header Files
@@ -186,20 +186,27 @@ set(VULKAN_API_FILES
 set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})
 
+macro(add_project_files)
+  add_library(engine_framework OBJECT ${PROJECT_FILES})
+  target_link_libraries(engine PRIVATE engine_framework)
+endmacro()
+
 if(WIN32)
   list(APPEND PROJECT_FILES ${WINDOWS_FILES})
 elseif(UNIX)
   list(APPEND PROJECT_FILES ${UNIX_FILES})
 endif()
 
-add_executable(engine WIN32 ${PROJECT_FILES})
+add_executable(engine WIN32 src/entrypoint.cpp)
+
+set_property(TARGET engine PROPERTY ENABLE_EXPORTS ON)
 
 target_include_directories(
-  sandbox
+  engine
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
   PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-target_precompile_headers(sandbox PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
+target_precompile_headers(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
 
 configure_file(engine_config.h.in engine_config.h @ONLY)
 
@@ -210,9 +217,9 @@ else()
 endif()
 
 if(ENG_SHIPPING)
-  file(GLOB MY_PUBLIC_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+  file(GLOB ENG_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/shaders
        ${CMAKE_CURRENT_SOURCE_DIR}/assets)
-  file(COPY ${MY_PUBLIC_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/engine)
+  file(COPY ${ENG_ASSETS} DESTINATION ${CMAKE_BINARY_DIR}/engine)
 endif()
 
 add_subdirectory(vendor)

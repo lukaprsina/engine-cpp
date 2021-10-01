@@ -22,6 +22,7 @@ namespace engine
         Platform(const std::string name, const std::vector<std::string> &arguments);
         virtual ~Platform() = default;
 
+        void ConfigurePaths();
         virtual bool Initialize(std::unique_ptr<Application> &&app);
         virtual bool Prepare();
         virtual void MainLoop();
@@ -46,6 +47,7 @@ namespace engine
         static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
+        std::string m_Name{};
         std::unique_ptr<Application> m_App{};
         std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
         std::vector<void *> m_ClosedWindows{};
