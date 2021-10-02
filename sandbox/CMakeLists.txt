@@ -1,11 +1,9 @@
+set(SANDBOX_SRC ${CMAKE_SOURCE_DIR}/sandbox/src  CACHE STRING "Sandbox source directory")
+
 set(SANDBOX_FILES
     # Header files
-    src/sandbox.h
+    ${SANDBOX_SRC}/sandbox.h
     # Source files
-    src/sandbox.cpp)
+    ${SANDBOX_SRC}/sandbox.cpp)
 
-    list(APPEND PROJECT_FILES ${SANDBOX_FILES})
-
-add_library(sandbox STATIC ${SANDBOX_FILES})
-target_link_libraries(sandbox PRIVATE engine)
-target_link_libraries(engine_framework PRIVATE sandbox)
+set(ENG_PROJECT_FILES ${SANDBOX_FILES} CACHE STRING "All built files")
