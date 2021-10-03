@@ -1,6 +1,7 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
+#include "vulkan_api/device.h"
 #include "scene/scene.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
@@ -248,11 +249,8 @@ namespace engine
         if (result != VK_SUCCESS)
             return VK_NULL_HANDLE;
 
-        physical_device.IsPresentSupported(m_Surface, 0);
-
+        m_Platform.GetApp().GetDevice().CheckIfPresentSupported(m_Surface);
         return m_Surface;
-
-        // TODO: loop through queues
     }
 
     bool GlfwWindow::ShouldClose() const

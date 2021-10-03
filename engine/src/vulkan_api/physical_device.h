@@ -19,8 +19,6 @@ namespace engine
         const std::vector<VkQueueFamilyProperties> &GetQueueFamilyProperties() const { return m_QueueFamilyProperties; }
         VkPhysicalDevice GetHandle() const { return m_Handle; };
         Instance &GetInstance() const { return m_Instance; };
-
-        void SetPresentSupported(VkSurfaceKHR surface, uint32_t queue_family_index);
         VkBool32 IsPresentSupported(VkSurfaceKHR surface, uint32_t queue_family_index);
 
     private:

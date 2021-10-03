@@ -30,8 +30,9 @@ namespace engine
         virtual void Terminate(ExitCode code);
 
         virtual Window *CreatePlatformWindow() = 0;
-        Window &GetWindow(void *handle) { return *m_Windows.at(handle); };
-        Application &GetApp() const { return *m_App; };
+        Window &GetWindow(void *handle) { return *m_Windows.at(handle); }
+        std::unordered_map<void *, std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
+        Application &GetApp() const { return *m_App; }
         virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };

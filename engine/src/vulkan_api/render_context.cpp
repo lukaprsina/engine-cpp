@@ -149,7 +149,8 @@ namespace engine
 
         VkFence fence = frame.RequestFence();
 
-        queue.Submit({submit_info}, fence);
+        std::vector<QueueFamily> &queue_families = m_Device.GetQueueFamilies();
+        VkResult result = queue.Submit({submit_info}, fence);
 
         return signal_semaphore;
     }
@@ -185,7 +186,7 @@ namespace engine
         {
             auto result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
 
-            if (result == VK_SUBOPTIMAL_KHR || result == VK_NOT_READY || result == VK_ERROR_OUT_OF_DATE_KHR)
+            if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
             {
                 bool swapchain_updated = HandleSurfaceChanges(result == VK_ERROR_OUT_OF_DATE_KHR ||
                                                               result == VK_NOT_READY);

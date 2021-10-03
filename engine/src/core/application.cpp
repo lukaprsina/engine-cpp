@@ -87,7 +87,7 @@ namespace engine
         if (!IsHeadless() || m_Instance->IsExtensionEnabled(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME))
             AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-        m_Device = std::make_unique<Device>(gpu, GetDeviceExtensions());
+        m_Device = std::make_unique<Device>(gpu, *m_Platform, GetDeviceExtensions());
 
         for (auto &layer_pair : m_LayerStack.GetLayers())
         {

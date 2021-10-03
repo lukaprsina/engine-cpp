@@ -9,12 +9,14 @@ namespace engine
 {
     class CommandPool;
     class FencePool;
+    class Platform;
 
     class Device
     {
     public:
-        Device(PhysicalDevice &gpu,
-               std::unordered_map<const char *, bool> requested_extensions = {});
+        Device(PhysicalDevice &gpu, Platform &platform,
+               std::unordered_map<const char *, bool>
+                   requested_extensions = {});
         ~Device();
 
         VkResult WaitIdle();
@@ -24,6 +26,7 @@ namespace engine
         const QueueFamily &GetSuitableGraphicsQueueFamily();
 
         QueueFamily &GetQueueFamilyByFlags(VkQueueFlags required_queue_flags);
+        void CheckIfPresentSupported(VkSurfaceKHR surface);
         VkFence RequestFence();
         CommandBuffer &RequestCommandBuffer();
 
@@ -31,11 +34,13 @@ namespace engine
         PhysicalDevice &GetGPU() const { return m_Gpu; }
         VmaAllocator GetMemoryAllocator() const { return m_MemoryAllocator; }
         ResourceCache &GetResourceCache() { return m_ResourceCache; }
+        std::vector<QueueFamily> &GetQueueFamilies() { return m_QueueFamilies; }
         CommandPool &GetCommandPool() { return *m_CommandPool; }
         FencePool &GetFencePool() { return *m_FencePool; }
 
     private:
         PhysicalDevice &m_Gpu;
+        Platform &m_Platform;
         ResourceCache m_ResourceCache;
 
         std::vector<VkExtensionProperties> m_DeviceExtensions{};

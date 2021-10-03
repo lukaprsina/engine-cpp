@@ -71,7 +71,15 @@ namespace engine
 
     void Scene::AddFreeCamera(VkExtent2D extent, Window *window)
     {
-        m_DefaultCamera = m_Cameras[0].get();
+        if (m_Cameras.empty())
+        {
+            auto entity = CreateEntity();
+            entity.AddComponent<sg::PerspectiveCamera>("Camera");
+            entity.AddComponent<sg::Transform>(entity);
+            m_Cameras.emplace_back(std::make_unique<Entity>(entity));
+        }
+
+        m_DefaultCamera = m_Cameras.back().get();
         auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this, window);
         free_camera_script.Resize(extent.width, extent.height);
         ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());

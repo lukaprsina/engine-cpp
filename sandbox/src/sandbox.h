@@ -14,6 +14,13 @@ public:
     void OnAttach() override;
 };
 
+class Simple : public engine::Layer
+{
+public:
+    Simple(engine::Application *application);
+    void OnAttach() override;
+};
+
 class Sandbox : public engine::Application
 {
 public:

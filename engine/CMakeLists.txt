@@ -196,12 +196,6 @@ elseif(UNIX)
 endif()
 
 add_executable(engine WIN32 ${ENG_PROJECT_FILES})
-# add_executable(engine WIN32 src/entrypoint.cpp)
-# set_property(TARGET engine PROPERTY ENABLE_EXPORTS ON)
-
-if(NOT "D:/dev/c++/engine/sandbox/src/sandbox.h" IN_LIST ENG_PROJECT_FILES)
-  message("KAZZZOM KOAKDOAKWODKAWODKOAKWDO")
-endif()
 
 target_include_directories(
   engine
@@ -213,7 +207,7 @@ target_precompile_headers(engine PUBLIC ${ENGINE_SRC}/pch.h)
 configure_file(engine_config.h.in engine_config.h @ONLY)
 
 if(MSVC)
-  # target_compile_options(engine PRIVATE /W3 /WX)
+  target_compile_options(engine PRIVATE /W3 /WX)
 else()
   target_compile_options(engine PRIVATE -Wall) # -Weffc++)
 endif()
