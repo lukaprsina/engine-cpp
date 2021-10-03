@@ -5,8 +5,6 @@
 #include "window/input.h"
 #include "core/layer_stack.h"
 
-#include <filesystem>
-
 namespace engine
 {
     std::vector<std::string> Platform::s_Arguments = {};
@@ -39,8 +37,37 @@ namespace engine
         }
         else
         {
-            base_directory = base_directory.parent_path();
+            int i = 0;
+            auto new_base = base_directory;
+            for (auto &folder : base_directory)
+            {
+                new_base = new_base.parent_path();
+                if (new_base.filename().generic_string() == m_EngineName)
+                    break;
+
+                i++;
+            }
+
+            int source_size = 0;
+            for (auto &folder : source_directory)
+                source_size++;
+
+            auto new_source = std::filesystem::path();
+            int source_folder_index = source_size - i + 1;
+            int j = 0;
+            for (auto &folder : source_directory)
+            {
+                if (j == source_folder_index)
+                    break;
+                else
+                    new_source = new_source / folder;
+                j++;
+            }
+
+            std::cout << new_source.generic_string() << std::endl;
             std::cout << "Not from source" << std::endl;
+
+            base_directory = new_source / m_EngineName;
         }
 #else
         base_directory /= m_EngineName;
