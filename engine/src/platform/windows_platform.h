@@ -11,8 +11,8 @@ namespace engine
             PSTR lpCmdLine, INT nCmdShow);
         virtual ~WindowsPlatform() = default;
 
-        virtual bool Initialize(std::unique_ptr<Application> &&app) override;
-        virtual void CreatePlatformWindow() override;
-        virtual const char *GetSurfaceExtension() override;
+        bool Initialize(std::unique_ptr<Application>&& app) override;
+        Window* CreatePlatformWindow() override;        
+        const char* GetSurfaceExtension() override;
     };
 }

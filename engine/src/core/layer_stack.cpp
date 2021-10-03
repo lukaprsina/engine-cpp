@@ -1,14 +1,23 @@
 #include "core/layer_stack.h"
 
+#include "core/application.h"
+
 namespace engine
 {
-	void LayerStack::PushLayer(Layer *layer)
+	LayerStack::LayerStack(Application &application)
+		: m_Application(application)
 	{
-		m_Layers.emplace_back(layer);
 	}
 
-	void LayerStack::PopLayer(Layer *layer)
+	void LayerStack::PushLayer(const std::string &name, const std::shared_ptr<Layer> layer)
 	{
+		m_Layers[name] = layer;
+	}
+
+	/* void LayerStack::PopLayer(Layer *layer)
+	{
+		layer->OnDetach();
+
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())
 		{
@@ -58,5 +67,5 @@ namespace engine
 
 			m_Layers.insert(m_Layers.begin() + distance - count, layer);
 		}
-	}
+	} */
 }

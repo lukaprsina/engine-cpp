@@ -6,11 +6,11 @@
 
 namespace engine
 {
-    Queue::Queue(Device &device, QueueFamily &queue_family, uint32_t index)
-        : m_Device(device), m_QueueFamily(queue_family), m_Index(index)
+    Queue::Queue(Device &device, uint32_t queue_family_index, uint32_t index)
+        : m_Device(device), m_QueueFamilyIndex(queue_family_index), m_Index(index)
 
     {
-        vkGetDeviceQueue(device.GetHandle(), m_QueueFamily.GetFamilyIndex(), index, &m_Handle);
+        vkGetDeviceQueue(device.GetHandle(), queue_family_index, index, &m_Handle);
     }
 
     VkResult Queue::Submit(const CommandBuffer &command_buffer, VkFence fence) const
@@ -29,7 +29,7 @@ namespace engine
 
     VkResult Queue::Present(const VkPresentInfoKHR &present_info) const
     {
-        if (!m_QueueFamily.CanPresent())
+        if (!m_Device.GetQueueFamilies()[m_QueueFamilyIndex].CanPresent())
         {
             return VK_ERROR_INCOMPATIBLE_DISPLAY_KHR;
         }

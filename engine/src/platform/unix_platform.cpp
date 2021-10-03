@@ -46,6 +46,7 @@ namespace engine
         : Platform(argv[0], std::vector<std::string>(argv + 1, argv + argc)),
           m_Type(type)
     {
+        ConfigurePaths();
         Platform::SetTempDirectory(GetTempPathFromEnvironment());
         Platform::SetExternalStorageDirectory(GetRootFolder());
     }
@@ -55,18 +56,38 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    void UnixPlatform::CreatePlatformWindow()
+    Window *UnixPlatform::CreatePlatformWindow()
     {
         WindowSettings settings;
+        void *handle;
 
-        if (m_App->IsHeadless())
-            m_Window = std::make_unique<HeadlessWindow>(*this, settings);
-
-        else
         {
-            GlfwWindow::Init();
-            m_Window = std::make_unique<GlfwWindow>(*this, settings);
+            std::unique_ptr<Window> window;
+
+            if (m_App->IsHeadless())
+                window = std::make_unique<HeadlessWindow>(*this, settings);
+
+            else
+            {
+                GlfwWindow::Init();
+                window = std::make_unique<GlfwWindow>(*this, settings);
+            }
+
+            handle = window->GetNativeWindow();
+            m_Windows.emplace(handle, std::move(window));
         }
+
+        auto &window = m_Windows.at(handle);
+
+        if (!window)
+            throw std::runtime_error("Can't create window!");
+        else
+            ENG_CORE_INFO("Window created!");
+
+        // TODO: move to window
+        window->SetEventCallback(std::bind(&Window::OnEvent, window.get(), std::placeholders::_1));
+
+        return window.get();
     }
 
     const char *UnixPlatform::GetSurfaceExtension()
@@ -84,5 +105,10 @@ namespace engine
         ENG_ASSERT(surface_extesion, "Platform not supported, no surface extension available");
         return "";
 #endif
+    }
+
+    void UnixPlatform::Terminate(ExitCode)
+    {
+        GlfwWindow::DeInit();
     }
 }

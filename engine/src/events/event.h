@@ -2,6 +2,8 @@
 
 namespace engine
 {
+    class Window;
+
     enum class EventType
     {
         None = 0,
@@ -20,11 +22,11 @@ namespace engine
     enum EventCategory
     {
         None = 0,
-        EventCategoryApplication = BIT(0),
-        EventCategoryInput = BIT(1),
-        EventCategoryKeyboard = BIT(2),
-        EventCategoryMouse = BIT(3),
-        EventCategoryMouseButton = BIT(4)
+        EventCategoryApplication = ENG_BIT(0),
+        EventCategoryInput = ENG_BIT(1),
+        EventCategoryKeyboard = ENG_BIT(2),
+        EventCategoryMouse = ENG_BIT(3),
+        EventCategoryMouseButton = ENG_BIT(4)
     };
 
 #define EVENT_CLASS_TYPE(type)                                                  \
@@ -38,7 +40,9 @@ namespace engine
     class Event
     {
     public:
-        Event() = default;
+        Event(Window *window)
+            : m_Window(*window) {}
+
         virtual ~Event() = default;
         bool handled = false;
 
@@ -53,8 +57,11 @@ namespace engine
             return GetCategoryFlags() & category;
         }
 
+        Window &GetWindow() { return m_Window; }
+
     private:
         friend class EventDispatcher;
+        Window &m_Window;
     };
 
     class EventDispatcher

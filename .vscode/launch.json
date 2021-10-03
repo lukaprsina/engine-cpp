@@ -10,10 +10,22 @@
                 "scenes/space_module/SpaceModule.gltf"
             ],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
-            "environment": [],
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "$PATH:${command:cmake.getLaunchTargetDirectory}"
+                }
+            ],
             "preLaunchTask": "CMake Build",
-            "console": "newExternalWindow"
+            "console": "newExternalWindow",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         },
         {
             "name": "Cmake launch",

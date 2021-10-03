@@ -18,6 +18,7 @@ namespace engine
     class RenderContext;
     class RenderTarget;
     class Entity;
+    class Device;
 
     struct alignas(16) LightInfo
     {
@@ -42,13 +43,12 @@ namespace engine
     class Subpass
     {
     public:
-        Subpass(RenderContext &render_context,
-                ShaderSource &&vertex_shader,
+        Subpass(ShaderSource &&vertex_shader,
                 ShaderSource &&fragment_shader);
         virtual ~Subpass();
 
-        virtual void Prepare() = 0;
-        virtual void Draw(CommandBuffer &command_buffer) = 0;
+        virtual void Prepare(Device &device) = 0;
+        virtual void Draw(RenderContext &render_context, CommandBuffer &command_buffer) = 0;
         void UpdateRenderTargetAttachments(RenderTarget &render_target);
 
         const ShaderSource &GetVertexShader() const { return m_VertexShader; }
@@ -70,7 +70,7 @@ namespace engine
         LightingState &GetLightingState() { return m_LightingState; }
 
         template <typename T>
-        void AllocateLights(Scene &scene, size_t light_count)
+        void AllocateLights(RenderContext &render_context, Scene &scene, size_t light_count)
         {
             auto view = scene.GetRegistry().view<sg::Light, sg::Transform>();
 
@@ -98,25 +98,22 @@ namespace engine
                 case sg::LightType::Directional:
                 {
                     if (m_LightingState.directional_lights.size() < light_count)
-                    {
                         m_LightingState.directional_lights.push_back(light);
-                    }
+
                     break;
                 }
                 case sg::LightType::Point:
                 {
                     if (m_LightingState.point_lights.size() < light_count)
-                    {
                         m_LightingState.point_lights.push_back(light);
-                    }
+
                     break;
                 }
                 case sg::LightType::Spot:
                 {
                     if (m_LightingState.spot_lights.size() < light_count)
-                    {
                         m_LightingState.spot_lights.push_back(light);
-                    }
+
                     break;
                 }
                 default:
@@ -130,13 +127,12 @@ namespace engine
             std::copy(m_LightingState.point_lights.begin(), m_LightingState.point_lights.end(), light_info.point_lights);
             std::copy(m_LightingState.spot_lights.begin(), m_LightingState.spot_lights.end(), light_info.spot_lights);
 
-            auto &render_frame = m_RenderContext.GetActiveFrame();
+            auto &render_frame = render_context.GetActiveFrame();
             m_LightingState.light_buffer = render_frame.AllocateBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(T));
             m_LightingState.light_buffer.Update(light_info);
         }
 
     protected:
-        RenderContext &m_RenderContext;
         VkSampleCountFlagBits m_SampleCount{VK_SAMPLE_COUNT_1_BIT};
         std::unordered_map<std::string, ShaderResourceMode> m_ResourceModeMap;
         LightingState m_LightingState{};

@@ -1,9 +1,12 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
+#include "vulkan_api/device.h"
+#include "scene/scene.h"
 #include "events/application_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
+#include "vulkan_api/physical_device.h"
 
 ENG_DISABLE_WARNINGS()
 #define GLFW_INCLUDE_NONE
@@ -19,45 +22,51 @@ namespace engine
             ENG_CORE_INFO("GLFW Error (code {}): {}", error, description);
         }
 
-        void WindowCloseCallback(GLFWwindow *window)
+        void WindowCloseCallback(GLFWwindow *glfw_window)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
-            WindowCloseEvent event;
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
+            WindowCloseEvent event(window);
+
             data.EventCallback(event);
         }
 
-        void WindowSizeCallback(GLFWwindow *window, int width, int height)
+        void WindowSizeCallback(GLFWwindow *glfw_window, int width, int height)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
 
             data.width = width;
             data.height = height;
 
-            WindowResizeEvent event(width, height);
+            WindowResizeEvent event(window, width, height);
             data.EventCallback(event);
         }
 
-        void WindowFocusCallback(GLFWwindow *window, int focused)
+        void WindowFocusCallback(GLFWwindow *glfw_window, int focused)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
 
-            WindowFocusedEvent event(focused);
+            WindowFocusedEvent event(window, focused);
             data.EventCallback(event);
         }
 
-        void WindowPositionCallback(GLFWwindow *window, int xPos, int yPos)
+        void WindowPositionCallback(GLFWwindow *glfw_window, int xPos, int yPos)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
             data.posx = xPos;
             data.posy = yPos;
 
-            WindowMovedEvent event(xPos, yPos);
+            WindowMovedEvent event(window, xPos, yPos);
             data.EventCallback(event);
         }
 
-        void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+        void KeyCallback(GLFWwindow *glfw_window, int key, int scancode, int action, int mods)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
             static uint32_t repeat_count = 0;
 
             switch (action)
@@ -65,14 +74,14 @@ namespace engine
             case GLFW_PRESS:
             {
                 repeat_count = 0;
-                KeyPressedEvent event(key, 0);
+                KeyPressedEvent event(window, key, 0);
                 data.EventCallback(event);
                 break;
             }
 
             case GLFW_RELEASE:
             {
-                KeyReleasedEvent event(key);
+                KeyReleasedEvent event(window, key);
                 data.EventCallback(event);
                 break;
             }
@@ -80,51 +89,54 @@ namespace engine
             case GLFW_REPEAT:
             {
                 repeat_count++;
-                KeyPressedEvent event(key, repeat_count);
+                KeyPressedEvent event(window, key, repeat_count);
                 data.EventCallback(event);
                 break;
             }
             }
         }
 
-        void CharCallback(GLFWwindow *window, uint32_t key)
+        void CharCallback(GLFWwindow *glfw_window, uint32_t key)
         {
         }
 
-        void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
+        void MouseButtonCallback(GLFWwindow *glfw_window, int button, int action, int mods)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
 
             switch (action)
             {
             case GLFW_PRESS:
             {
-                MouseButtonPressedEvent event(button);
+                MouseButtonPressedEvent event(window, button);
                 data.EventCallback(event);
                 break;
             }
             case GLFW_RELEASE:
             {
-                MouseButtonReleasedEvent event(button);
+                MouseButtonReleasedEvent event(window, button);
                 data.EventCallback(event);
                 break;
             }
             }
         }
 
-        void ScrollCallback(GLFWwindow *window, double xOffset, double yOffset)
+        void ScrollCallback(GLFWwindow *glfw_window, double xOffset, double yOffset)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
 
-            MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
+            MouseScrolledEvent event(window, static_cast<float>(xOffset), static_cast<float>(yOffset));
             data.EventCallback(event);
         }
 
-        void CursorPositionCallback(GLFWwindow *window, double xPos, double yPos)
+        void CursorPositionCallback(GLFWwindow *glfw_window, double xPos, double yPos)
         {
-            WindowSettings &data = *(WindowSettings *)glfwGetWindowUserPointer(window);
+            Window *window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+            auto data = window->GetSettings();
 
-            MouseMovedEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
+            MouseMovedEvent event(window, static_cast<float>(xPos), static_cast<float>(yPos));
             data.EventCallback(event);
         }
     }
@@ -165,7 +177,7 @@ namespace engine
         SetSettings(settings);
         m_WindowedSettings = settings;
 
-        glfwSetWindowUserPointer(m_Handle, &m_Settings);
+        glfwSetWindowUserPointer(m_Handle, this);
 
         glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
         glfwSetWindowSizeCallback(m_Handle, WindowSizeCallback);
@@ -182,8 +194,6 @@ namespace engine
     {
         if (m_Handle)
             glfwDestroyWindow(m_Handle);
-
-        glfwTerminate();
     }
 
     void GlfwWindow::ProcessEvents()
@@ -219,7 +229,6 @@ namespace engine
 
             if (m_Settings.focused)
             {
-                // glfwFocusWindow(m_Handle);
                 glfwRequestWindowAttention(m_Handle);
             }
         }
@@ -227,7 +236,7 @@ namespace engine
         m_Dirty = false;
     }
 
-    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance)
+    VkSurfaceKHR GlfwWindow::CreateSurface(Instance &instance, PhysicalDevice &physical_device)
     {
         ENG_ASSERT(instance.GetHandle() && "Create an instance before calling CreateSurface.");
         ENG_ASSERT(m_Handle && "Create a window before calling CreateSurface.");
@@ -235,13 +244,13 @@ namespace engine
         if (instance.GetHandle() == VK_NULL_HANDLE || !m_Handle)
             return VK_NULL_HANDLE;
 
-        VkSurfaceKHR surface = VK_NULL_HANDLE;
-        VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &surface);
+        VkResult result = glfwCreateWindowSurface(instance.GetHandle(), m_Handle, nullptr, &m_Surface);
 
         if (result != VK_SUCCESS)
             return VK_NULL_HANDLE;
 
-        return surface;
+        m_Platform.GetApp().GetDevice().CheckIfPresentSupported(m_Surface);
+        return m_Surface;
     }
 
     bool GlfwWindow::ShouldClose() const
@@ -252,5 +261,15 @@ namespace engine
     void GlfwWindow::Close()
     {
         glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
+    }
+
+    void GlfwWindow::Destroy()
+    {
+        glfwDestroyWindow(m_Handle);
+    }
+
+    void GlfwWindow::DeInit()
+    {
+        glfwTerminate();
     }
 }

@@ -1,18 +1,18 @@
 #include "vulkan_api/rendering/render_pipeline.h"
 
 #include "vulkan_api/command_buffer.h"
+#include "vulkan_api/device.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/subpasses/subpass.h"
+#include "vulkan_api/render_context.h"
 
 namespace engine
 {
-    RenderPipeline::RenderPipeline(std::vector<std::unique_ptr<Subpass>> &&subpasses)
-        : m_Subpasses(std::move(subpasses))
+    RenderPipeline::RenderPipeline(Device &device, std::vector<std::unique_ptr<Subpass>> &&subpasses)
+        : m_Device(device), m_Subpasses(std::move(subpasses))
     {
         for (auto &subpass : m_Subpasses)
-        {
-            subpass->Prepare();
-        }
+            subpass->Prepare(m_Device);
 
         m_ClearValue[0].color = {0.05f, 0.05f, 0.05f, 1.0f};
         m_ClearValue[1].depthStencil = {0.0f, ~0U};
@@ -24,11 +24,11 @@ namespace engine
 
     void RenderPipeline::AddSubpass(std::unique_ptr<Subpass> &&subpass)
     {
-        subpass->Prepare();
+        subpass->Prepare(m_Device);
         m_Subpasses.emplace_back(std::move(subpass));
     }
 
-    void RenderPipeline::Draw(CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents)
+    void RenderPipeline::Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents)
     {
         ENG_ASSERT(!m_Subpasses.empty(), "Render pipeline should contain at least one sub-pass");
 
@@ -48,7 +48,7 @@ namespace engine
             else
                 command_buffer.NextSubpass();
 
-            subpass->Draw(command_buffer);
+            subpass->Draw(render_context, command_buffer);
         }
 
         m_ActiveSubpassIndex = 0;

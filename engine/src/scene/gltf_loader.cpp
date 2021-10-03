@@ -487,9 +487,9 @@ namespace engine
 
         command_buffer.End();
 
-        auto &queue = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+        auto &queue_family = m_Device.GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
 
-        queue.GetQueues()[0].Submit(command_buffer, m_Device.RequestFence());
+        queue_family.GetQueues()[0].Submit(command_buffer, m_Device.RequestFence());
 
         m_Device.GetFencePool().Wait();
         m_Device.GetFencePool().Reset();

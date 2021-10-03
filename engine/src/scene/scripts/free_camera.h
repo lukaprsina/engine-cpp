@@ -7,6 +7,7 @@
 namespace engine
 {
     class Scene;
+    class Window;
 
     namespace sg
     {
@@ -16,7 +17,7 @@ namespace engine
         {
         public:
             FreeCamera() = default;
-            FreeCamera(Scene &scene);
+            FreeCamera(Scene &scene, Window *window);
             FreeCamera(FreeCamera &&other);
             FreeCamera(const FreeCamera &) = default;
             FreeCamera &operator=(const FreeCamera &) = default;
@@ -28,6 +29,7 @@ namespace engine
 
         private:
             Scene &m_Scene;
+            Window *m_Window;
             float m_SpeedMultiplier{3.0f};
             glm::vec2 m_MouseMoveDelta{};
         };

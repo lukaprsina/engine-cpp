@@ -1,209 +1,221 @@
+set(ENGINE_SRC ${CMAKE_SOURCE_DIR}/engine/src  CACHE STRING "Engine source directory")
+
 set(CORE_FILES
     # Header Files
-    src/core/application.h
-    src/core/options.h
-    src/core/log.h
-    src/core/timer.h
+    ${ENGINE_SRC}/core/application.h
+    ${ENGINE_SRC}/core/options.h
+    ${ENGINE_SRC}/core/log.h
+    ${ENGINE_SRC}/core/timer.h
     # Source Files
-    src/core/application.cpp
-    src/core/options.cpp
-    src/core/log.cpp
-    src/core/timer.cpp)
+    ${ENGINE_SRC}/core/application.cpp
+    ${ENGINE_SRC}/core/options.cpp
+    ${ENGINE_SRC}/core/log.cpp
+    ${ENGINE_SRC}/core/timer.cpp)
 
 set(COMMON_FILES
     # Header Files
-    src/common/base.h
-    src/common/error.h
-    src/common/vulkan.h
-    src/common/strings.h
-    src/common/resource_caching.h
+    ${ENGINE_SRC}/common/base.h
+    ${ENGINE_SRC}/common/error.h
+    ${ENGINE_SRC}/common/vulkan.h
+    ${ENGINE_SRC}/common/strings.h
+    ${ENGINE_SRC}/common/resource_caching.h
     # Source files
-    src/common/base.cpp
-    src/common/error.cpp
-    src/common/vulkan.cpp
-    src/common/strings.cpp)
+    ${ENGINE_SRC}/common/base.cpp
+    ${ENGINE_SRC}/common/error.cpp
+    ${ENGINE_SRC}/common/vulkan.cpp
+    ${ENGINE_SRC}/common/strings.cpp)
 
 set(EVENT_FILES # Header Files
-    src/events/application_event.h src/events/event.h src/events/key_event.h
-    src/events/mouse_event.h)
+    ${ENGINE_SRC}/events/application_event.h ${ENGINE_SRC}/events/event.h ${ENGINE_SRC}/events/key_event.h
+    ${ENGINE_SRC}/events/mouse_event.h)
 
 set(WINDOW_FILES
     # Header Files
-    src/window/glfw_window.h
-    src/window/window.h
-    src/window/headless_window.h
+    ${ENGINE_SRC}/window/glfw_window.h
+    ${ENGINE_SRC}/window/window.h
+    ${ENGINE_SRC}/window/headless_window.h
     # Source Files
-    src/window/window.cpp
-    src/window/headless_window.cpp
-    src/window/glfw_window.cpp)
+    ${ENGINE_SRC}/window/window.cpp
+    ${ENGINE_SRC}/window/headless_window.cpp
+    ${ENGINE_SRC}/window/glfw_window.cpp)
 
 set(PLATFORM_FILES
     # Header Files
-    src/platform/platform.h
+    ${ENGINE_SRC}/platform/platform.h
     # Source Files
-    src/entrypoint.cpp src/platform/platform.cpp)
+    ${ENGINE_SRC}/platform/platform.cpp)
 
 set(WINDOWS_FILES
     # Header Files
-    src/platform/windows_platform.h
+    ${ENGINE_SRC}/platform/windows_platform.h
     # Source Files
-    src/platform/windows_platform.cpp src/window/glfw_input.cpp)
+    ${ENGINE_SRC}/platform/windows_platform.cpp ${ENGINE_SRC}/window/glfw_input.cpp)
 
 set(UNIX_FILES
     # Header Files
-    src/platform/unix_platform.h
+    ${ENGINE_SRC}/platform/unix_platform.h
     # Source Files
-    src/platform/unix_platform.cpp src/window/glfw_input.cpp)
+    ${ENGINE_SRC}/platform/unix_platform.cpp ${ENGINE_SRC}/window/glfw_input.cpp)
 
 set(VULKAN_API_FILES
     # Header files
-    src/vulkan_api/instance.h
-    src/vulkan_api/physical_device.h
-    src/vulkan_api/device.h
-    src/vulkan_api/resource_cache.h
-    src/vulkan_api/queue.h
-    src/vulkan_api/command_pool.h
-    src/vulkan_api/fence_pool.h
-    src/vulkan_api/render_context.h
-    src/vulkan_api/swapchain.h
-    src/vulkan_api/command_buffer.h
-    src/vulkan_api/core/image.h
-    src/vulkan_api/core/image_view.h
-    src/vulkan_api/render_target.h
-    src/vulkan_api/render_frame.h
-    src/vulkan_api/semaphore_pool.h
-    src/vulkan_api/queue_family.h
-    src/vulkan_api/rendering/render_pipeline.h
-    src/vulkan_api/subpasses/subpass.h
-    src/renderer/shader.h
-    src/platform/filesystem.h
-    src/vulkan_api/subpasses/geometry_subpass.h
-    src/vulkan_api/subpasses/forward_subpass.h
-    src/scene/scene.h
-    src/scene/components/camera.h
-    src/vulkan_api/core/pipeline_layout.h
-    src/vulkan_api/core/descriptor_set_layout.h
-    src/vulkan_api/core/descriptor_pool.h
-    src/vulkan_api/core/render_pass.h
-    src/vulkan_api/core/descriptor_set.h
-    src/vulkan_api/core/framebuffer.h
-    src/scene/gltf_loader.h
-    src/scene/components/light.h
-    src/vulkan_api/rendering/resource_binding_state.h
-    src/vulkan_api/rendering/pipeline_state.h
-    src/vulkan_api/core/sampler.h
-    src/vulkan_api/core/buffer.h
-    src/vulkan_api/core/buffer_pool.h
-    src/vulkan_api/core/pipeline.h
-    src/renderer/glsl_compiler.h
-    src/renderer/spirv_reflection.h
-    src/vulkan_api/resource_record.h
-    src/vulkan_api/resource_replay.h
-    src/scene/entity.h
-    src/scene/components/sampler.h
-    src/scene/components/image.h
-    src/scene/components/image/ktx.h
-    src/scene/components/image/stb.h
-    src/scene/components/image/astc.h
-    src/scene/components/texture.h
-    src/scene/components/material.h
-    src/scene/components/pbr_material.h
-    src/scene/components/mesh.h
-    src/scene/components/aabb.h
-    src/scene/components/submesh.h
-    src/scene/components/transform.h
-    src/scene/components/perspective_camera.h
-    src/scene/script.h
-    src/scene/scripts/free_camera.h
-    src/window/input.h
-    src/vulkan_api/initializers.h
-    src/core/layer.h
-    src/core/layer_stack.h
-    src/core/gui.h
-    # Source files
-    src/vulkan_api/instance.cpp
-    src/vulkan_api/physical_device.cpp
-    src/vulkan_api/device.cpp
-    src/vulkan_api/resource_cache.cpp
-    src/vulkan_api/queue.cpp
-    src/vulkan_api/command_pool.cpp
-    src/vulkan_api/fence_pool.cpp
-    src/vulkan_api/render_context.cpp
-    src/vulkan_api/swapchain.cpp
-    src/vulkan_api/command_buffer.cpp
-    src/vulkan_api/core/image.cpp
-    src/vulkan_api/core/image_view.cpp
-    src/vulkan_api/render_target.cpp
-    src/vulkan_api/render_frame.cpp
-    src/vulkan_api/semaphore_pool.cpp
-    src/vulkan_api/queue_family.cpp
-    src/vulkan_api/rendering/render_pipeline.cpp
-    src/vulkan_api/subpasses/subpass.cpp
-    src/renderer/shader.cpp
-    src/platform/filesystem.cpp
-    src/vulkan_api/subpasses/geometry_subpass.cpp
-    src/vulkan_api/subpasses/forward_subpass.cpp
-    src/scene/scene.cpp
-    src/scene/components/camera.cpp
-    src/vulkan_api/core/pipeline_layout.cpp
-    src/vulkan_api/core/descriptor_set_layout.cpp
-    src/vulkan_api/core/descriptor_pool.cpp
-    src/vulkan_api/core/render_pass.cpp
-    src/vulkan_api/core/descriptor_set.cpp
-    src/vulkan_api/core/framebuffer.cpp
-    src/scene/gltf_loader.cpp
-    src/scene/components/light.cpp
-    src/vulkan_api/rendering/resource_binding_state.cpp
-    src/vulkan_api/rendering/pipeline_state.cpp
-    src/vulkan_api/core/sampler.cpp
-    src/vulkan_api/core/buffer.cpp
-    src/vulkan_api/core/buffer_pool.cpp
-    src/vulkan_api/core/pipeline.cpp
-    src/renderer/glsl_compiler.cpp
-    src/renderer/spirv_reflection.cpp
-    src/vulkan_api/resource_record.cpp
-    src/vulkan_api/resource_replay.cpp
-    src/scene/entity.cpp
-    src/scene/components/sampler.cpp
-    src/scene/components/image.cpp
-    src/scene/components/image/ktx.cpp
-    src/scene/components/image/stb.cpp
-    src/scene/components/image/astc.cpp
-    src/scene/components/texture.cpp
-    src/scene/components/material.cpp
-    src/scene/components/pbr_material.cpp
-    src/scene/components/mesh.cpp
-    src/scene/components/aabb.cpp
-    src/scene/components/submesh.cpp
-    src/scene/components/transform.cpp
-    src/scene/components/perspective_camera.cpp
-    src/scene/script.cpp
-    src/scene/scripts/free_camera.cpp
-    src/core/layer_stack.cpp
-    src/core/gui.cpp)
+    ${ENGINE_SRC}/vulkan_api/instance.h
+    ${ENGINE_SRC}/vulkan_api/physical_device.h
+    ${ENGINE_SRC}/vulkan_api/device.h
+    ${ENGINE_SRC}/vulkan_api/resource_cache.h
+    ${ENGINE_SRC}/vulkan_api/queue.h
+    ${ENGINE_SRC}/vulkan_api/command_pool.h
+    ${ENGINE_SRC}/vulkan_api/fence_pool.h
+    ${ENGINE_SRC}/vulkan_api/render_context.h
+    ${ENGINE_SRC}/vulkan_api/swapchain.h
+    ${ENGINE_SRC}/vulkan_api/command_buffer.h
+    ${ENGINE_SRC}/vulkan_api/core/image.h
+    ${ENGINE_SRC}/vulkan_api/core/image_view.h
+    ${ENGINE_SRC}/vulkan_api/render_target.h
+    ${ENGINE_SRC}/vulkan_api/render_frame.h
+    ${ENGINE_SRC}/vulkan_api/semaphore_pool.h
+    ${ENGINE_SRC}/vulkan_api/queue_family.h
+    ${ENGINE_SRC}/vulkan_api/rendering/render_pipeline.h
+    ${ENGINE_SRC}/vulkan_api/subpasses/subpass.h
+    ${ENGINE_SRC}/renderer/shader.h
+    ${ENGINE_SRC}/platform/filesystem.h
+    ${ENGINE_SRC}/vulkan_api/subpasses/geometry_subpass.h
+    ${ENGINE_SRC}/vulkan_api/subpasses/forward_subpass.h
+    ${ENGINE_SRC}/scene/scene.h
+    ${ENGINE_SRC}/scene/components/camera.h
+    ${ENGINE_SRC}/vulkan_api/core/pipeline_layout.h
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_set_layout.h
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_pool.h
+    ${ENGINE_SRC}/vulkan_api/core/render_pass.h
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_set.h
+    ${ENGINE_SRC}/vulkan_api/core/framebuffer.h
+    ${ENGINE_SRC}/scene/gltf_loader.h
+    ${ENGINE_SRC}/scene/components/light.h
+    ${ENGINE_SRC}/vulkan_api/rendering/resource_binding_state.h
+    ${ENGINE_SRC}/vulkan_api/rendering/pipeline_state.h
+    ${ENGINE_SRC}/vulkan_api/core/sampler.h
+    ${ENGINE_SRC}/vulkan_api/core/buffer.h
+    ${ENGINE_SRC}/vulkan_api/core/buffer_pool.h
+    ${ENGINE_SRC}/vulkan_api/core/pipeline.h
+    ${ENGINE_SRC}/renderer/glsl_compiler.h
+    ${ENGINE_SRC}/renderer/spirv_reflection.h
+    ${ENGINE_SRC}/vulkan_api/resource_record.h
+    ${ENGINE_SRC}/vulkan_api/resource_replay.h
+    ${ENGINE_SRC}/scene/entity.h
+    ${ENGINE_SRC}/scene/components/sampler.h
+    ${ENGINE_SRC}/scene/components/image.h
+    ${ENGINE_SRC}/scene/components/image/ktx.h
+    ${ENGINE_SRC}/scene/components/image/stb.h
+    ${ENGINE_SRC}/scene/components/image/astc.h
+    ${ENGINE_SRC}/scene/components/texture.h
+    ${ENGINE_SRC}/scene/components/material.h
+    ${ENGINE_SRC}/scene/components/pbr_material.h
+    ${ENGINE_SRC}/scene/components/mesh.h
+    ${ENGINE_SRC}/scene/components/aabb.h
+    ${ENGINE_SRC}/scene/components/submesh.h
+    ${ENGINE_SRC}/scene/components/transform.h
+    ${ENGINE_SRC}/scene/components/perspective_camera.h
+    ${ENGINE_SRC}/scene/script.h
+    ${ENGINE_SRC}/scene/scripts/free_camera.h
+    ${ENGINE_SRC}/window/input.h
+    ${ENGINE_SRC}/vulkan_api/initializers.h
+    ${ENGINE_SRC}/core/layer.h
+    ${ENGINE_SRC}/core/layer_stack.h
+    # ${ENGINE_SRC}/core/gui.h Source files
+    ${ENGINE_SRC}/vulkan_api/instance.cpp
+    ${ENGINE_SRC}/vulkan_api/physical_device.cpp
+    ${ENGINE_SRC}/vulkan_api/device.cpp
+    ${ENGINE_SRC}/vulkan_api/resource_cache.cpp
+    ${ENGINE_SRC}/vulkan_api/queue.cpp
+    ${ENGINE_SRC}/vulkan_api/command_pool.cpp
+    ${ENGINE_SRC}/vulkan_api/fence_pool.cpp
+    ${ENGINE_SRC}/vulkan_api/render_context.cpp
+    ${ENGINE_SRC}/vulkan_api/swapchain.cpp
+    ${ENGINE_SRC}/vulkan_api/command_buffer.cpp
+    ${ENGINE_SRC}/vulkan_api/core/image.cpp
+    ${ENGINE_SRC}/vulkan_api/core/image_view.cpp
+    ${ENGINE_SRC}/vulkan_api/render_target.cpp
+    ${ENGINE_SRC}/vulkan_api/render_frame.cpp
+    ${ENGINE_SRC}/vulkan_api/semaphore_pool.cpp
+    ${ENGINE_SRC}/vulkan_api/queue_family.cpp
+    ${ENGINE_SRC}/vulkan_api/rendering/render_pipeline.cpp
+    ${ENGINE_SRC}/vulkan_api/subpasses/subpass.cpp
+    ${ENGINE_SRC}/renderer/shader.cpp
+    ${ENGINE_SRC}/platform/filesystem.cpp
+    ${ENGINE_SRC}/vulkan_api/subpasses/geometry_subpass.cpp
+    ${ENGINE_SRC}/vulkan_api/subpasses/forward_subpass.cpp
+    ${ENGINE_SRC}/scene/scene.cpp
+    ${ENGINE_SRC}/scene/components/camera.cpp
+    ${ENGINE_SRC}/vulkan_api/core/pipeline_layout.cpp
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_set_layout.cpp
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_pool.cpp
+    ${ENGINE_SRC}/vulkan_api/core/render_pass.cpp
+    ${ENGINE_SRC}/vulkan_api/core/descriptor_set.cpp
+    ${ENGINE_SRC}/vulkan_api/core/framebuffer.cpp
+    ${ENGINE_SRC}/scene/gltf_loader.cpp
+    ${ENGINE_SRC}/scene/components/light.cpp
+    ${ENGINE_SRC}/vulkan_api/rendering/resource_binding_state.cpp
+    ${ENGINE_SRC}/vulkan_api/rendering/pipeline_state.cpp
+    ${ENGINE_SRC}/vulkan_api/core/sampler.cpp
+    ${ENGINE_SRC}/vulkan_api/core/buffer.cpp
+    ${ENGINE_SRC}/vulkan_api/core/buffer_pool.cpp
+    ${ENGINE_SRC}/vulkan_api/core/pipeline.cpp
+    ${ENGINE_SRC}/renderer/glsl_compiler.cpp
+    ${ENGINE_SRC}/renderer/spirv_reflection.cpp
+    ${ENGINE_SRC}/vulkan_api/resource_record.cpp
+    ${ENGINE_SRC}/vulkan_api/resource_replay.cpp
+    ${ENGINE_SRC}/scene/entity.cpp
+    ${ENGINE_SRC}/scene/components/sampler.cpp
+    ${ENGINE_SRC}/scene/components/image.cpp
+    ${ENGINE_SRC}/scene/components/image/ktx.cpp
+    ${ENGINE_SRC}/scene/components/image/stb.cpp
+    ${ENGINE_SRC}/scene/components/image/astc.cpp
+    ${ENGINE_SRC}/scene/components/texture.cpp
+    ${ENGINE_SRC}/scene/components/material.cpp
+    ${ENGINE_SRC}/scene/components/pbr_material.cpp
+    ${ENGINE_SRC}/scene/components/mesh.cpp
+    ${ENGINE_SRC}/scene/components/aabb.cpp
+    ${ENGINE_SRC}/scene/components/submesh.cpp
+    ${ENGINE_SRC}/scene/components/transform.cpp
+    ${ENGINE_SRC}/scene/components/perspective_camera.cpp
+    ${ENGINE_SRC}/scene/script.cpp
+    ${ENGINE_SRC}/scene/scripts/free_camera.cpp
+    ${ENGINE_SRC}/core/layer.cpp
+    ${ENGINE_SRC}/core/layer_stack.cpp
+    ${ENGINE_SRC}/entrypoint.cpp
+    # ${ENGINE_SRC}/core/gui.cpp
+)
 
-set(PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
+list(APPEND ENG_PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
                   ${PLATFORM_FILES} ${VULKAN_API_FILES})
 
 if(WIN32)
-  list(APPEND PROJECT_FILES ${WINDOWS_FILES})
+  list(APPEND ENG_PROJECT_FILES ${WINDOWS_FILES})
 elseif(UNIX)
-  list(APPEND PROJECT_FILES ${UNIX_FILES})
+  list(APPEND ENG_PROJECT_FILES ${UNIX_FILES})
 endif()
 
-add_executable(engine WIN32 ${PROJECT_FILES})
+add_executable(engine WIN32 ${ENG_PROJECT_FILES})
 
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-                                         ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(
+  engine
+  PUBLIC ${ENGINE_SRC}
+  PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-target_precompile_headers(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/pch.h)
+target_precompile_headers(engine PUBLIC ${ENGINE_SRC}/pch.h)
 
 configure_file(engine_config.h.in engine_config.h @ONLY)
 
 if(MSVC)
-  # target_compile_options(engine PRIVATE /W3 /WX)
+  target_compile_options(engine PRIVATE /W3 /WX)
 else()
   target_compile_options(engine PRIVATE -Wall) # -Weffc++)
 endif()
 
-add_subdirectory("vendor")
+if(ENG_SHIPPING)
+  file(GLOB ENG_ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+       ${CMAKE_CURRENT_SOURCE_DIR}/assets)
+  file(COPY ${ENG_ASSETS} DESTINATION ${CMAKE_BINARY_DIR}/engine)
+endif()
+
+add_subdirectory(vendor)

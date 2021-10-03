@@ -6,6 +6,7 @@
 
 namespace engine
 {
+    class Window;
     class Platform;
     class WindowCloseEvent;
     class WindowResizeEvent;
@@ -13,10 +14,8 @@ namespace engine
     class Event;
     class Instance;
     class Device;
-    class RenderContext;
     class Scene;
     class RenderTarget;
-    class RenderPipeline;
     class CommandBuffer;
     class Gui;
 
@@ -36,40 +35,29 @@ namespace engine
         bool OnResize(WindowResizeEvent &event);
         bool OnKeyPressed(KeyPressedEvent &event);
 
-        bool Prepare();
+        virtual bool Prepare();
         void Step();
         void Update(float delta_time);
-        void UpdateScene(float delta_time);
-        void Draw(CommandBuffer &command_buffer);
         void Finish();
 
-        void LoadScene(const std::string &path);
+        Scene *LoadScene(std::string name);
+        void SetName(const std::string &name) { m_Name = name; }
+        std::string GetName() const { return m_Name; }
 
-        void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
-
-        void SetName(const std::string &name)
-        {
-            m_Name = name;
-        }
-        std::string GetName() const { return m_Name; };
-        Platform &GetPlatform() { return *m_Platform; };
-        Instance &GetInstance() { return *m_Instance; };
-        Device &GetDevice() { return *m_Device; };
+        Platform &GetPlatform() { return *m_Platform; }
+        Instance &GetInstance() { return *m_Instance; }
+        Device &GetDevice() { return *m_Device; }
+        LayerStack &GetLayerStack() { return m_LayerStack; }
+        std::vector<std::unique_ptr<Scene>> &GetScenes() { return m_Scenes; }
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
 
         void ParseOptions(std::vector<std::string> &arguments);
-        Options GetOptions() const { return m_Options; };
+        Options GetOptions() const { return m_Options; }
 
-        void SetHeadless(bool headless) { m_Headless = headless; };
-        bool IsHeadless() const { return m_Headless; };
-
-        RenderContext &GetRenderContext()
-        {
-            ENG_ASSERT(m_RenderContext, "Render context is not valid");
-            return *m_RenderContext;
-        }
+        void SetHeadless(bool headless) { m_Headless = headless; }
+        bool IsHeadless() const { return m_Headless; }
 
         void AddInstanceExtension(const char *extension, bool optional = false) { m_InstanceExtensions[extension] = optional; }
         const std::unordered_map<const char *, bool> GetInstanceExtensions() { return m_InstanceExtensions; }
@@ -92,15 +80,14 @@ namespace engine
 
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
-        std::unique_ptr<Scene> m_Scene{};
-        std::unique_ptr<Gui> m_Gui{};
-        std::unique_ptr<RenderContext> m_RenderContext{};
-        std::unique_ptr<RenderPipeline> m_RenderPipeline{};
+        std::vector<std::unique_ptr<Scene>> m_Scenes{};
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};
         std::vector<const char *> m_ValidationLayers{};
-
-        VkSurfaceKHR m_Surface{VK_NULL_HANDLE};
     };
+
+    std::unique_ptr<Application> CreateApplication(Platform *platform);
 }
+
+extern std::unique_ptr<engine::Application> engine::CreateApplication(engine::Platform *platform);

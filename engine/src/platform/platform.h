@@ -14,6 +14,7 @@ namespace engine
     };
 
     class Event;
+    class Layer;
 
     class Platform
     {
@@ -21,15 +22,17 @@ namespace engine
         Platform(const std::string name, const std::vector<std::string> &arguments);
         virtual ~Platform() = default;
 
+        void ConfigurePaths();
         virtual bool Initialize(std::unique_ptr<Application> &&app);
         virtual bool Prepare();
         virtual void MainLoop();
-        void Run();
+        virtual bool ShouldClose();
         virtual void Terminate(ExitCode code);
-        virtual void Close() const;
 
-        Window &GetWindow() const { return *m_Window; };
-        Application &GetApp() const { return *m_App; };
+        virtual Window *CreatePlatformWindow() = 0;
+        Window &GetWindow(void *handle) { return *m_Windows.at(handle); }
+        std::unordered_map<void *, std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
+        Application &GetApp() const { return *m_App; }
         virtual const char *GetSurfaceExtension() = 0;
 
         static void SetArguments(const std::vector<std::string> &arguments) { s_Arguments = arguments; };
@@ -45,11 +48,12 @@ namespace engine
         static const std::filesystem::path &GetTempDirectory() { return s_TempDirectory; };
 
     protected:
-        std::unique_ptr<Window> m_Window{};
+        std::string m_Name{};
         std::unique_ptr<Application> m_App{};
+        std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
+        std::vector<void *> m_ClosedWindows{};
+        std::vector<Layer *> m_Layers;
         Timer m_Timer{};
-
-        virtual void CreatePlatformWindow() = 0;
 
     private:
         std::string m_EngineName = "engine";

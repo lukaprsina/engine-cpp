@@ -4,10 +4,13 @@
 
 namespace engine
 {
+    class Window;
+
     class WindowCloseEvent : public Event
     {
     public:
-        WindowCloseEvent() {}
+        WindowCloseEvent(Window *window)
+            : Event(window) {}
 
         std::string ToString() const override
         {
@@ -23,8 +26,8 @@ namespace engine
     class WindowResizeEvent : public Event
     {
     public:
-        WindowResizeEvent(unsigned int width, unsigned int height)
-            : m_Width(width), m_Height(height) {}
+        WindowResizeEvent(Window *window, unsigned int width, unsigned int height)
+            : Event(window), m_Width(width), m_Height(height) {}
 
         inline unsigned int GetWidth() const { return m_Width; }
         inline unsigned int GetHeight() const { return m_Height; }
@@ -45,8 +48,8 @@ namespace engine
     class WindowFocusedEvent : public Event
     {
     public:
-        WindowFocusedEvent(int Focused)
-            : m_Focused((bool)Focused)
+        WindowFocusedEvent(Window *window, int Focused)
+            : Event(window), m_Focused((bool)Focused)
         {
         }
 
@@ -69,8 +72,8 @@ namespace engine
     class WindowMovedEvent : public Event
     {
     public:
-        WindowMovedEvent(int XPositon, int YPosition)
-            : m_XPosition(XPositon), m_YPosition(YPosition) {}
+        WindowMovedEvent(Window *window, int XPositon, int YPosition)
+            : Event(window), m_XPosition(XPositon), m_YPosition(YPosition) {}
 
         inline int GetXPosition() const { return m_XPosition; }
         inline int GetYPosition() const { return m_YPosition; }
@@ -87,4 +90,4 @@ namespace engine
     private:
         int m_XPosition, m_YPosition;
     };
-} // namespace eng
+}

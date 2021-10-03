@@ -12,9 +12,8 @@
 
 namespace engine
 {
-    GeometrySubpass::GeometrySubpass(RenderContext &render_context, ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene)
-        : Subpass(render_context,
-                  std::move(vertex_shader),
+    GeometrySubpass::GeometrySubpass(ShaderSource &&vertex_shader, ShaderSource &&fragment_shader, Scene &scene)
+        : Subpass(std::move(vertex_shader),
                   std::move(fragment_shader)),
           m_Scene(scene)
     {
@@ -24,9 +23,9 @@ namespace engine
     {
     }
 
-    void GeometrySubpass::Prepare()
+    void GeometrySubpass::Prepare(Device &device)
     {
-        auto &device = m_RenderContext.GetDevice();
+
         auto view = m_Scene.GetRegistry().view<sg::Mesh>();
 
         for (auto &entity : view)
@@ -43,7 +42,7 @@ namespace engine
         }
     }
 
-    void GeometrySubpass::Draw(CommandBuffer &command_buffer)
+    void GeometrySubpass::Draw(RenderContext &render_context, CommandBuffer &command_buffer)
     {
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes;
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes;
@@ -53,7 +52,7 @@ namespace engine
         for (auto node_it = opaque_nodes.begin(); node_it != opaque_nodes.end(); node_it++)
         {
             auto &transform = *(node_it->second.second);
-            UpdateUniform(command_buffer, transform, m_ThreadIndex);
+            UpdateUniform(render_context, command_buffer, transform, m_ThreadIndex);
 
             // Invert the front face if the mesh was flipped
             const auto &scale = transform.GetScale();
@@ -86,7 +85,7 @@ namespace engine
         for (auto node_it = transparent_nodes.rbegin(); node_it != transparent_nodes.rend(); node_it++)
         {
             auto &transform = *(node_it->second.second);
-            UpdateUniform(command_buffer, transform, m_ThreadIndex);
+            UpdateUniform(render_context, command_buffer, transform, m_ThreadIndex);
 
             DrawSubmesh(command_buffer, *node_it->second.first);
         }
@@ -125,7 +124,7 @@ namespace engine
         }
     }
 
-    void GeometrySubpass::UpdateUniform(CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
+    void GeometrySubpass::UpdateUniform(RenderContext &render_context, CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
     {
         GlobalUniform global_uniform;
         auto &camera = m_Scene.GetDefaultCamera();
@@ -136,13 +135,7 @@ namespace engine
                                           VulkanStyleProjection(perspective_camera.GetProjection()) *
                                           glm::inverse(camera_transform.GetWorldMatrix());
 
-        /* ENG_CORE_INFO(glm::to_string(camera.m_PreRotation));
-        ENG_CORE_INFO(glm::to_string(camera.GetProjection()));
-        ENG_CORE_INFO(glm::to_string(VulkanStyleProjection(camera.GetProjection())));
-        ENG_CORE_INFO(glm::to_string(glm::inverse(camera_transform.GetWorldMatrix())));
-        ENG_CORE_INFO(glm::to_string(global_uniform.camera_view_proj)); */
-
-        auto &render_frame = m_RenderContext.GetActiveFrame();
+        auto &render_frame = render_context.GetActiveFrame();
 
         //TODO: thread index
         auto allocation = render_frame.AllocateBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,

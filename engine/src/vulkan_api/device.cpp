@@ -1,6 +1,7 @@
 #include "vulkan_api/device.h"
 
 #include "vulkan_api/instance.h"
+#include "platform/platform.h"
 #include "vulkan_api/command_pool.h"
 #include "vulkan_api/fence_pool.h"
 
@@ -11,10 +12,9 @@ ENG_ENABLE_WARNINGS()
 
 namespace engine
 {
-    Device::Device(PhysicalDevice &gpu,
-                   VkSurfaceKHR surface,
+    Device::Device(PhysicalDevice &gpu, Platform &platform,
                    std::unordered_map<const char *, bool> requested_extensions)
-        : m_Gpu(gpu), m_ResourceCache(*this)
+        : m_Gpu(gpu), m_Platform(platform), m_ResourceCache(*this)
     {
         ENG_CORE_INFO("Selected GPU: {}", gpu.GetProperties().deviceName);
 
@@ -106,12 +106,10 @@ namespace engine
         if (result != VK_SUCCESS)
             throw VulkanException(result, "Cannot create device");
 
-        for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties_count; ++queue_family_index)
+        for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties.size(); ++queue_family_index)
         {
             const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
-            VkBool32 present_supported = gpu.IsPresentSupported(surface, queue_family_index);
-
-            m_QueueFamilies.emplace_back(*this, queue_family_index, queue_family_property, present_supported);
+            m_QueueFamilies.emplace_back(*this, queue_family_index, queue_family_property, VK_TRUE);
         }
 
         VmaVulkanFunctions vma_vulkan_func{};
@@ -226,6 +224,19 @@ namespace engine
         }
 
         return GetQueueFamilyByFlags(VK_QUEUE_GRAPHICS_BIT);
+    }
+
+    void Device::CheckIfPresentSupported(VkSurfaceKHR surface)
+    {
+        const std::vector<VkQueueFamilyProperties> &queue_family_properties = m_Gpu.GetQueueFamilyProperties();
+        for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties.size(); ++queue_family_index)
+        {
+            const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
+            VkBool32 present_supported = m_Gpu.IsPresentSupported(surface, queue_family_index);
+
+            VkBool32 can_present = m_QueueFamilies[queue_family_index].CanPresent();
+            m_QueueFamilies[queue_family_index].SetCanPresent(present_supported && can_present);
+        }
     }
 
     QueueFamily &Device::GetQueueFamilyByFlags(VkQueueFlags required_queue_flags)

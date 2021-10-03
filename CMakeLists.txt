@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 
 project(engine)
 
@@ -7,4 +7,5 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake
 
 include(global_options)
 
+add_subdirectory(sandbox)
 add_subdirectory(engine)

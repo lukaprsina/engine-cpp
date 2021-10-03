@@ -27,4 +27,4 @@ namespace engine
         std::vector<const RenderPass *> m_RenderPasses;
         std::vector<const GraphicsPipeline *> m_GraphicsPipelines;
     };
-} // namespace engine
+}

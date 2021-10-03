@@ -14,11 +14,12 @@ namespace engine
     {
     public:
         UnixPlatform(const UnixType &type, int argc, char *argv[]);
-        virtual ~UnixPlatform() = default;
+        ~UnixPlatform() = default;
 
-        virtual bool Initialize(std::unique_ptr<Application> &&app) override;
-        virtual void CreatePlatformWindow() override;
-        virtual const char *GetSurfaceExtension() override;
+        bool Initialize(std::unique_ptr<Application> &&app) override;
+        Window *CreatePlatformWindow() override;
+        void Terminate(ExitCode) override;
+        const char *GetSurfaceExtension() override;
 
     private:
         UnixType m_Type;

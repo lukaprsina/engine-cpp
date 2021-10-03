@@ -3,6 +3,7 @@
 #include "events/event.h"
 #include "core/application.h"
 #include "window/input.h"
+#include "core/layer_stack.h"
 
 #include <filesystem>
 
@@ -14,12 +15,40 @@ namespace engine
     std::filesystem::path Platform::s_TempDirectory = {};
 
     Platform::Platform(const std::string name, const std::vector<std::string> &arguments)
+        : m_Name(name)
     {
-        auto source_directory = std::filesystem::canonical(ENG_BASE_DIRECTORY);
-
-        Platform::SetSourceDirectory(source_directory / m_EngineName);
-
         Platform::SetArguments(arguments);
+    }
+
+    void Platform::ConfigurePaths()
+    {
+        auto source_directory = std::filesystem::path(ENG_BASE_DIRECTORY);
+        std::cout << "Source: " << source_directory.generic_string() << std::endl;
+
+        auto base_directory = std::filesystem::current_path();
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
+        base_directory = std::filesystem::canonical(base_directory);
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
+#ifdef ENG_SHIPPING
+        if (source_directory == base_directory)
+        {
+            std::cout << "From source" << std::endl;
+            base_directory /= m_EngineName;
+        }
+        else
+        {
+            base_directory = base_directory.parent_path();
+            std::cout << "Not from source" << std::endl;
+        }
+#else
+        base_directory /= m_EngineName;
+#endif
+
+        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+
+        Platform::SetSourceDirectory(base_directory);
     }
 
     bool Platform::Initialize(std::unique_ptr<Application> &&app)
@@ -29,17 +58,6 @@ namespace engine
 
         bool is_headless = m_App->GetOptions().Contains("--headless");
         m_App->SetHeadless(is_headless);
-
-        CreatePlatformWindow();
-
-        if (!m_Window)
-            throw std::runtime_error("Can't create window!");
-        else
-            ENG_CORE_INFO("Window created!");
-
-        Input::m_WindowPointer = m_Window->GetNativeWindow();
-
-        m_Window->SetEventCallback(std::bind(&Application::OnEvent, m_App.get(), std::placeholders::_1));
 
         return true;
     }
@@ -56,17 +74,42 @@ namespace engine
     {
         ENG_CORE_INFO("Starting the main loop.");
 
-        while (!m_Window->ShouldClose())
+        while (!ShouldClose())
         {
-            if (!m_Window->GetSettings().minimized)
-                Run();
-            m_Window->ProcessEvents();
+            m_App->Step();
+
+            for (auto &window_pair : m_Windows)
+            {
+                auto &window = window_pair.second;
+                window->Draw();
+                window->ProcessEvents();
+            }
         }
     }
 
-    void Platform::Run()
+    bool Platform::ShouldClose()
     {
-        m_App->Step();
+        bool should_continue = false;
+
+        for (auto &window_pair : m_Windows)
+        {
+            auto &window = window_pair.second;
+            if (window->ShouldClose())
+            {
+                window->Close();
+                m_ClosedWindows.emplace_back(window_pair.first);
+            }
+
+            else
+                should_continue = true;
+        }
+
+        for (void *window_handle : m_ClosedWindows)
+            m_Windows.erase(window_handle);
+
+        m_ClosedWindows.clear();
+
+        return !should_continue;
     }
 
     void Platform::Terminate(ExitCode)
@@ -75,13 +118,9 @@ namespace engine
             m_App->Finish();
 
         m_App.reset();
-        m_Window.reset();
+
+        m_Windows.clear();
 
         spdlog::drop_all();
-    }
-
-    void Platform::Close() const
-    {
-        m_Window->Close();
     }
 }

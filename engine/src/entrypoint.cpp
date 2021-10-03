@@ -1,10 +1,10 @@
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
 #include "platform/windows_platform.h"
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-    PSTR lpCmdLine, INT nCmdShow)
+                     PSTR lpCmdLine, INT nCmdShow)
 {
-    engine::WindowsPlatform platform{ hInstance, hPrevInstance,
-                                     lpCmdLine, nCmdShow };
+    engine::WindowsPlatform platform{hInstance, hPrevInstance,
+                                     lpCmdLine, nCmdShow};
 #else
 #include "platform/unix_platform.h"
 int main(int argc, char *argv[])
@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
     try
     {
 #endif
-        std::unique_ptr<engine::Application> app = std::make_unique<engine::Application>(&platform);
+        std::unique_ptr<engine::Application> app = engine::CreateApplication(&platform);
+
         app->SetName("Engine");
         app->ParseOptions(platform.GetArguments());
 

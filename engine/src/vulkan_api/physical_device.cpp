@@ -25,6 +25,7 @@ namespace engine
 
     VkBool32 PhysicalDevice::IsPresentSupported(VkSurfaceKHR surface, uint32_t queue_family_index)
     {
+        // TODO: accept queue class
         VkBool32 present_supported = VK_FALSE;
         if (surface != VK_NULL_HANDLE)
             VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(m_Handle, queue_family_index, surface, &present_supported));

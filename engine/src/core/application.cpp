@@ -1,5 +1,6 @@
 #include "core/application.h"
 
+#include "window/window.h"
 #include "core/timer.h"
 #include "core/gui.h"
 #include "core/layer_stack.h"
@@ -24,7 +25,7 @@
 namespace engine
 {
     Application::Application(Platform *platform)
-        : m_Platform(platform)
+        : m_Platform(platform), m_LayerStack(*this)
     {
         Log::Init();
         // Log::GetCoreLogger()->set_level(spdlog::level::warn);
@@ -53,17 +54,13 @@ namespace engine
         if (m_Device)
             m_Device->WaitIdle();
 
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnDetach();
+        for (auto &layer : m_LayerStack.GetLayers())
+            layer.second->OnDetach();
 
-        m_Scene.reset();
-        m_Gui.reset();
+        /* m_Scene.reset();
+        m_Gui.reset(); */
 
-        m_RenderContext.reset();
         m_Device.reset();
-
-        if (m_Surface != VK_NULL_HANDLE)
-            vkDestroySurfaceKHR(m_Instance->GetHandle(), m_Surface, nullptr);
 
         m_Instance.reset();
     }
@@ -81,18 +78,26 @@ namespace engine
                                                 m_Headless,
                                                 VK_API_VERSION_1_0);
 
-        m_Surface = m_Platform->GetWindow().CreateSurface(*m_Instance);
         PhysicalDevice &gpu = m_Instance->GetBestGpu();
 
         if (gpu.GetFeatures().textureCompressionASTC_LDR)
-            gpu.GetMutableRequestedFeatures().textureCompressionASTC_LDR = VK_TRUE;
+            gpu.GetMutableRequestedFeatures()
+                .textureCompressionASTC_LDR = VK_TRUE;
 
         if (!IsHeadless() || m_Instance->IsExtensionEnabled(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME))
             AddDeviceExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-        m_Device = std::make_unique<Device>(gpu, m_Surface, GetDeviceExtensions());
+        m_Device = std::make_unique<Device>(gpu, *m_Platform, GetDeviceExtensions());
 
-        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
+        for (auto &layer_pair : m_LayerStack.GetLayers())
+        {
+            Layer *layer = layer_pair.second.get();
+            layer->OnAttach();
+        }
+
+        return true;
+
+        /* std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
                                                              VK_PRESENT_MODE_FIFO_KHR,
                                                              VK_PRESENT_MODE_MAILBOX_KHR});
 
@@ -101,17 +106,6 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        m_RenderContext = std::make_unique<RenderContext>(*m_Device,
-                                                          m_Surface,
-                                                          present_mode_priority,
-                                                          surface_format_priority,
-                                                          m_Platform->GetWindow().GetSettings().width,
-                                                          m_Platform->GetWindow().GetSettings().height);
-
-        m_RenderContext->Prepare();
-
-        ShaderSource vert_shader("base.vert");
-        ShaderSource frag_shader("base.frag");
 
         std::string scene;
 
@@ -123,24 +117,11 @@ namespace engine
         else
             LoadScene(scene);
 
-        m_Scene->AddFreeCamera(m_RenderContext->GetSurfaceExtent());
+        
 
-        auto scene_subpass = std::make_unique<ForwardSubpass>(GetRenderContext(),
-                                                              std::move(vert_shader),
-                                                              std::move(frag_shader),
-                                                              *m_Scene);
+        m_Gui = std::make_unique<Gui>(*this, m_Window);
 
-        m_RenderPipeline = std::make_unique<RenderPipeline>();
-        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
-
-        m_Gui = std::make_unique<Gui>(*this, m_Platform->GetWindow());
-
-        m_LayerStack.PushLayer(m_Gui.get());
-
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnAttach();
-
-        return true;
+        m_LayerStack.PushLayer(m_Gui.get()); */
     }
 
     void Application::Step()
@@ -170,85 +151,11 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
-        UpdateScene(delta_time);
+        for (auto &scene : m_Scenes)
+            scene->Update(delta_time);
 
-        for (Layer *layer : m_LayerStack.GetLayers())
-            layer->OnUpdate(delta_time);
-
-        auto &command_buffer = m_RenderContext->Begin();
-        command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        Draw(command_buffer);
-        command_buffer.End();
-        m_RenderContext->Submit(command_buffer);
-    }
-
-    void Application::UpdateScene(float delta_time)
-    {
-        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
-
-        for (auto &entity : view)
-        {
-            auto &camera = view.get<sg::FreeCamera>(entity);
-            camera.Update(delta_time);
-        }
-    }
-
-    void Application::Draw(CommandBuffer &command_buffer)
-    {
-        auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
-
-        {
-            // Image 0 is the swapchain
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-
-            // Skip 1 as it is handled later as a depth-stencil attachment
-            for (size_t i = 2; i < views.size(); ++i)
-            {
-                command_buffer.CreateImageMemoryBarrier(views.at(i), memory_barrier);
-            }
-        }
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
-        }
-
-        SetViewportAndScissor(command_buffer,
-                              m_RenderContext->GetActiveFrame().GetRenderTarget().GetExtent());
-
-        if (m_RenderPipeline)
-            m_RenderPipeline->Draw(command_buffer,
-                                   m_RenderContext->GetActiveFrame().GetRenderTarget());
-
-        m_Gui->Draw(command_buffer);
-
-        command_buffer.EndRenderPass();
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-            memory_barrier.src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-        }
+        for (auto &layer : m_LayerStack.GetLayers())
+            layer.second->OnUpdate(delta_time);
     }
 
     void Application::Finish()
@@ -257,15 +164,16 @@ namespace engine
         ENG_CORE_INFO("Closing Application. (Runtime: {:.1f})", execution_time);
     }
 
+    Scene *Application::LoadScene(std::string name)
+    {
+        GLTFLoader loader(*m_Device);
+        auto scene = loader.ReadSceneFromFile(name);
+        m_Scenes.emplace_back(std::move(scene));
+        return m_Scenes.back().get();
+    }
+
     void Application::OnEvent(Event &event)
     {
-        for (auto it = m_LayerStack.GetLayers().rbegin(); it != m_LayerStack.GetLayers().rend(); ++it)
-        {
-            if (event.handled)
-                break;
-            (*it)->OnEvent(event);
-        }
-
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_EVENT_FN(Application::OnResize));
@@ -274,32 +182,31 @@ namespace engine
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)
     {
-        m_Platform->Close();
         return false;
     }
 
     bool Application::OnResize(WindowResizeEvent &event)
     {
-        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+        /* auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
         for (auto &entity : view)
         {
             auto &free_camera = view.get<sg::FreeCamera>(entity);
             free_camera.Resize(event.GetWidth(), event.GetHeight());
-        }
+        } */
 
         return false;
     }
 
     bool Application::OnKeyPressed(KeyPressedEvent &event)
     {
-        bool alt_enter = Input::IsKeyPressed(Key::LeftAlt) && Input::IsKeyPressed(Key::Enter);
+        /* bool alt_enter = m_Window->GetInput().IsKeyPressed(Key::LeftAlt) && m_Window->GetInput().IsKeyPressed(Key::Enter);
 
         if (event.GetKeyCode() == Key::F11 || alt_enter)
         {
-            auto window_settings = m_Platform->GetWindow().GetSettings();
+            auto window_settings = m_Window->GetSettings();
             window_settings.fullscreen = !window_settings.fullscreen;
-            m_Platform->GetWindow().SetSettings(window_settings);
-        }
+            m_Window->SetSettings(window_settings);
+        } */
 
         return false;
     }
@@ -307,29 +214,5 @@ namespace engine
     void Application::ParseOptions(std::vector<std::string> &arguments)
     {
         m_Options.ParseOptions(m_Usage, arguments);
-    }
-
-    void Application::LoadScene(const std::string &path)
-    {
-        GLTFLoader loader(*m_Device);
-
-        m_Scene = loader.ReadSceneFromFile(path);
-
-        if (!m_Scene)
-            throw std::runtime_error("Cannot load scene: " + path);
-    }
-
-    void Application::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const
-    {
-        VkViewport viewport{};
-        viewport.width = static_cast<float>(extent.width);
-        viewport.height = static_cast<float>(extent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        command_buffer.SetViewport(0, {viewport});
-
-        VkRect2D scissor{};
-        scissor.extent = extent;
-        command_buffer.SetScissor(0, {scissor});
     }
 }

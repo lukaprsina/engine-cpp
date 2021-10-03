@@ -16,7 +16,11 @@ namespace engine
     {
         for (uint32_t queue_index = 0; queue_index < properties.queueCount; queue_index++)
         {
-            m_Queues.emplace_back(device, *this, queue_index);
+            m_Queues.emplace_back(device, m_FamilyIndex, queue_index);
         }
+    }
+
+    QueueFamily::~QueueFamily()
+    {
     }
 }

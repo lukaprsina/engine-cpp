@@ -12,12 +12,13 @@ namespace engine
                     uint32_t family_index,
                     VkQueueFamilyProperties properties,
                     VkBool32 can_present);
-        ~QueueFamily() = default;
+        ~QueueFamily();
 
         const std::vector<Queue> &GetQueues() const { return m_Queues; }
         uint32_t GetFamilyIndex() const { return m_FamilyIndex; }
         VkQueueFamilyProperties GetProperties() const { return m_Properties; }
-        uint32_t CanPresent() const { return m_CanPresent; }
+        VkBool32 CanPresent() const { return m_CanPresent; }
+        void SetCanPresent(VkBool32 can_present) { m_CanPresent = can_present; }
 
     private:
         Device &m_Device;

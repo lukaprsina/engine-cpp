@@ -62,5 +62,5 @@ namespace engine
 	 */
 			void init();
 		};
-	} // namespace sg
-} // namespace engine
+	}
+}

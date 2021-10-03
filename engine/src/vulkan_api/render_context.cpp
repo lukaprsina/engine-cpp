@@ -149,7 +149,8 @@ namespace engine
 
         VkFence fence = frame.RequestFence();
 
-        queue.Submit({submit_info}, fence);
+        std::vector<QueueFamily> &queue_families = m_Device.GetQueueFamilies();
+        VkResult result = queue.Submit({submit_info}, fence);
 
         return signal_semaphore;
     }
@@ -184,11 +185,11 @@ namespace engine
         if (m_Swapchain)
         {
             auto result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
-            
-            if (result == VK_SUBOPTIMAL_KHR || result == VK_NOT_READY || result == VK_ERROR_OUT_OF_DATE_KHR)
+
+            if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR)
             {
                 bool swapchain_updated = HandleSurfaceChanges(result == VK_ERROR_OUT_OF_DATE_KHR ||
-                    result == VK_NOT_READY);
+                                                              result == VK_NOT_READY);
 
                 if (swapchain_updated)
                     result = m_Swapchain->AcquireNextImage(m_ActiveFrameIndex, m_AcquiredSemaphore, VK_NULL_HANDLE);
@@ -196,7 +197,7 @@ namespace engine
 
             if (result != VK_SUCCESS)
             {
-                // TODO: VK_NOT_READY 
+                // TODO: VK_NOT_READY
                 prev_frame.Reset();
                 return;
             }
@@ -297,14 +298,11 @@ namespace engine
             auto render_target = m_CreateRenderTargetFunction(std::move(swapchain_image));
 
             if (frame_it != m_Frames.end())
-            {
                 (*frame_it)->UpdateRenderTarget(std::move(render_target));
-            }
+
+            // Create a new frame if the new swapchain has more images than current frames
             else
-            {
-                // Create a new frame if the new swapchain has more images than current frames
                 m_Frames.emplace_back(std::make_unique<RenderFrame>(m_Device, std::move(render_target), m_ThreadCount));
-            }
 
             ++frame_it;
         }
