@@ -140,7 +140,7 @@ namespace engine
             m_Fps = (m_FrameCount - m_LastFrameCount) / elapsed_time;
             m_FrameTime = delta_time * 1000.0f;
 
-            ENG_CORE_TRACE("FPS: {:.1f}", m_Fps);
+            // ENG_CORE_TRACE("FPS: {:.1f}", m_Fps);
 
             m_LastFrameCount = m_FrameCount;
             m_Timer.Lap();

@@ -177,13 +177,14 @@ namespace engine
 
         VkApplicationInfo app_info{};
         app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        app_info.pNext = nullptr;
         app_info.pApplicationName = name.c_str();
         app_info.applicationVersion = 0;
         app_info.pEngineName = "Engine";
         app_info.engineVersion = 0;
         app_info.apiVersion = api_version;
 
-        VkInstanceCreateInfo instance_info;
+        VkInstanceCreateInfo instance_info{};
         instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         instance_info.pApplicationInfo = &app_info;
         instance_info.flags = VK_FLAGS_NONE;
@@ -194,7 +195,7 @@ namespace engine
         instance_info.enabledLayerCount = ToUint32_t(requested_validation_layers.size());
         instance_info.ppEnabledLayerNames = requested_validation_layers.data();
 
-#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
+#if defined(ENG_VALIDATION_LAYERS)
         VkDebugUtilsMessengerCreateInfoEXT debug_utils_create_info{};
         VkDebugReportCallbackCreateInfoEXT debug_report_create_info{};
 
@@ -217,7 +218,7 @@ namespace engine
         }
 #endif
 
-#if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
+#if defined(ENG_VALIDATION_LAYERS) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
         VkValidationFeaturesEXT validation_features_info{};
 
         if (validation_features)
@@ -243,7 +244,7 @@ namespace engine
 
         volkLoadInstance(m_Handle);
 
-#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
+#if defined(ENG_VALIDATION_LAYERS)
         if (debug_utils)
         {
             result = vkCreateDebugUtilsMessengerEXT(m_Handle, &debug_utils_create_info, nullptr, &m_DebugUtilsMessenger);
@@ -263,7 +264,7 @@ namespace engine
 
     Instance::~Instance()
     {
-#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
+#if defined(ENG_VALIDATION_LAYERS)
         if (m_DebugUtilsMessenger != VK_NULL_HANDLE)
             vkDestroyDebugUtilsMessengerEXT(m_Handle, m_DebugUtilsMessenger, nullptr);
 
@@ -350,7 +351,7 @@ namespace engine
     bool Instance::EnableDebugCallback(std::vector<VkExtensionProperties> &available_instance_extensions)
     {
         bool debug_utils = false;
-#if defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)
+#if defined(ENG_VALIDATION_LAYERS)
         for (auto &available_extension : available_instance_extensions)
         {
             if (strcmp(available_extension.extensionName, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0)
@@ -372,7 +373,7 @@ namespace engine
     bool Instance::EnableValidationFeatures()
     {
         bool validation_features = false;
-#if (defined(ENG_DEBUG) || defined(ENG_VALIDATION_LAYERS)) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
+#if defined(ENG_VALIDATION_LAYERS) && defined(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
         {
             uint32_t layer_instance_extension_count;
             VK_CHECK(vkEnumerateInstanceExtensionProperties("VK_LAYER_KHRONOS_validation", &layer_instance_extension_count, nullptr));

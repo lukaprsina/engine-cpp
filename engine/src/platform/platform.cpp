@@ -21,13 +21,14 @@ namespace engine
     void Platform::ConfigurePaths()
     {
         auto source_directory = std::filesystem::path(ENG_BASE_DIRECTORY);
-        std::cout << "Source: " << source_directory.generic_string() << std::endl;
+        std::cout << "Source: \t\t" << source_directory.generic_string() << std::endl;
+
+        auto bin_directory = std::filesystem::path(ENG_BIN_DIRECTORY);
+        std::cout << "Bin: \t\t\t" << bin_directory.generic_string() << std::endl;
 
         auto base_directory = std::filesystem::current_path();
-        std::cout << "Base: " << base_directory.generic_string() << std::endl;
-
         base_directory = std::filesystem::canonical(base_directory);
-        std::cout << "Base: " << base_directory.generic_string() << std::endl;
+        std::cout << "Canonical Base: \t" << base_directory.generic_string() << std::endl;
 
 #ifdef ENG_SHIPPING
         if (source_directory == base_directory)
@@ -38,43 +39,43 @@ namespace engine
         else
         {
             int i = 0;
-            auto new_base = base_directory;
-            for (auto &folder : base_directory)
+            auto new_bin_dir = bin_directory;
+
+            for (auto &folder : bin_directory)
             {
-                new_base = new_base.parent_path();
-                if (new_base.filename().generic_string() == m_EngineName)
+                new_bin_dir = new_bin_dir.parent_path();
+                if (new_bin_dir.filename().generic_string() == m_EngineName)
                     break;
 
                 i++;
             }
 
-            int source_size = 0;
-            for (auto &folder : source_directory)
-                source_size++;
+            int base_size = 0;
+            for (auto &folder : base_directory)
+                base_size++;
 
-            auto new_source = std::filesystem::path();
-            int source_folder_index = source_size - i + 1;
+            auto new_base = std::filesystem::path();
+            int base_folder_index = base_size - i - 1;
             int j = 0;
-            for (auto &folder : source_directory)
+            for (auto &folder : base_directory)
             {
-                if (j == source_folder_index)
+                if (j == base_folder_index)
                     break;
                 else
-                    new_source = new_source / folder;
+                    new_base = new_base / folder;
                 j++;
             }
 
-            std::cout << new_source.generic_string() << std::endl;
+            std::cout << new_base.generic_string() << std::endl;
             std::cout << "Not from source" << std::endl;
-
-            base_directory = new_source / m_EngineName;
+            base_directory = new_base;
         }
 #else
         base_directory /= m_EngineName;
 #endif
 
         std::cout << "Base: " << base_directory.generic_string() << std::endl;
-
+        std::filesystem::current_path(base_directory);
         Platform::SetSourceDirectory(base_directory);
     }
 

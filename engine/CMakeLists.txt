@@ -197,6 +197,18 @@ endif()
 
 add_executable(engine WIN32 ${ENG_PROJECT_FILES})
 
+if(ENG_SHIPPING)
+  target_compile_definitions(engine PUBLIC ENG_SHIPPING)
+endif()
+
+if(ENG_VALIDATION_LAYERS)
+  target_compile_definitions(engine PUBLIC ENG_VALIDATION_LAYERS)
+endif()
+
+if(ENG_VALIDATION_LAYERS_GPU_ASSISTED)
+  target_compile_definitions(engine PUBLIC ENG_VALIDATION_LAYERS_GPU_ASSISTED)
+endif()
+
 target_include_directories(
   engine
   PUBLIC ${ENGINE_SRC}
