@@ -101,7 +101,12 @@ namespace engine
             Layer &layer = *layer_pair.second;
             Scene *scene = layer.GetScene();
             if (layer.GetWindow()->GetNativeWindow() == GetNativeWindow())
-                scene->Draw(*m_RenderContext, layer, command_buffer, render_target);
+            {
+                if (scene)
+                    scene->Draw(*m_RenderContext, layer, command_buffer, render_target);
+                else if (layer.GetName() == "gui")
+                    layer.Draw(command_buffer);
+            }
         }
     }
 

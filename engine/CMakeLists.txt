@@ -121,7 +121,8 @@ set(VULKAN_API_FILES
     ${ENGINE_SRC}/vulkan_api/initializers.h
     ${ENGINE_SRC}/core/layer.h
     ${ENGINE_SRC}/core/layer_stack.h
-    # ${ENGINE_SRC}/core/gui.h Source files
+    ${ENGINE_SRC}/core/gui.h
+    # Source files
     ${ENGINE_SRC}/vulkan_api/instance.cpp
     ${ENGINE_SRC}/vulkan_api/physical_device.cpp
     ${ENGINE_SRC}/vulkan_api/device.cpp
@@ -183,7 +184,7 @@ set(VULKAN_API_FILES
     ${ENGINE_SRC}/core/layer.cpp
     ${ENGINE_SRC}/core/layer_stack.cpp
     ${ENGINE_SRC}/entrypoint.cpp
-    # ${ENGINE_SRC}/core/gui.cpp
+    ${ENGINE_SRC}/core/gui.cpp
 )
 
 list(APPEND ENG_PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}

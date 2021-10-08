@@ -13,11 +13,12 @@ namespace engine
 	class KeyPressedEvent;
 	class Event;
 	class Entity;
+	class CommandBuffer;
 
 	class Layer
 	{
 	public:
-		Layer(Application &application, const std::string &name);
+		Layer(Application *application, const std::string &name);
 		virtual ~Layer();
 
 		void AddFreeCamera(VkExtent2D extent, Window *window);
@@ -25,6 +26,7 @@ namespace engine
 		virtual void OnAttach() {}
 		virtual void OnDetach();
 		virtual void OnUpdate(float delta_time) {}
+		virtual void Draw(CommandBuffer &command_buffer) {}
 		virtual void OnEvent(Event &event);
 		virtual bool OnWindowClose(WindowCloseEvent &event);
 		virtual bool OnResize(WindowResizeEvent &event);
@@ -45,8 +47,8 @@ namespace engine
 	private:
 		std::string m_Name{};
 		Application &m_Application;
-		Scene *m_Scene;
-		Entity *m_Camera;
-		Window *m_Window;
+		Scene *m_Scene{};
+		Entity *m_Camera{};
+		Window *m_Window{};
 	};
 }

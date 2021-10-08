@@ -51,7 +51,7 @@ namespace engine
     class Gui : public Layer
     {
     public:
-        Gui(Application &application,
+        Gui(Application *application,
             Window *window,
             const float font_size = 21.0f,
             bool explicit_update = false);
@@ -60,7 +60,7 @@ namespace engine
         void NewFrame();
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
-        void Draw(CommandBuffer &command_buffer);
+        void Draw(CommandBuffer &command_buffer) override;
         void Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer);
 
         void OnEvent(Event &event) override;

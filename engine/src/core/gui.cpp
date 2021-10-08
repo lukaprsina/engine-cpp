@@ -289,7 +289,6 @@ namespace engine
 #if GLFW_HAS_MOUSE_PASSTHROUGH || (GLFW_HAS_WINDOW_HOVERED && defined(_WIN32))
             io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
 #endif
-
             bd->Window = window;
             bd->Time = 0.0;
             bd->WantUpdateMonitors = true;
@@ -1025,13 +1024,14 @@ namespace engine
 
     const std::string Gui::default_font = "Roboto-Medium";
 
-    Gui::Gui(Application &application,
+    Gui::Gui(Application *application,
              Window *window,
              const float font_size,
              bool explicit_update)
-        : m_Application(application), m_ExplicitUpdate(explicit_update),
+        : Layer(application, "gui"), m_Application(*application), m_ExplicitUpdate(explicit_update),
           m_Window(*window)
     {
+        SetWindow(window);
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
 
@@ -1043,7 +1043,7 @@ namespace engine
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         ImGuiStyle &style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

@@ -12,8 +12,8 @@
 
 namespace engine
 {
-    Layer::Layer(Application &application, const std::string &name)
-        : m_Application(application), m_Name(name)
+    Layer::Layer(Application *application, const std::string &name)
+        : m_Application(*application), m_Name(name)
     {
     }
 
@@ -27,11 +27,18 @@ namespace engine
         static int camera_counter = 0;
         if (cameras.size() > camera_counter)
             m_Camera = cameras[camera_counter].get();
+
         else
         {
             auto entity = m_Scene->CreateEntity();
-            entity.AddComponent<sg::PerspectiveCamera>("Camera");
-            entity.AddComponent<sg::Transform>(entity);
+            auto &perspective_camera = entity.AddComponent<sg::PerspectiveCamera>("Camera");
+            auto &transform = entity.AddComponent<sg::Transform>(entity);
+            if (cameras.size() > 0)
+            {
+                transform = cameras.front()->GetComponent<sg::Transform>();
+                perspective_camera = cameras.front()->GetComponent<sg::PerspectiveCamera>();
+            }
+
             cameras.emplace_back(std::make_unique<Entity>(entity));
             m_Camera = cameras.back().get();
         }

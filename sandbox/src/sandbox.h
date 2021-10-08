@@ -3,6 +3,7 @@
 #include "core/application.h"
 #include "common/base.h"
 #include "core/layer.h"
+#include "window/window.h"
 #include "platform/platform.h"
 
 #include <memory>
@@ -10,7 +11,7 @@
 class Game : public engine::Layer
 {
 public:
-    Game(engine::Application *application, const std::string &name);
+    Game(engine::Application *application, engine::Window *window, const std::string &name);
     void OnAttach() override;
 };
 

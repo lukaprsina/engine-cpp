@@ -155,7 +155,10 @@ namespace engine
         }
 
         for (Scene *scene : scenes)
-            scene->Update(delta_time);
+        {
+            if (scene)
+                scene->Update(delta_time);
+        }
     }
 
     void Application::Finish()
