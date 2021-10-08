@@ -9,9 +9,9 @@ namespace engine
 	{
 	}
 
-	void LayerStack::PushLayer(const std::string &name, const std::shared_ptr<Layer> layer)
+	void LayerStack::PushLayer(const std::shared_ptr<Layer> layer)
 	{
-		m_Layers[name] = layer;
+		m_Layers[layer->GetName()] = layer;
 	}
 
 	void LayerStack::PopLayer(Layer *layer)

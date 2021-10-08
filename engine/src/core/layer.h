@@ -17,7 +17,7 @@ namespace engine
 	class Layer
 	{
 	public:
-		Layer(Application *application);
+		Layer(Application &application, const std::string &name);
 		virtual ~Layer();
 
 		void AddFreeCamera(VkExtent2D extent, Window *window);
@@ -30,7 +30,8 @@ namespace engine
 		virtual bool OnResize(WindowResizeEvent &event);
 		virtual bool OnKeyPressed(KeyPressedEvent &event);
 
-		Application *GetApp() { return m_Application; }
+		Application &GetApp() { return m_Application; }
+		std::string GetName() { return m_Name; }
 
 		void SetScene(Scene *scene);
 		Scene *GetScene() { return m_Scene; }
@@ -42,7 +43,8 @@ namespace engine
 		Entity *GetCamera() { return m_Camera; }
 
 	private:
-		Application *m_Application;
+		std::string m_Name{};
+		Application &m_Application;
 		Scene *m_Scene;
 		Entity *m_Camera;
 		Window *m_Window;

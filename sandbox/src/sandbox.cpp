@@ -16,15 +16,15 @@ Sandbox::Sandbox(engine::Platform *platform)
 {
 }
 
-Game::Game(engine::Application *application)
-    : Layer(application)
+Game::Game(engine::Application *application, const std::string &name)
+    : Layer(*application, name)
 {
 }
 
 void Game::OnAttach()
 {
-    SetWindow(GetApp()->GetPlatform().CreatePlatformWindow());
-    SetScene(GetApp()->LoadScene("scenes/sponza/Sponza01.gltf"));
+    SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
+    SetScene(GetApp().LoadScene("scenes/sponza/Sponza01.gltf"));
 
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
@@ -38,22 +38,22 @@ void Game::OnAttach()
                                                              {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                              {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-    window->CreateSurface(GetApp()->GetInstance(), GetApp()->GetDevice().GetGPU());
-    window->CreateRenderContext(GetApp()->GetDevice(), present_mode_priority, surface_format_priority);
+    window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
+    window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->CreateRenderPipeline(GetApp()->GetDevice());
+    scene->CreateRenderPipeline(GetApp().GetDevice());
     AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
-Simple::Simple(engine::Application *application)
-    : Layer(application)
+Simple::Simple(engine::Application *application, const std::string &name)
+    : Layer(*application, name)
 {
 }
 
 void Simple::OnAttach()
 {
-    SetWindow(GetApp()->GetPlatform().CreatePlatformWindow());
-    SetScene(GetApp()->GetScenes()[0].get());
+    SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
+    SetScene(GetApp().GetScenes()[0].get());
 
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
@@ -67,10 +67,10 @@ void Simple::OnAttach()
                                                              {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                              {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-    window->CreateSurface(GetApp()->GetInstance(), GetApp()->GetDevice().GetGPU());
-    window->CreateRenderContext(GetApp()->GetDevice(), present_mode_priority, surface_format_priority);
+    window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
+    window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->CreateRenderPipeline(GetApp()->GetDevice());
+    scene->CreateRenderPipeline(GetApp().GetDevice());
     AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
@@ -78,7 +78,7 @@ bool Sandbox::Prepare()
 {
     Application::Prepare();
     LoadScene("scenes/cube.gltf");
-    GetLayerStack().PushLayer("Game", std::make_shared<Simple>(this));
-    GetLayerStack().PushLayer("Cube", std::make_shared<Simple>(this));
+    GetLayerStack().PushLayer(std::make_shared<Simple>(this, "Game"));
+    GetLayerStack().PushLayer(std::make_shared<Simple>(this, "Cube"));
     return true;
 }

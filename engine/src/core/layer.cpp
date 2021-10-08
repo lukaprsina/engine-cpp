@@ -12,8 +12,8 @@
 
 namespace engine
 {
-    Layer::Layer(Application *application)
-        : m_Application(application)
+    Layer::Layer(Application &application, const std::string &name)
+        : m_Application(application), m_Name(name)
     {
     }
 
@@ -26,9 +26,7 @@ namespace engine
         auto &cameras = m_Scene->GetCameras();
         static int camera_counter = 0;
         if (cameras.size() > camera_counter)
-        {
             m_Camera = cameras[camera_counter].get();
-        }
         else
         {
             auto entity = m_Scene->CreateEntity();
@@ -39,7 +37,7 @@ namespace engine
         }
 
         camera_counter++;
-        auto free_camera_script = m_Camera->AddComponent<sg::FreeCamera>(GetScene(), window);
+        auto free_camera_script = m_Camera->AddComponent<sg::FreeCamera>(m_Application, m_Name);
         auto &perspective_camera = m_Camera->GetComponent<sg::PerspectiveCamera>();
         free_camera_script.Resize(perspective_camera, extent.width, extent.height);
     }

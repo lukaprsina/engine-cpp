@@ -10,7 +10,7 @@ namespace engine
 	{
 	public:
 		LayerStack(Application &application);
-		void PushLayer(const std::string &name, const std::shared_ptr<Layer> layer);
+		void PushLayer(const std::shared_ptr<Layer> layer);
 		void PopLayer(Layer *layer);
 		// void PopLayer(const std::string &name);
 

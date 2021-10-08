@@ -10,14 +10,14 @@
 class Game : public engine::Layer
 {
 public:
-    Game(engine::Application *application);
+    Game(engine::Application *application, const std::string &name);
     void OnAttach() override;
 };
 
 class Simple : public engine::Layer
 {
 public:
-    Simple(engine::Application *application);
+    Simple(engine::Application *application, const std::string &name);
     void OnAttach() override;
 };
 

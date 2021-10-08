@@ -7,7 +7,9 @@
 namespace engine
 {
     class Scene;
+    class Application;
     class Window;
+    class Layer;
 
     namespace sg
     {
@@ -16,8 +18,7 @@ namespace engine
         class FreeCamera : public Script
         {
         public:
-            FreeCamera() = default;
-            FreeCamera(Scene *scene, Window *window);
+            FreeCamera(Application &application, std::string &layer_name);
             FreeCamera(FreeCamera &&other);
             FreeCamera(const FreeCamera &) = default;
             FreeCamera &operator=(const FreeCamera &) = default;
@@ -28,8 +29,8 @@ namespace engine
             void Resize(sg::PerspectiveCamera &camera, uint32_t width, uint32_t height);
 
         private:
-            Scene *m_Scene;
-            Window *m_Window;
+            Application &m_App;
+            std::string m_LayerName{};
             float m_SpeedMultiplier{3.0f};
             glm::vec2 m_MouseMoveDelta{};
         };
