@@ -13,6 +13,7 @@ namespace engine
     class RenderContext;
     class CommandBuffer;
     class RenderTarget;
+    class Layer;
 
     namespace sg
     {
@@ -33,15 +34,13 @@ namespace engine
         ~Scene();
 
         void Update(float delta_time);
-        void Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target,
+        void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
                   VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
         Entity CreateEntity();
-        void AddFreeCamera(VkExtent2D extent, Window *window);
         void CreateRenderPipeline(Device &device);
 
         entt::registry &GetRegistry() { return m_Registry; }
-        Entity &GetDefaultCamera() { return *m_DefaultCamera; }
 
         std::vector<std::unique_ptr<Entity>> &GetLights() { return m_Lights; }
         std::vector<std::unique_ptr<sg::Sampler>> &GetSamplers() { return m_Samplers; }
@@ -64,8 +63,6 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> m_Meshes;
         std::vector<std::unique_ptr<Entity>> m_Cameras;
         std::vector<std::unique_ptr<sg::Submesh>> m_Submeshes;
-
-        Entity *m_DefaultCamera;
         std::unique_ptr<RenderPipeline> m_RenderPipeline{};
     };
 }

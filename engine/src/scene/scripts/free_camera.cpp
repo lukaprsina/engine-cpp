@@ -17,7 +17,7 @@ namespace engine
 {
     namespace sg
     {
-        FreeCamera::FreeCamera(Scene &scene, Window *window)
+        FreeCamera::FreeCamera(Scene *scene, Window *window)
             : m_Scene(scene), m_Window(window)
         {
         }
@@ -78,7 +78,7 @@ namespace engine
 
             if (delta_rotation != glm::vec3(0.0f, 0.0f, 0.0f) || delta_translation != glm::vec3(0.0f, 0.0f, 0.0f))
             {
-                auto view = m_Scene.GetRegistry().view<sg::PerspectiveCamera, sg::Transform>();
+                auto view = m_Scene->GetRegistry().view<sg::PerspectiveCamera, sg::Transform>();
 
                 for (auto &entity : view)
                 {
@@ -97,9 +97,8 @@ namespace engine
             m_MouseMoveDelta = {};
         }
 
-        void FreeCamera::Resize(uint32_t width, uint32_t height)
+        void FreeCamera::Resize(sg::PerspectiveCamera &camera, uint32_t width, uint32_t height)
         {
-            auto &camera = m_Scene.GetDefaultCamera().GetComponent<sg::PerspectiveCamera>();
             camera.m_AspectRatio = static_cast<float>(width) / height;
         }
     }

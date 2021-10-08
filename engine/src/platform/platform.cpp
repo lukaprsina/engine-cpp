@@ -92,10 +92,17 @@ namespace engine
 
     bool Platform::Prepare()
     {
+        bool result = false;
         if (m_App)
-            return m_App->Prepare();
+            result = m_App->Prepare();
 
-        return false;
+        for (auto &layer_pair : m_App->GetLayerStack().GetLayers())
+        {
+            Layer *layer = layer_pair.second.get();
+            layer->OnAttach();
+        }
+
+        return result;
     }
 
     void Platform::MainLoop()

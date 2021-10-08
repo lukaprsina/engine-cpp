@@ -2,6 +2,7 @@
 
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/device.h"
+#include "core/layer.h"
 #include "scene/components/submesh.h"
 #include "scene/components/mesh.h"
 #include "scene/scene.h"
@@ -47,11 +48,11 @@ namespace engine
         }
     }
 
-    void ForwardSubpass::Draw(RenderContext &render_context, CommandBuffer &command_buffer)
+    void ForwardSubpass::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer)
     {
         AllocateLights<ForwardLights>(render_context, m_Scene, MAX_FORWARD_LIGHT_COUNT);
 
         command_buffer.BindLighting(m_LightingState, 0, 4);
-        GeometrySubpass::Draw(render_context, command_buffer);
+        GeometrySubpass::Draw(render_context, layer, command_buffer);
     }
 }

@@ -1,6 +1,7 @@
 #include "scene/scene.h"
 
 #include "scene/entity.h"
+#include "core/layer.h"
 #include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/subpasses/forward_subpass.h"
@@ -55,11 +56,11 @@ namespace engine
         m_RenderPipeline->AddSubpass(std::move(scene_subpass));
     }
 
-    void Scene::Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target,
+    void Scene::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
                      VkSubpassContents contents)
     {
         if (m_RenderPipeline)
-            m_RenderPipeline->Draw(render_context, command_buffer,
+            m_RenderPipeline->Draw(render_context, layer, command_buffer,
                                    render_target);
     }
 
@@ -67,21 +68,5 @@ namespace engine
     {
         Entity entity{m_Registry.create(), this};
         return entity;
-    }
-
-    void Scene::AddFreeCamera(VkExtent2D extent, Window *window)
-    {
-        if (m_Cameras.empty())
-        {
-            auto entity = CreateEntity();
-            entity.AddComponent<sg::PerspectiveCamera>("Camera");
-            entity.AddComponent<sg::Transform>(entity);
-            m_Cameras.emplace_back(std::make_unique<Entity>(entity));
-        }
-
-        m_DefaultCamera = m_Cameras.back().get();
-        auto free_camera_script = m_DefaultCamera->AddComponent<sg::FreeCamera>(*this, window);
-        free_camera_script.Resize(extent.width, extent.height);
-        ENG_ASSERT(m_DefaultCamera->HasComponent<sg::Transform>());
     }
 }

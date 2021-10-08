@@ -10,9 +10,9 @@
                 "scenes/space_module/SpaceModule.gltf"
             ],
             "stopAtEntry": false,
-            // "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}",
             // "cwd": "D:/dev/c++/engine/build/engine/bin/Debug",
-            "cwd": "C:/Users/prsin/Desktop/engine/bin/Release",
+            // "cwd": "C:/Users/prsin/Desktop/engine/bin/Release",
             "environment": [
                 {
                     "name": "PATH",

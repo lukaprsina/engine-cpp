@@ -23,6 +23,9 @@ namespace engine
 
     Window::~Window()
     {
+        for (Layer *layer : m_Layers)
+            m_Platform.GetApp().GetLayerStack().PopLayer(layer);
+
         if (m_Surface != VK_NULL_HANDLE)
             vkDestroySurfaceKHR(m_Platform.GetApp().GetInstance().GetHandle(), m_Surface, nullptr);
     }
@@ -92,8 +95,14 @@ namespace engine
 
     void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target)
     {
-        for (Scene *scene : m_Scenes)
-            scene->Draw(*m_RenderContext, command_buffer, render_target);
+        for (auto &layer_pair : m_Platform.GetApp().GetLayerStack().GetLayers())
+        {
+            // renders every window scene
+            Layer &layer = *layer_pair.second;
+            Scene *scene = layer.GetScene();
+            if (layer.GetWindow()->GetNativeWindow() == GetNativeWindow())
+                scene->Draw(*m_RenderContext, layer, command_buffer, render_target);
+        }
     }
 
     void Window::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const

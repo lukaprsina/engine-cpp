@@ -5,6 +5,7 @@ namespace engine
     class CommandBuffer;
     class RenderTarget;
     class Subpass;
+    class Layer;
     class Device;
     class RenderContext;
 
@@ -16,7 +17,7 @@ namespace engine
 
         void AddSubpass(std::unique_ptr<Subpass> &&subpass);
 
-        void Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target,
+        void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
                   VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
     private:

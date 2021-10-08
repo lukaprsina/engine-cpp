@@ -3,6 +3,7 @@
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/render_target.h"
 #include "scene/components/light.h"
+#include "core/layer.h"
 
 namespace engine
 {

@@ -41,8 +41,8 @@ void Game::OnAttach()
     window->CreateSurface(GetApp()->GetInstance(), GetApp()->GetDevice().GetGPU());
     window->CreateRenderContext(GetApp()->GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
     scene->CreateRenderPipeline(GetApp()->GetDevice());
+    AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
 Simple::Simple(engine::Application *application)
@@ -53,7 +53,7 @@ Simple::Simple(engine::Application *application)
 void Simple::OnAttach()
 {
     SetWindow(GetApp()->GetPlatform().CreatePlatformWindow());
-    SetScene(GetApp()->LoadScene("scenes/space_module/SpaceModule.gltf"));
+    SetScene(GetApp()->GetScenes()[0].get());
 
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
@@ -70,14 +70,15 @@ void Simple::OnAttach()
     window->CreateSurface(GetApp()->GetInstance(), GetApp()->GetDevice().GetGPU());
     window->CreateRenderContext(GetApp()->GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
     scene->CreateRenderPipeline(GetApp()->GetDevice());
+    AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
 bool Sandbox::Prepare()
 {
-    GetLayerStack().PushLayer("Game", std::make_shared<Game>(this));
-    GetLayerStack().PushLayer("Cube", std::make_shared<Simple>(this));
     Application::Prepare();
+    LoadScene("scenes/cube.gltf");
+    GetLayerStack().PushLayer("Game", std::make_shared<Simple>(this));
+    GetLayerStack().PushLayer("Cube", std::make_shared<Simple>(this));
     return true;
 }

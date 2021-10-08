@@ -6,6 +6,9 @@
 #include "events/key_event.h"
 #include "scene/scripts/free_camera.h"
 #include "scene/scene.h"
+#include "scene/components/perspective_camera.h"
+#include "scene/components/transform.h"
+#include "scene/entity.h"
 
 namespace engine
 {
@@ -16,6 +19,29 @@ namespace engine
 
     Layer::~Layer()
     {
+    }
+
+    void Layer::AddFreeCamera(VkExtent2D extent, Window *window)
+    {
+        auto &cameras = m_Scene->GetCameras();
+        static int camera_counter = 0;
+        if (cameras.size() > camera_counter)
+        {
+            m_Camera = cameras[camera_counter].get();
+        }
+        else
+        {
+            auto entity = m_Scene->CreateEntity();
+            entity.AddComponent<sg::PerspectiveCamera>("Camera");
+            entity.AddComponent<sg::Transform>(entity);
+            cameras.emplace_back(std::make_unique<Entity>(entity));
+            m_Camera = cameras.back().get();
+        }
+
+        camera_counter++;
+        auto free_camera_script = m_Camera->AddComponent<sg::FreeCamera>(GetScene(), window);
+        auto &perspective_camera = m_Camera->GetComponent<sg::PerspectiveCamera>();
+        free_camera_script.Resize(perspective_camera, extent.width, extent.height);
     }
 
     void Layer::OnEvent(Event &event)
@@ -33,11 +59,11 @@ namespace engine
 
     bool Layer::OnResize(WindowResizeEvent &event)
     {
-        auto view = m_Scene->GetRegistry().view<sg::FreeCamera>();
+        auto view = m_Scene->GetRegistry().view<sg::FreeCamera, sg::PerspectiveCamera>();
         for (auto &entity : view)
         {
-            auto &free_camera = view.get<sg::FreeCamera>(entity);
-            free_camera.Resize(event.GetWidth(), event.GetHeight());
+            auto &[free_camera, perspective_camera] = view.get<sg::FreeCamera, sg::PerspectiveCamera>(entity);
+            free_camera.Resize(perspective_camera, event.GetWidth(), event.GetHeight());
         }
 
         return false;
@@ -71,5 +97,7 @@ namespace engine
 
     void Layer::OnDetach()
     {
+        if (m_Camera)
+            m_Scene->GetRegistry().destroy(m_Camera->GetHandle());
     }
 }

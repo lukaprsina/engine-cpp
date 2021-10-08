@@ -12,12 +12,15 @@ namespace engine
 	class WindowResizeEvent;
 	class KeyPressedEvent;
 	class Event;
+	class Entity;
 
 	class Layer
 	{
 	public:
 		Layer(Application *application);
 		virtual ~Layer();
+
+		void AddFreeCamera(VkExtent2D extent, Window *window);
 
 		virtual void OnAttach() {}
 		virtual void OnDetach();
@@ -35,9 +38,13 @@ namespace engine
 		void SetWindow(Window *Window);
 		Window *GetWindow() { return m_Window; }
 
+		void SetCamera(Entity *Camera);
+		Entity *GetCamera() { return m_Camera; }
+
 	private:
 		Application *m_Application;
 		Scene *m_Scene;
+		Entity *m_Camera;
 		Window *m_Window;
 	};
 }

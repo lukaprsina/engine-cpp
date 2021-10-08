@@ -11,7 +11,7 @@ namespace engine
             virtual ~Script();
 
             virtual void Update(float delta_time) = 0;
-            virtual void Resize(uint32_t width, uint32_t height){};
+            // virtual void Resize(Entity *entity, uint32_t width, uint32_t height) {}
         };
     }
 }

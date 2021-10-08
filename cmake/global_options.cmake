@@ -1,13 +1,13 @@
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(ENG_VALIDATION_LAYERS
-    OFF
+    ON
     CACHE BOOL "Enable validation layers")
 set(ENG_VALIDATION_LAYERS_GPU_ASSISTED
     OFF
     CACHE BOOL "Enable GPU assisted validation layers")
 set(ENG_SHIPPING
-    ON
+    OFF
     CACHE BOOL "Install everything into the build directory")
 set(ENG_WSI_SELECTION
     "XCB"

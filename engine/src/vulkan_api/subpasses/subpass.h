@@ -19,6 +19,7 @@ namespace engine
     class RenderTarget;
     class Entity;
     class Device;
+    class Layer;
 
     struct alignas(16) LightInfo
     {
@@ -48,7 +49,7 @@ namespace engine
         virtual ~Subpass();
 
         virtual void Prepare(Device &device) = 0;
-        virtual void Draw(RenderContext &render_context, CommandBuffer &command_buffer) = 0;
+        virtual void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer) = 0;
         void UpdateRenderTargetAttachments(RenderTarget &render_target);
 
         const ShaderSource &GetVertexShader() const { return m_VertexShader; }

@@ -7,6 +7,7 @@
 #include "scene/components/texture.h"
 #include "scene/components/pbr_material.h"
 #include "scene/components/submesh.h"
+#include "core/layer.h"
 #include "scene/components/perspective_camera.h"
 #include "vulkan_api/device.h"
 
@@ -42,17 +43,17 @@ namespace engine
         }
     }
 
-    void GeometrySubpass::Draw(RenderContext &render_context, CommandBuffer &command_buffer)
+    void GeometrySubpass::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer)
     {
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> opaque_nodes;
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> transparent_nodes;
 
-        GetSortedNodes(opaque_nodes, transparent_nodes);
+        GetSortedNodes(opaque_nodes, transparent_nodes, layer.GetCamera());
 
         for (auto node_it = opaque_nodes.begin(); node_it != opaque_nodes.end(); node_it++)
         {
             auto &transform = *(node_it->second.second);
-            UpdateUniform(render_context, command_buffer, transform, m_ThreadIndex);
+            UpdateUniform(render_context, command_buffer, transform, layer.GetCamera(), m_ThreadIndex);
 
             // Invert the front face if the mesh was flipped
             const auto &scale = transform.GetScale();
@@ -85,7 +86,7 @@ namespace engine
         for (auto node_it = transparent_nodes.rbegin(); node_it != transparent_nodes.rend(); node_it++)
         {
             auto &transform = *(node_it->second.second);
-            UpdateUniform(render_context, command_buffer, transform, m_ThreadIndex);
+            UpdateUniform(render_context, command_buffer, transform, layer.GetCamera(), m_ThreadIndex);
 
             DrawSubmesh(command_buffer, *node_it->second.first);
         }
@@ -93,10 +94,10 @@ namespace engine
 
     void GeometrySubpass::GetSortedNodes(
         std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &opaque_nodes,
-        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes)
+        std::multimap<float, std::pair<sg::Submesh *, sg::Transform *>> &transparent_nodes,
+        Entity *camera)
     {
-        auto &camera = m_Scene.GetDefaultCamera();
-        auto camera_matrix = camera.GetComponent<sg::Transform>().GetWorldMatrix();
+        auto camera_matrix = camera->GetComponent<sg::Transform>().GetWorldMatrix();
 
         auto view = m_Scene.GetRegistry().view<sg::Mesh, sg::Transform>();
         for (auto &entity : view)
@@ -124,12 +125,11 @@ namespace engine
         }
     }
 
-    void GeometrySubpass::UpdateUniform(RenderContext &render_context, CommandBuffer &command_buffer, sg::Transform &submesh_transform, size_t thread_index)
+    void GeometrySubpass::UpdateUniform(RenderContext &render_context, CommandBuffer &command_buffer, sg::Transform &submesh_transform, Entity *camera, size_t thread_index)
     {
         GlobalUniform global_uniform;
-        auto &camera = m_Scene.GetDefaultCamera();
-        auto &perspective_camera = camera.GetComponent<sg::PerspectiveCamera>();
-        auto &camera_transform = camera.GetComponent<sg::Transform>();
+        auto &perspective_camera = camera->GetComponent<sg::PerspectiveCamera>();
+        auto &camera_transform = camera->GetComponent<sg::Transform>();
 
         global_uniform.camera_view_proj = perspective_camera.m_PreRotation *
                                           VulkanStyleProjection(perspective_camera.GetProjection()) *

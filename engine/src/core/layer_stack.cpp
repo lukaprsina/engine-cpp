@@ -14,18 +14,28 @@ namespace engine
 		m_Layers[name] = layer;
 	}
 
-	/* void LayerStack::PopLayer(Layer *layer)
+	void LayerStack::PopLayer(Layer *layer)
 	{
 		layer->OnDetach();
 
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
-		if (it != m_Layers.end())
+		for (auto &layer_pair : m_Layers)
 		{
-			m_Layers.erase(it);
+			if (layer == layer_pair.second.get())
+				m_DestroyedLayers.emplace_back(layer_pair.first);
 		}
+
+		for (std::string &name : m_DestroyedLayers)
+			m_Layers.erase(name);
+
+		m_DestroyedLayers.clear();
+		//  auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
+		// if (it != m_Layers.end())
+		// {
+		// 	m_Layers.erase(it);
+		// }
 	}
 
-	void LayerStack::BringLayerToFront(Layer *layer)
+	/* void LayerStack::BringLayerToFront(Layer *layer)
 	{
 		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 		if (it != m_Layers.end())

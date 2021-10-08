@@ -2,6 +2,7 @@
 
 #include "vulkan_api/command_buffer.h"
 #include "vulkan_api/device.h"
+#include "core/layer.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/subpasses/subpass.h"
 #include "vulkan_api/render_context.h"
@@ -28,7 +29,7 @@ namespace engine
         m_Subpasses.emplace_back(std::move(subpass));
     }
 
-    void RenderPipeline::Draw(RenderContext &render_context, CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents)
+    void RenderPipeline::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target, VkSubpassContents contents)
     {
         ENG_ASSERT(!m_Subpasses.empty(), "Render pipeline should contain at least one sub-pass");
 
@@ -48,7 +49,7 @@ namespace engine
             else
                 command_buffer.NextSubpass();
 
-            subpass->Draw(render_context, command_buffer);
+            subpass->Draw(render_context, layer, command_buffer);
         }
 
         m_ActiveSubpassIndex = 0;

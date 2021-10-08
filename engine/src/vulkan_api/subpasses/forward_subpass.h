@@ -22,6 +22,6 @@ namespace engine
         ~ForwardSubpass();
 
         virtual void Prepare(Device &device) override;
-        virtual void Draw(RenderContext &render_context, CommandBuffer &command_buffer) override;
+        virtual void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer) override;
     };
 }

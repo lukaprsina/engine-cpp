@@ -22,6 +22,8 @@
 #include "scene/scripts/free_camera.h"
 #include "scene/gltf_loader.h"
 
+#include <set>
+
 namespace engine
 {
     Application::Application(Platform *platform)
@@ -89,12 +91,6 @@ namespace engine
 
         m_Device = std::make_unique<Device>(gpu, *m_Platform, GetDeviceExtensions());
 
-        for (auto &layer_pair : m_LayerStack.GetLayers())
-        {
-            Layer *layer = layer_pair.second.get();
-            layer->OnAttach();
-        }
-
         return true;
 
         /* std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_IMMEDIATE_KHR,
@@ -151,11 +147,15 @@ namespace engine
 
     void Application::Update(float delta_time)
     {
-        for (auto &scene : m_Scenes)
-            scene->Update(delta_time);
-
+        std::set<Scene *> scenes;
         for (auto &layer : m_LayerStack.GetLayers())
+        {
             layer.second->OnUpdate(delta_time);
+            scenes.emplace(layer.second->GetScene());
+        }
+
+        for (Scene *scene : scenes)
+            scene->Update(delta_time);
     }
 
     void Application::Finish()
