@@ -21,11 +21,11 @@ Game::Game(engine::Application *application, engine::Window *window, const std::
     : Layer(application, name)
 {
     SetWindow(window);
+    SetScene(GetApp().GetScenes()[0].get());
 }
 
 void Game::OnAttach()
 {
-    SetScene(GetApp().LoadScene("scenes/sponza/Sponza01.gltf"));
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
 
