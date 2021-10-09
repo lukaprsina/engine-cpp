@@ -57,10 +57,10 @@ namespace engine
             m_Device->WaitIdle();
 
         for (auto &layer : m_LayerStack.GetLayers())
+        {
             layer.second->OnDetach();
-
-        /* m_Scene.reset();
-        m_Gui.reset(); */
+            layer.second.reset();
+        }
 
         m_Device.reset();
 

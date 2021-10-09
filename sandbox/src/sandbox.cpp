@@ -7,7 +7,7 @@
 #include "scene/gltf_loader.h"
 #include "vulkan_api/rendering/render_pipeline.h"
 #include "scene/scene.h"
-#include "window/window.h"
+#include "window/glfw_window.h"
 #include "vulkan_api/subpasses/forward_subpass.h"
 #include "vulkan_api/rendering/render_pipeline.h"
 #include "core/gui.h"
@@ -53,7 +53,7 @@ Simple::Simple(engine::Application *application, const std::string &name)
 void Simple::OnAttach()
 {
     SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
-    SetScene(GetApp().GetScenes()[0].get());
+    SetScene(GetApp().GetScenes()[1].get());
 
     engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
@@ -78,6 +78,7 @@ bool Sandbox::Prepare()
 {
     Application::Prepare();
     LoadScene("scenes/cube.gltf");
+    LoadScene("scenes/planet.gltf");
 
     engine::Window *main_window = GetPlatform().CreatePlatformWindow();
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,

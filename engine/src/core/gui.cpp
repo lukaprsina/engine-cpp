@@ -1176,6 +1176,7 @@ namespace engine
     Gui::~Gui()
     {
         auto &device = m_Window.GetRenderContext().GetDevice();
+        device.WaitIdle();
         vkDestroyDescriptorPool(device.GetHandle(), m_DescriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(device.GetHandle(), m_DescriptorSetLayout, nullptr);
         vkDestroyPipeline(device.GetHandle(), m_Pipeline, nullptr);

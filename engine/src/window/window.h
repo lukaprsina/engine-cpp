@@ -52,6 +52,7 @@ namespace engine
         void SetSettings(WindowSettings &settings);
         WindowSettings GetSettings() { return m_Settings; }
         VkSurfaceKHR GetSurface() { return m_Surface; }
+        std::vector<Layer *> &GetLayers() { return m_Layers; }
         Input &GetInput() { return m_Input; }
         void SetEventCallback(const std::function<void(Event &)> &event_callback) { m_Settings.EventCallback = event_callback; }
 

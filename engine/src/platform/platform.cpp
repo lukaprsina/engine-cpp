@@ -2,6 +2,7 @@
 
 #include "events/event.h"
 #include "core/application.h"
+#include "scene/scene.h"
 #include "window/input.h"
 #include "core/layer_stack.h"
 
@@ -119,6 +120,11 @@ namespace engine
                 window->Draw();
                 window->ProcessEvents();
             }
+
+            for (void *window_handle : m_ClosedWindows)
+                m_Windows.erase(window_handle);
+
+            m_ClosedWindows.clear();
         }
     }
 
@@ -138,11 +144,6 @@ namespace engine
             else
                 should_continue = true;
         }
-
-        for (void *window_handle : m_ClosedWindows)
-            m_Windows.erase(window_handle);
-
-        m_ClosedWindows.clear();
 
         return !should_continue;
     }

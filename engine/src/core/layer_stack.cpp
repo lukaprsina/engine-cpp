@@ -1,6 +1,7 @@
 #include "core/layer_stack.h"
 
 #include "core/application.h"
+#include "scene/scene.h" 
 
 namespace engine
 {
@@ -18,6 +19,22 @@ namespace engine
 	{
 		layer->OnDetach();
 
+		int i = 0;
+		for (auto &scene : m_Application.GetScenes())
+		{
+			if (scene.get() == layer->GetScene())
+				i++;
+		}
+
+		if (i <= 1)
+		{
+			for (auto &scene : m_Application.GetScenes())
+			{
+				if (scene.get() == layer->GetScene())
+					scene.reset();
+			}
+		}
+
 		for (auto &layer_pair : m_Layers)
 		{
 			if (layer == layer_pair.second.get())
@@ -28,11 +45,6 @@ namespace engine
 			m_Layers.erase(name);
 
 		m_DestroyedLayers.clear();
-		//  auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
-		// if (it != m_Layers.end())
-		// {
-		// 	m_Layers.erase(it);
-		// }
 	}
 
 	/* void LayerStack::BringLayerToFront(Layer *layer)
