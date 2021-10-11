@@ -15,7 +15,7 @@ namespace engine
     Window::Window(Platform &platform, WindowSettings &settings)
         : m_Platform(platform), m_Settings(settings), m_Input(this)
     {
-        SetEventCallback(ENG_BIND_EVENT_FN(Window::OnEvent));
+        SetEventCallback(ENG_BIND_CALLBACK(Window::OnEvent));
 
         MouseMovedEvent event(this, static_cast<float>(1), static_cast<float>(2));
         m_Settings.EventCallback(event);

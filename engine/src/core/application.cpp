@@ -178,9 +178,9 @@ namespace engine
     void Application::OnEvent(Event &event)
     {
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_EVENT_FN(Application::OnWindowClose));
-        dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_EVENT_FN(Application::OnResize));
-        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_EVENT_FN(Application::OnKeyPressed));
+        dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_CALLBACK(Application::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_CALLBACK(Application::OnResize));
+        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_CALLBACK(Application::OnKeyPressed));
     }
 
     bool Application::OnWindowClose(WindowCloseEvent & /*event*/)

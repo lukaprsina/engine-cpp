@@ -94,6 +94,25 @@ namespace engine
         bool m_ExplicitUpdate{false};
         Window &m_Window;
 
+        void ImGuiInitGlfw();
+        void ImGuiGlfwNewFrame();
+        void ImGuiCreateWindow(ImGuiViewport *viewport);
+        void ImGuiDestroyWindow(ImGuiViewport *viewport);
+        void ImGuiGlfwShowWindow(ImGuiViewport *viewport);
+        void ImGuiGlfwSetWindowPos(ImGuiViewport *viewport);
+        void ImGuiGlfwGetWindowPos(ImGuiViewport *viewport);
+        void ImGuiGlfwSetWindowSize(ImGuiViewport *viewport);
+        void ImGuiGlfwGetWindowSize(ImGuiViewport *viewport);
+        void ImGuiGlfwSetWindowFocus(ImGuiViewport *viewport);
+        void ImGuiGlfwGetWindowFocus(ImGuiViewport *viewport);
+        void ImGuiGlfwGetWindowMinimized(ImGuiViewport *viewport);
+        void ImGuiGlfwSetWindowTitle(ImGuiViewport *viewport);
+        void ImGuiGlfwRenderWindow(ImGuiViewport *viewport);
+        void ImGuiGlfwSwapBuffers(ImGuiViewport *viewport);
+        void ImGuiGlfwSetWindowAlpha(ImGuiViewport *viewport);
+        void ImGuiGlfwCreateVkSurface(ImGuiViewport *viewport);
+        void ImGuiWin32SetImeInputPos(ImGuiViewport *viewport);
+
         void UpdateBuffers(CommandBuffer &command_buffer, RenderFrame &render_frame);
     };
 }

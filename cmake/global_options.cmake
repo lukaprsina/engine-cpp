@@ -4,10 +4,10 @@ set(ENG_VALIDATION_LAYERS
     ON
     CACHE BOOL "Enable validation layers")
 set(ENG_VALIDATION_LAYERS_GPU_ASSISTED
-    OFF
+    ON
     CACHE BOOL "Enable GPU assisted validation layers")
 set(ENG_SHIPPING
-    OFF
+    ON
     CACHE BOOL "Install everything into the build directory")
 set(ENG_WSI_SELECTION
     "XCB"
@@ -30,7 +30,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/engine/bin")
 
 if(${ENG_PLATFORM} STREQUAL "VK_USE_PLATFORM_WIN32_KHR")
   if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-    set(ENG_BIN_DIRECTORY "${CMAKE_BINARY_DIR}/engine/bin/Debug" CACHE STRING "Executable directory")
+    set(ENG_BIN_DIRECTORY
+        "${CMAKE_BINARY_DIR}/engine/bin/Debug"
+        CACHE STRING "Executable directory")
   else()
     set(ENG_BIN_DIRECTORY "${CMAKE_BINARY_DIR}/engine/bin/${CMAKE_BUILD_TYPE}")
   endif()

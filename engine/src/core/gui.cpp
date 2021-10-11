@@ -15,9 +15,6 @@
 #include "vulkan_api/rendering/pipeline_state.h"
 #include "vulkan_api/render_frame.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
-
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY
@@ -1020,6 +1017,15 @@ namespace engine
         void ImGui_ImplGlfw_ShutdownPlatformInterface()
         {
         }
+
+        void ImGuiCreateWindow(ImGuiViewport *viewport)
+        {
+            ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
+        }
+
+        void ImGuiDestroyWindow(ImGuiViewport *viewport)
+        {
+        }
     }
 
     const std::string Gui::default_font = "Roboto-Medium";
@@ -1043,7 +1049,7 @@ namespace engine
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         ImGuiStyle &style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -1170,7 +1176,8 @@ namespace engine
         }
 
         auto glfw_window = reinterpret_cast<GLFWwindow *>(m_Window.GetNativeWindow());
-        ImGui_ImplGlfw_InitForVulkan(glfw_window, true);
+        // ImGui_ImplGlfw_InitForVulkan(glfw_window, true);
+        ImGuiInitGlfw();
     }
 
     Gui::~Gui()
@@ -1184,11 +1191,145 @@ namespace engine
         ImGui::DestroyContext();
     }
 
+    void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
+    {
+        ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
+    }
+
+    void Gui::ImGuiDestroyWindow(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwShowWindow(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSetWindowPos(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwGetWindowPos(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSetWindowSize(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwGetWindowSize(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSetWindowFocus(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwGetWindowFocus(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwGetWindowMinimized(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSetWindowTitle(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwRenderWindow(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSwapBuffers(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwSetWindowAlpha(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiGlfwCreateVkSurface(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiWin32SetImeInputPos(ImGuiViewport *viewport)
+    {
+    }
+
+    void Gui::ImGuiInitGlfw()
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        IM_ASSERT(io.BackendPlatformUserData == NULL && "Already initialized a platform backend!");
+        ImGui_ImplGlfw_Data *bd = IM_NEW(ImGui_ImplGlfw_Data)();
+        io.BackendPlatformUserData = (void *)bd;
+        io.BackendPlatformName = "imgui_impl_glfw";
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;      // We can honor GetMouseCursor() values (optional)
+        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;       // We can honor io.WantSetMousePos requests (optional, rarely used)
+        io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports; // We can create multi-viewports on the Platform side (optional)
+#if GLFW_HAS_MOUSE_PASSTHROUGH || (GLFW_HAS_WINDOW_HOVERED && defined(_WIN32))
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
+#endif
+        bd->Window = static_cast<GLFWwindow *>(m_Window.GetNativeWindow());
+        bd->Time = 0.0;
+        bd->WantUpdateMonitors = true;
+
+        ImGuiViewport *main_viewport = ImGui::GetMainViewport();
+        main_viewport->PlatformHandle = (void *)bd->Window;
+#ifdef _WIN32
+        main_viewport->PlatformHandleRaw = glfwGetWin32Window(bd->Window);
+#endif
+
+        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
+        do
+        {
+            typedef void (*callback_fnc)(ImGuiViewport *);
+            Callback<void(ImGuiViewport *)>::func = std::bind(&Gui::ImGuiDestroyWindow, this, std::placeholders::_1);
+            callback_fnc c_func = static_cast<callback_fnc>(Callback<void(ImGuiViewport *)>::callback);
+            platform_io.Platform_DestroyWindow = c_func;
+        } while (false);
+
+        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, void, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_DestroyWindow, Gui::ImGuiDestroyWindow, void, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_ShowWindow, Gui::ImGuiGlfwShowWindow, void, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowPos, Gui::ImGuiGlfwSetWindowPos, void, ImGuiViewport *, ImVec2)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowPos, Gui::ImGuiGlfwGetWindowPos, ImVec2, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowSize, Gui::ImGuiGlfwSetWindowSize, void, ImGuiViewport *, ImVec2)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowSize, Gui::ImGuiGlfwGetWindowSize, ImVec2, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowFocus, Gui::ImGuiGlfwSetWindowFocus, void, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowFocus, Gui::ImGuiGlfwGetWindowFocus, bool, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowMinimized, Gui::ImGuiGlfwGetWindowMinimized, bool, ImGuiViewport *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowTitle, Gui::ImGuiGlfwSetWindowTitle, void, ImGuiViewport *, const char *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_RenderWindow, Gui::ImGuiGlfwRenderWindow, void, ImGuiViewport *, void *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SwapBuffers, Gui::ImGuiGlfwSwapBuffers, void, ImGuiViewport *, void *)
+
+#if GLFW_HAS_WINDOW_ALPHA
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowAlpha, Gui::ImGuiGlfwSetWindowAlpha, void, ImGuiViewport *, float)
+#endif
+#if GLFW_HAS_VULKAN
+        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateVkSurface, Gui::ImGuiGlfwCreateVkSurface, int, ImGuiViewport *, long long unsigned int, const void *, long long unsigned int *)
+#endif
+#if 1 //HAS_WIN32_IME
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, void, ImGuiViewport *, ImVec2 pos)
+#endif
+        // Register main window handle (which is owned by the main application, not by us)
+        // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports.
+        ImGui_ImplGlfw_ViewportData *vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
+        vd->Window = bd->Window;
+        vd->WindowOwned = false;
+        main_viewport->PlatformUserData = vd;
+        main_viewport->PlatformHandle = (void *)bd->Window;
+    }
+
+    void Gui::ImGuiGlfwNewFrame()
+    {
+    }
+
     void Gui::NewFrame()
     {
         ImGui_ImplVulkan_Data *bd = ImGui::GetCurrentContext() ? (ImGui_ImplVulkan_Data *)ImGui::GetIO().BackendRendererUserData : NULL;
         ENG_ASSERT(bd != NULL);
         ImGui_ImplGlfw_NewFrame();
+        // ImGuiGlfwNewFrame();
         ImGui::NewFrame();
     }
 
@@ -1428,12 +1569,12 @@ namespace engine
     {
         auto &io = ImGui::GetIO();
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<MouseMovedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseMoved));
-        dispatcher.Dispatch<MouseScrolledEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseScrolled));
-        dispatcher.Dispatch<MouseButtonPressedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseButtonPressed));
-        dispatcher.Dispatch<MouseButtonReleasedEvent>(ENG_BIND_EVENT_FN(Gui::OnMouseButtonReleased));
-        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_EVENT_FN(Gui::OnKeyPressed));
-        dispatcher.Dispatch<KeyReleasedEvent>(ENG_BIND_EVENT_FN(Gui::OnKeyReleased));
+        dispatcher.Dispatch<MouseMovedEvent>(ENG_BIND_CALLBACK(Gui::OnMouseMoved));
+        dispatcher.Dispatch<MouseScrolledEvent>(ENG_BIND_CALLBACK(Gui::OnMouseScrolled));
+        dispatcher.Dispatch<MouseButtonPressedEvent>(ENG_BIND_CALLBACK(Gui::OnMouseButtonPressed));
+        dispatcher.Dispatch<MouseButtonReleasedEvent>(ENG_BIND_CALLBACK(Gui::OnMouseButtonReleased));
+        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_CALLBACK(Gui::OnKeyPressed));
+        dispatcher.Dispatch<KeyReleasedEvent>(ENG_BIND_CALLBACK(Gui::OnKeyReleased));
         event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
         event.handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
     }

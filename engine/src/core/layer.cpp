@@ -52,9 +52,9 @@ namespace engine
     void Layer::OnEvent(Event &event)
     {
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_EVENT_FN(Layer::OnWindowClose));
-        dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_EVENT_FN(Layer::OnResize));
-        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_EVENT_FN(Layer::OnKeyPressed));
+        dispatcher.Dispatch<WindowCloseEvent>(ENG_BIND_CALLBACK(Layer::OnWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(ENG_BIND_CALLBACK(Layer::OnResize));
+        dispatcher.Dispatch<KeyPressedEvent>(ENG_BIND_CALLBACK(Layer::OnKeyPressed));
     }
 
     bool Layer::OnWindowClose(WindowCloseEvent & /*event*/)
@@ -67,7 +67,7 @@ namespace engine
         auto view = m_Scene->GetRegistry().view<sg::FreeCamera, sg::PerspectiveCamera>();
         for (auto &entity : view)
         {
-            auto &[free_camera, perspective_camera] = view.get<sg::FreeCamera, sg::PerspectiveCamera>(entity);
+            auto [free_camera, perspective_camera] = view.get<sg::FreeCamera, sg::PerspectiveCamera>(entity);
             free_camera.Resize(perspective_camera, event.GetWidth(), event.GetHeight());
         }
 

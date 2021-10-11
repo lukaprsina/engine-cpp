@@ -148,9 +148,7 @@ namespace engine
         submit_info.pSignalSemaphores = &signal_semaphore;
 
         VkFence fence = frame.RequestFence();
-
-        std::vector<QueueFamily> &queue_families = m_Device.GetQueueFamilies();
-        VkResult result = queue.Submit({submit_info}, fence);
+        queue.Submit({submit_info}, fence);
 
         return signal_semaphore;
     }
