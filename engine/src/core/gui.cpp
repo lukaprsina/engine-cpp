@@ -1261,7 +1261,7 @@ namespace engine
     {
     }
 
-    template <typename Id, typename T>
+    /* template <typename Id, typename T>
     struct Callback;
 
     template <typename Id, typename Ret, typename... Params>
@@ -1274,7 +1274,19 @@ namespace engine
     };
 
     template <typename Id, typename Ret, typename... Params>
-    std::function<Ret(Params...)> Callback<Id, Ret(Params...)>::func;
+    std::function<Ret(Params...)> Callback<Id, Ret(Params...)>::func; */
+
+    template <typename T, T>
+    struct proxy;
+
+    template <typename T, typename R, typename... Args, R (T::*mf)(Args...)>
+    struct proxy<R (T::*)(Args...), mf>
+    {
+        static R call(T &obj, Args... args)
+        {
+            return (obj.*mf)(std::forward<Args>(args)...);
+        }
+    };
 
     void Gui::ImGuiInitGlfw()
     {
@@ -1301,23 +1313,22 @@ namespace engine
 
         ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
 
-#define ENG_BIND_C_CALLBACK(handle, user_func, ret, ...)                                                                                                                      \
+        // https://stackoverflow.com/questions/25732386/what-is-stddecay-and-when-it-should-be-used
+
+        proxy<decltype(&Gui::ImGuiCreateWindow), &Gui::ImGuiCreateWindow> create_proxy;
+        create_proxy.call(*this, main_viewport);
+
+        proxy<decltype(&Gui::ImGuiCreateWindow), &Gui::ImGuiDestroyWindow> destroy_proxy;
+        destroy_proxy.call(*this, main_viewport);
+
+        /* #define ENG_BIND_C_CALLBACK(handle, user_func, ret, ...)                                                                                                                      \
     do                                                                                                                                                                        \
     {                                                                                                                                                                         \
         typedef ret (*callback_fnc)(__VA_ARGS__);                                                                                                                             \
         Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = [this](auto &&...args) -> decltype(auto) { return this->user_func(std::forward<decltype(args)>(args)...); }; \
         callback_fnc c_func = static_cast<callback_fnc>(Callback<ret(__VA_ARGS__), &user_func>::callback);                                                                    \
         handle = c_func;                                                                                                                                                      \
-    } while (false);
-
-        do
-        {
-            typedef void (*callback_fnc)(ImGuiViewport *);
-            Callback<decltype(&Gui::ImGuiCreateWindow), void(ImGuiViewport *)>::func = [this](auto &&...args) -> decltype(auto)
-            { return this->Gui::ImGuiCreateWindow(std::forward<decltype(args)>(args)...); };
-            callback_fnc c_func = static_cast<callback_fnc>(Callback<decltype(&Gui::ImGuiCreateWindow), void(ImGuiViewport *)>::callback);
-            platform_io.Platform_CreateWindow = c_func;
-        } while (false);
+    } while (false); */
 
         //Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = std::bind(&user_func, this, std::forward(__VA_ARGS__)...);
         /* ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, void, ImGuiViewport *)
