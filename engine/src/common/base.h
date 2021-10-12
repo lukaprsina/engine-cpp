@@ -9,13 +9,13 @@
 
 #define ENG_BIND_CALLBACK(fn) [this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
-namespace engine
+/* namespace engine
 {
-    template <typename T>
+    template <typename T, typename Id>
     struct Callback;
 
-    template <typename Ret, typename... Params>
-    struct Callback<Ret(Params...)>
+    template <typename Ret, typename Id, typename... Params>
+    struct Callback<Ret(Params...), Id>
     {
         template <typename... Args>
         static Ret callback(Args... args) { return func(args...); }
@@ -23,18 +23,9 @@ namespace engine
         static std::function<Ret(Params...)> func;
     };
 
-    template <typename Ret, typename... Params>
-    std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
-}
-
-#define ENG_BIND_C_CALLBACK(handle, user_func, ret, ...)                                            \
-    do                                                                                              \
-    {                                                                                               \
-        typedef ret (*callback_fnc)(__VA_ARGS__);                                                   \
-        Callback<void(ImGuiViewport *)>::func = std::bind(&user_func, this, std::placeholders::_1); \
-        callback_fnc c_func = static_cast<callback_fnc>(Callback<ret(__VA_ARGS__)>::callback);      \
-        handle = c_func;                                                                            \
-    } while (false);
+    template <typename Ret, typename Id, typename... Params>
+    std::function<Ret(Params...)> Callback<Ret(Params...), Id>::func;
+} */
 
 #if !defined(NDEBUG) || defined(DEBUG) || defined(_DEBUG)
 #define ENG_DEBUG

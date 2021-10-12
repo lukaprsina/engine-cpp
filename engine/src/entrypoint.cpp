@@ -16,10 +16,10 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-    // #ifndef ENG_DEBUG
+#ifndef ENG_DEBUG
     try
     {
-        // #endif
+#endif
         std::unique_ptr<engine::Application> app = engine::CreateApplication(&platform);
 
         app->SetName("Engine");
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         {
             platform.Terminate(engine::ExitCode::UnableToRun);
         }
-        // #ifndef ENG_DEBUG
+#ifndef ENG_DEBUG
     }
     catch (const std::exception &e)
     {
@@ -42,5 +42,5 @@ int main(int argc, char *argv[])
         std::cin.get();
         platform.Terminate(engine::ExitCode::FatalError);
     }
-    // #endif
+#endif
 }

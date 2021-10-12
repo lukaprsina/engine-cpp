@@ -1204,57 +1204,77 @@ namespace engine
     {
     }
 
-    void Gui::ImGuiGlfwSetWindowPos(ImGuiViewport *viewport)
+    void Gui::ImGuiGlfwSetWindowPos(ImGuiViewport *viewport, ImVec2)
     {
     }
 
-    void Gui::ImGuiGlfwGetWindowPos(ImGuiViewport *viewport)
+    ImVec2 Gui::ImGuiGlfwGetWindowPos(ImGuiViewport *viewport)
+    {
+        return {0, 0};
+    }
+
+    void Gui::ImGuiGlfwSetWindowSize(ImGuiViewport *viewport, ImVec2)
     {
     }
 
-    void Gui::ImGuiGlfwSetWindowSize(ImGuiViewport *viewport)
+    ImVec2 Gui::ImGuiGlfwGetWindowSize(ImGuiViewport *viewport)
     {
-    }
-
-    void Gui::ImGuiGlfwGetWindowSize(ImGuiViewport *viewport)
-    {
+        return {0, 0};
     }
 
     void Gui::ImGuiGlfwSetWindowFocus(ImGuiViewport *viewport)
     {
     }
 
-    void Gui::ImGuiGlfwGetWindowFocus(ImGuiViewport *viewport)
+    bool Gui::ImGuiGlfwGetWindowFocus(ImGuiViewport *viewport)
+    {
+        return true;
+    }
+
+    bool Gui::ImGuiGlfwGetWindowMinimized(ImGuiViewport *viewport)
+    {
+        return true;
+    }
+
+    void Gui::ImGuiGlfwSetWindowTitle(ImGuiViewport *viewport, const char *)
     {
     }
 
-    void Gui::ImGuiGlfwGetWindowMinimized(ImGuiViewport *viewport)
+    void Gui::ImGuiGlfwRenderWindow(ImGuiViewport *viewport, void *)
     {
     }
 
-    void Gui::ImGuiGlfwSetWindowTitle(ImGuiViewport *viewport)
+    void Gui::ImGuiGlfwSwapBuffers(ImGuiViewport *viewport, void *)
     {
     }
 
-    void Gui::ImGuiGlfwRenderWindow(ImGuiViewport *viewport)
+    void Gui::ImGuiGlfwSetWindowAlpha(ImGuiViewport *viewport, float)
     {
     }
 
-    void Gui::ImGuiGlfwSwapBuffers(ImGuiViewport *viewport)
+    int Gui::ImGuiGlfwCreateVkSurface(ImGuiViewport *vp, ImU64 vk_inst, const void *vk_allocators, ImU64 *out_vk_surface)
+    {
+        return 0;
+    }
+
+    void Gui::ImGuiWin32SetImeInputPos(ImGuiViewport *viewport, ImVec2 position)
     {
     }
 
-    void Gui::ImGuiGlfwSetWindowAlpha(ImGuiViewport *viewport)
-    {
-    }
+    template <typename Id, typename T>
+    struct Callback;
 
-    void Gui::ImGuiGlfwCreateVkSurface(ImGuiViewport *viewport)
+    template <typename Id, typename Ret, typename... Params>
+    struct Callback<Id, Ret(Params...)>
     {
-    }
+        template <typename... Args>
+        static Ret callback(Args... args) { return func(args...); }
 
-    void Gui::ImGuiWin32SetImeInputPos(ImGuiViewport *viewport)
-    {
-    }
+        static std::function<Ret(Params...)> func;
+    };
+
+    template <typename Id, typename Ret, typename... Params>
+    std::function<Ret(Params...)> Callback<Id, Ret(Params...)>::func;
 
     void Gui::ImGuiInitGlfw()
     {
@@ -1280,15 +1300,27 @@ namespace engine
 #endif
 
         ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
+
+#define ENG_BIND_C_CALLBACK(handle, user_func, ret, ...)                                                                                                                      \
+    do                                                                                                                                                                        \
+    {                                                                                                                                                                         \
+        typedef ret (*callback_fnc)(__VA_ARGS__);                                                                                                                             \
+        Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = [this](auto &&...args) -> decltype(auto) { return this->user_func(std::forward<decltype(args)>(args)...); }; \
+        callback_fnc c_func = static_cast<callback_fnc>(Callback<ret(__VA_ARGS__), &user_func>::callback);                                                                    \
+        handle = c_func;                                                                                                                                                      \
+    } while (false);
+
         do
         {
             typedef void (*callback_fnc)(ImGuiViewport *);
-            Callback<void(ImGuiViewport *)>::func = std::bind(&Gui::ImGuiDestroyWindow, this, std::placeholders::_1);
-            callback_fnc c_func = static_cast<callback_fnc>(Callback<void(ImGuiViewport *)>::callback);
-            platform_io.Platform_DestroyWindow = c_func;
+            Callback<decltype(&Gui::ImGuiCreateWindow), void(ImGuiViewport *)>::func = [this](auto &&...args) -> decltype(auto)
+            { return this->Gui::ImGuiCreateWindow(std::forward<decltype(args)>(args)...); };
+            callback_fnc c_func = static_cast<callback_fnc>(Callback<decltype(&Gui::ImGuiCreateWindow), void(ImGuiViewport *)>::callback);
+            platform_io.Platform_CreateWindow = c_func;
         } while (false);
 
-        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, void, ImGuiViewport *)
+        //Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = std::bind(&user_func, this, std::forward(__VA_ARGS__)...);
+        /* ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, void, ImGuiViewport *)
         ENG_BIND_C_CALLBACK(platform_io.Platform_DestroyWindow, Gui::ImGuiDestroyWindow, void, ImGuiViewport *)
         ENG_BIND_C_CALLBACK(platform_io.Platform_ShowWindow, Gui::ImGuiGlfwShowWindow, void, ImGuiViewport *)
         ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowPos, Gui::ImGuiGlfwSetWindowPos, void, ImGuiViewport *, ImVec2)
@@ -1306,18 +1338,35 @@ namespace engine
         ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowAlpha, Gui::ImGuiGlfwSetWindowAlpha, void, ImGuiViewport *, float)
 #endif
 #if GLFW_HAS_VULKAN
-        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateVkSurface, Gui::ImGuiGlfwCreateVkSurface, int, ImGuiViewport *, long long unsigned int, const void *, long long unsigned int *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateVkSurface, Gui::ImGuiGlfwCreateVkSurface, int, ImGuiViewport *, ImU64, const void *, ImU64 *)
 #endif
 #if 1 //HAS_WIN32_IME
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, void, ImGuiViewport *, ImVec2 pos)
-#endif
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, void, ImGuiViewport *, ImVec2)
+#endif */
         // Register main window handle (which is owned by the main application, not by us)
-        // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports.
+        // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports. */
         ImGui_ImplGlfw_ViewportData *vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
         vd->Window = bd->Window;
         vd->WindowOwned = false;
         main_viewport->PlatformUserData = vd;
         main_viewport->PlatformHandle = (void *)bd->Window;
+
+        platform_io.Platform_CreateWindow(main_viewport);
+        platform_io.Platform_DestroyWindow(main_viewport);
+        platform_io.Platform_ShowWindow(main_viewport);
+        platform_io.Platform_SetWindowPos(main_viewport, {0, 0});
+        platform_io.Platform_GetWindowPos(main_viewport);
+        platform_io.Platform_SetWindowSize(main_viewport, {0, 0});
+        platform_io.Platform_GetWindowSize(main_viewport);
+        platform_io.Platform_SetWindowFocus(main_viewport);
+        platform_io.Platform_GetWindowFocus(main_viewport);
+        platform_io.Platform_GetWindowMinimized(main_viewport);
+        platform_io.Platform_SetWindowTitle(main_viewport, "flick");
+        platform_io.Platform_RenderWindow(main_viewport, nullptr);
+        platform_io.Platform_SwapBuffers(main_viewport, nullptr);
+        platform_io.Platform_SetWindowAlpha(main_viewport, 0.0f);
+        platform_io.Platform_CreateVkSurface(main_viewport, 0, nullptr, 0);
+        platform_io.Platform_SetImeInputPos(main_viewport, {0, 0});
     }
 
     void Gui::ImGuiGlfwNewFrame()
