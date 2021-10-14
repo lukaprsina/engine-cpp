@@ -668,7 +668,7 @@ namespace engine
                 if (ImGui_ImplGlfw_ViewportData *vd = (ImGui_ImplGlfw_ViewportData *)viewport->PlatformUserData)
                 {
                     bool ignore_event = (ImGui::GetFrameCount() <= vd->IgnoreWindowPosEventFrame + 1);
-                    //data->IgnoreWindowPosEventFrame = -1;
+                    // data->IgnoreWindowPosEventFrame = -1;
                     if (ignore_event)
                         return;
                 }
@@ -683,7 +683,7 @@ namespace engine
                 if (ImGui_ImplGlfw_ViewportData *vd = (ImGui_ImplGlfw_ViewportData *)viewport->PlatformUserData)
                 {
                     bool ignore_event = (ImGui::GetFrameCount() <= vd->IgnoreWindowSizeEventFrame + 1);
-                    //data->IgnoreWindowSizeEventFrame = -1;
+                    // data->IgnoreWindowSizeEventFrame = -1;
                     if (ignore_event)
                         return;
                 }
@@ -1261,33 +1261,6 @@ namespace engine
     {
     }
 
-    /* template <typename Id, typename T>
-    struct Callback;
-
-    template <typename Id, typename Ret, typename... Params>
-    struct Callback<Id, Ret(Params...)>
-    {
-        template <typename... Args>
-        static Ret callback(Args... args) { return func(args...); }
-
-        static std::function<Ret(Params...)> func;
-    };
-
-    template <typename Id, typename Ret, typename... Params>
-    std::function<Ret(Params...)> Callback<Id, Ret(Params...)>::func; */
-
-    template <typename T, T>
-    struct proxy;
-
-    template <typename T, typename R, typename... Args, R (T::*mf)(Args...)>
-    struct proxy<R (T::*)(Args...), mf>
-    {
-        static R call(T &obj, Args... args)
-        {
-            return (obj.*mf)(std::forward<Args>(args)...);
-        }
-    };
-
     void Gui::ImGuiInitGlfw()
     {
         ImGuiIO &io = ImGui::GetIO();
@@ -1315,45 +1288,29 @@ namespace engine
 
         // https://stackoverflow.com/questions/25732386/what-is-stddecay-and-when-it-should-be-used
 
-        proxy<decltype(&Gui::ImGuiCreateWindow), &Gui::ImGuiCreateWindow> create_proxy;
-        create_proxy.call(*this, main_viewport);
-
-        proxy<decltype(&Gui::ImGuiCreateWindow), &Gui::ImGuiDestroyWindow> destroy_proxy;
-        destroy_proxy.call(*this, main_viewport);
-
-        /* #define ENG_BIND_C_CALLBACK(handle, user_func, ret, ...)                                                                                                                      \
-    do                                                                                                                                                                        \
-    {                                                                                                                                                                         \
-        typedef ret (*callback_fnc)(__VA_ARGS__);                                                                                                                             \
-        Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = [this](auto &&...args) -> decltype(auto) { return this->user_func(std::forward<decltype(args)>(args)...); }; \
-        callback_fnc c_func = static_cast<callback_fnc>(Callback<ret(__VA_ARGS__), &user_func>::callback);                                                                    \
-        handle = c_func;                                                                                                                                                      \
-    } while (false); */
-
-        //Callback<ret(__VA_ARGS__), decltype(&user_func)>::func = std::bind(&user_func, this, std::forward(__VA_ARGS__)...);
-        /* ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, void, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_DestroyWindow, Gui::ImGuiDestroyWindow, void, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_ShowWindow, Gui::ImGuiGlfwShowWindow, void, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowPos, Gui::ImGuiGlfwSetWindowPos, void, ImGuiViewport *, ImVec2)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowPos, Gui::ImGuiGlfwGetWindowPos, ImVec2, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowSize, Gui::ImGuiGlfwSetWindowSize, void, ImGuiViewport *, ImVec2)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowSize, Gui::ImGuiGlfwGetWindowSize, ImVec2, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowFocus, Gui::ImGuiGlfwSetWindowFocus, void, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowFocus, Gui::ImGuiGlfwGetWindowFocus, bool, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowMinimized, Gui::ImGuiGlfwGetWindowMinimized, bool, ImGuiViewport *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowTitle, Gui::ImGuiGlfwSetWindowTitle, void, ImGuiViewport *, const char *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_RenderWindow, Gui::ImGuiGlfwRenderWindow, void, ImGuiViewport *, void *)
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SwapBuffers, Gui::ImGuiGlfwSwapBuffers, void, ImGuiViewport *, void *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateWindow, Gui::ImGuiCreateWindow, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_DestroyWindow, Gui::ImGuiDestroyWindow, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_ShowWindow, Gui::ImGuiGlfwShowWindow, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowPos, Gui::ImGuiGlfwSetWindowPos, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowPos, Gui::ImGuiGlfwGetWindowPos, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowSize, Gui::ImGuiGlfwSetWindowSize, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowSize, Gui::ImGuiGlfwGetWindowSize, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowFocus, Gui::ImGuiGlfwSetWindowFocus, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowFocus, Gui::ImGuiGlfwGetWindowFocus, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_GetWindowMinimized, Gui::ImGuiGlfwGetWindowMinimized, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowTitle, Gui::ImGuiGlfwSetWindowTitle, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_RenderWindow, Gui::ImGuiGlfwRenderWindow, this)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SwapBuffers, Gui::ImGuiGlfwSwapBuffers, this)
 
 #if GLFW_HAS_WINDOW_ALPHA
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowAlpha, Gui::ImGuiGlfwSetWindowAlpha, void, ImGuiViewport *, float)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetWindowAlpha, Gui::ImGuiGlfwSetWindowAlpha, this)
 #endif
 #if GLFW_HAS_VULKAN
-        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateVkSurface, Gui::ImGuiGlfwCreateVkSurface, int, ImGuiViewport *, ImU64, const void *, ImU64 *)
+        ENG_BIND_C_CALLBACK(platform_io.Platform_CreateVkSurface, Gui::ImGuiGlfwCreateVkSurface, this)
 #endif
-#if 1 //HAS_WIN32_IME
-        ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, void, ImGuiViewport *, ImVec2)
-#endif */
+#if 1 // HAS_WIN32_IME
+        ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, this)
+#endif
         // Register main window handle (which is owned by the main application, not by us)
         // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports. */
         ImGui_ImplGlfw_ViewportData *vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
@@ -1362,7 +1319,7 @@ namespace engine
         main_viewport->PlatformUserData = vd;
         main_viewport->PlatformHandle = (void *)bd->Window;
 
-        platform_io.Platform_CreateWindow(main_viewport);
+        /* platform_io.Platform_CreateWindow(main_viewport);
         platform_io.Platform_DestroyWindow(main_viewport);
         platform_io.Platform_ShowWindow(main_viewport);
         platform_io.Platform_SetWindowPos(main_viewport, {0, 0});
@@ -1377,7 +1334,7 @@ namespace engine
         platform_io.Platform_SwapBuffers(main_viewport, nullptr);
         platform_io.Platform_SetWindowAlpha(main_viewport, 0.0f);
         platform_io.Platform_CreateVkSurface(main_viewport, 0, nullptr, 0);
-        platform_io.Platform_SetImeInputPos(main_viewport, {0, 0});
+        platform_io.Platform_SetImeInputPos(main_viewport, {0, 0}); */
     }
 
     void Gui::ImGuiGlfwNewFrame()

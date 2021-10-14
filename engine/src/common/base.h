@@ -7,25 +7,36 @@
 
 #define ENG_BIT(x) (1 << x)
 
-#define ENG_BIND_CALLBACK(fn) [this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-
-/* namespace engine
+namespace engine
 {
-    template <typename T, typename Id>
-    struct Callback;
+    template <typename T, T t>
+    class Callback;
 
-    template <typename Ret, typename Id, typename... Params>
-    struct Callback<Ret(Params...), Id>
+    template <typename T, typename Ret, typename... Args, Ret (T::*mf)(Args...)>
+    class Callback<Ret (T::*)(Args...), mf>
     {
-        template <typename... Args>
-        static Ret callback(Args... args) { return func(args...); }
+    public:
+        typedef Ret (*callback_func)(Args...);
 
-        static std::function<Ret(Params...)> func;
+        static Ret call(Args... args) { return func(args...); }
+        static callback_func set(T *obj)
+        {
+            func = [obj](auto &&...args) -> decltype(auto)
+            { return (obj->*mf)(std::forward<decltype(args)>(args)...); };
+            return static_cast<callback_func>(call);
+        }
+
+    private:
+        static std::function<Ret(Args...)> func;
     };
 
-    template <typename Ret, typename Id, typename... Params>
-    std::function<Ret(Params...)> Callback<Ret(Params...), Id>::func;
-} */
+    template <typename T, typename Ret, typename... Args, Ret (T::*mf)(Args...)>
+    std::function<Ret(Args...)> Callback<Ret (T::*)(Args...), mf>::func;
+}
+
+#define ENG_BIND_CALLBACK(func) [this](auto &&...args) -> decltype(auto) { return this->func(std::forward<decltype(args)>(args)...); }
+
+#define ENG_BIND_C_CALLBACK(handle, func, obj) handle = Callback<decltype(&func), &func>::set(obj);
 
 #if !defined(NDEBUG) || defined(DEBUG) || defined(_DEBUG)
 #define ENG_DEBUG
