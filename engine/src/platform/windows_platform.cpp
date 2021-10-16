@@ -109,9 +109,8 @@ namespace engine
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    Window *WindowsPlatform::CreatePlatformWindow()
+    Window *WindowsPlatform::CreatePlatformWindow(WindowSettings settings)
     {
-        WindowSettings settings;
         void *handle;
 
         {

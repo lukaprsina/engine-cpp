@@ -45,8 +45,8 @@ namespace engine
         )"
 #ifndef VK_USE_PLATFORM_DISPLAY_KHR
             R"(
-        --width WIDTH             The width of the window [default: 1280].
-        --height HEIGHT           The height of the window [default: 720].)"
+        --width WIDTH             The width of the window.
+        --height HEIGHT           The height of the window.)"
 #endif
             "\n");
     }

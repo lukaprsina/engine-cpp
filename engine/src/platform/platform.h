@@ -29,7 +29,7 @@ namespace engine
         virtual bool ShouldClose();
         virtual void Terminate(ExitCode code);
 
-        virtual Window *CreatePlatformWindow() = 0;
+        virtual Window *CreatePlatformWindow(WindowSettings settings = WindowSettings()) = 0;
         Window &GetWindow(void *handle) { return *m_Windows.at(handle); }
         std::unordered_map<void *, std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
         Application &GetApp() const { return *m_App; }

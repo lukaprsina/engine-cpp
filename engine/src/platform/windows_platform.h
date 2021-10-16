@@ -8,11 +8,11 @@ namespace engine
     {
     public:
         WindowsPlatform(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-            PSTR lpCmdLine, INT nCmdShow);
+                        PSTR lpCmdLine, INT nCmdShow);
         virtual ~WindowsPlatform() = default;
 
-        bool Initialize(std::unique_ptr<Application>&& app) override;
-        Window* CreatePlatformWindow() override;        
-        const char* GetSurfaceExtension() override;
+        bool Initialize(std::unique_ptr<Application> &&app) override;
+        Window *CreatePlatformWindow(WindowSettings settings = WindowSettings()) override;
+        const char *GetSurfaceExtension() override;
     };
 }

@@ -1,6 +1,7 @@
 #include "core/gui.h"
 
 #include "window/input.h"
+#include "platform/platform.h"
 #include "window/glfw_window.h"
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/device.h"
@@ -1193,11 +1194,44 @@ namespace engine
 
     void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
     {
-        ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
+        WindowSettings settings;
+        settings.width = viewport->Size.x;
+        settings.height = viewport->Size.y;
+        settings.posx = viewport->Pos.x;
+        settings.posy = viewport->Pos.y;
+        settings.decorated = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? false : true;
+
+        Window *window = m_Application.GetPlatform().CreatePlatformWindow(settings);
+
+        std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
+                                                             VK_PRESENT_MODE_IMMEDIATE_KHR,
+                                                             VK_PRESENT_MODE_MAILBOX_KHR});
+
+        std::vector<VkSurfaceFormatKHR> surface_format_priority({{VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
+                                                                 {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
+
+        viewport->PlatformUserData = window;
+        viewport->PlatformHandle = static_cast<void *>(window->GetNativeWindow());
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+        viewport->PlatformHandleRaw = glfwGetWin32Window(window->GetNativeWindow());
+#endif
+
+        window->CreateSurface(m_Application.GetInstance(), m_Application.GetDevice().GetGPU());
+        window->CreateRenderContext(m_Application.GetDevice(), present_mode_priority, surface_format_priority);
+        window->GetRenderContext().Prepare();
     }
 
     void Gui::ImGuiDestroyWindow(ImGuiViewport *viewport)
     {
+        Window *window = static_cast<Window *>(viewport->PlatformUserData);
+        window->Close();
+        viewport->PlatformUserData = nullptr;
+        viewport->PlatformHandle = nullptr;
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+        viewport->PlatformHandleRaw = nullptr;
+#endif
     }
 
     void Gui::ImGuiGlfwShowWindow(ImGuiViewport *viewport)
@@ -1219,7 +1253,7 @@ namespace engine
 
     ImVec2 Gui::ImGuiGlfwGetWindowSize(ImGuiViewport *viewport)
     {
-        return {0, 0};
+        return {1920, 1080};
     }
 
     void Gui::ImGuiGlfwSetWindowFocus(ImGuiViewport *viewport)
@@ -1233,7 +1267,7 @@ namespace engine
 
     bool Gui::ImGuiGlfwGetWindowMinimized(ImGuiViewport *viewport)
     {
-        return true;
+        return false;
     }
 
     void Gui::ImGuiGlfwSetWindowTitle(ImGuiViewport *viewport, const char *)
@@ -1284,6 +1318,12 @@ namespace engine
         main_viewport->PlatformHandleRaw = glfwGetWin32Window(bd->Window);
 #endif
 
+        ImGui_ImplGlfw_ViewportData *vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
+        vd->Window = bd->Window;
+        vd->WindowOwned = false;
+        main_viewport->PlatformUserData = vd;
+        main_viewport->PlatformHandle = (void *)bd->Window;
+
         ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
 
         // https://stackoverflow.com/questions/25732386/what-is-stddecay-and-when-it-should-be-used
@@ -1313,11 +1353,6 @@ namespace engine
 #endif
         // Register main window handle (which is owned by the main application, not by us)
         // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports. */
-        ImGui_ImplGlfw_ViewportData *vd = IM_NEW(ImGui_ImplGlfw_ViewportData)();
-        vd->Window = bd->Window;
-        vd->WindowOwned = false;
-        main_viewport->PlatformUserData = vd;
-        main_viewport->PlatformHandle = (void *)bd->Window;
 
         /* platform_io.Platform_CreateWindow(main_viewport);
         platform_io.Platform_DestroyWindow(main_viewport);
@@ -1337,23 +1372,51 @@ namespace engine
         platform_io.Platform_SetImeInputPos(main_viewport, {0, 0}); */
     }
 
-    void Gui::ImGuiGlfwNewFrame()
+    void Gui::ImGuiGlfwNewFrame(float delta_time)
     {
+        ImGuiIO &io = ImGui::GetIO();
+        ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
+        GLFWwindow *gltf_window = bd->Window;
+        double current_time = glfwGetTime();
+        io.DeltaTime = bd->Time > 0.0 ? (float)(current_time - bd->Time) : (float)(1.0f / 60.0f);
+        bd->Time = current_time;
+
+        // Setup display size (every frame to accommodate for window resizing)
+        /* int w, h;
+        int display_w, display_h;
+        glfwGetWindowSize(bd->Window, &w, &h);
+        glfwGetFramebufferSize(bd->Window, &display_w, &display_h);
+        io.DisplaySize = ImVec2((float)w, (float)h);
+        if (w > 0 && h > 0)
+            io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
+        if (bd->WantUpdateMonitors)
+            ImGui_ImplGlfw_UpdateMonitors();
+
+        // Setup time step
+        double current_time = glfwGetTime();
+        io.DeltaTime = bd->Time > 0.0 ? (float)(current_time - bd->Time) : (float)(1.0f / 60.0f);
+        bd->Time = current_time;
+
+        ImGui_ImplGlfw_UpdateMousePosAndButtons();
+        ImGui_ImplGlfw_UpdateMouseCursor();
+
+        // Update game controllers (if enabled and available)
+        ImGui_ImplGlfw_UpdateGamepads(); */
     }
 
-    void Gui::NewFrame()
+    void Gui::NewFrame(float delta_time)
     {
         ImGui_ImplVulkan_Data *bd = ImGui::GetCurrentContext() ? (ImGui_ImplVulkan_Data *)ImGui::GetIO().BackendRendererUserData : NULL;
         ENG_ASSERT(bd != NULL);
         ImGui_ImplGlfw_NewFrame();
-        // ImGuiGlfwNewFrame();
+        ImGuiGlfwNewFrame(delta_time);
         ImGui::NewFrame();
     }
 
     void Gui::OnUpdate(float delta_time)
     {
         ImGuiIO &io = ImGui::GetIO();
-        NewFrame();
+        NewFrame(delta_time);
         ImGui::ShowDemoWindow();
         auto extent = m_Window.GetRenderContext().GetSurfaceExtent();
         Resize(extent.width, extent.height);

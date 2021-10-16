@@ -57,7 +57,7 @@ namespace engine
             bool explicit_update = false);
         ~Gui();
 
-        void NewFrame();
+        void NewFrame(float delta_time);
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
         void Draw(CommandBuffer &command_buffer) override;
@@ -95,7 +95,7 @@ namespace engine
         Window &m_Window;
 
         void ImGuiInitGlfw();
-        void ImGuiGlfwNewFrame();
+        void ImGuiGlfwNewFrame(float delta_time);
         void ImGuiCreateWindow(ImGuiViewport *viewport);
         void ImGuiDestroyWindow(ImGuiViewport *viewport);
         void ImGuiGlfwShowWindow(ImGuiViewport *viewport);

@@ -231,7 +231,6 @@ namespace engine
         const std::vector<VkQueueFamilyProperties> &queue_family_properties = m_Gpu.GetQueueFamilyProperties();
         for (uint32_t queue_family_index = 0; queue_family_index < queue_family_properties.size(); ++queue_family_index)
         {
-            const VkQueueFamilyProperties &queue_family_property = queue_family_properties[queue_family_index];
             VkBool32 present_supported = m_Gpu.IsPresentSupported(surface, queue_family_index);
 
             VkBool32 can_present = m_QueueFamilies[queue_family_index].CanPresent();

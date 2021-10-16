@@ -166,6 +166,9 @@ namespace engine
         if (settings.title.empty())
             settings.title = platform.GetApp().GetName();
 
+        glfwWindowHint(GLFW_DECORATED, settings.decorated);
+        glfwWindowHint(GLFW_FLOATING, settings.floating);
+
         m_Handle = glfwCreateWindow(settings.width,
                                     settings.height,
                                     settings.title.c_str(), nullptr, nullptr);
@@ -173,7 +176,11 @@ namespace engine
         if (!m_Handle)
             throw std::runtime_error("Couldn't create GLFW window.");
 
+        if (settings.posx != 0 && settings.posy != 0)
+            glfwSetWindowPos(m_Handle, settings.posx, settings.posy);
+            
         glfwGetWindowPos(m_Handle, &settings.posx, &settings.posy);
+
         SetSettings(settings);
         m_WindowedSettings = settings;
 

@@ -17,7 +17,7 @@ namespace engine
 
     struct WindowSettings
     {
-        std::string title = "";
+        std::string title{};
         int32_t width = 1280;
         int32_t height = 720;
         int32_t posx = 0;
@@ -25,6 +25,8 @@ namespace engine
         bool focused = true;
         bool fullscreen = false;
         bool minimized = false;
+        bool decorated = true;
+        bool floating = false;
 
         std::function<void(Event &)> EventCallback = nullptr;
     };

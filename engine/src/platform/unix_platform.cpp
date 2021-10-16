@@ -53,12 +53,12 @@ namespace engine
 
     bool UnixPlatform::Initialize(std::unique_ptr<Application> &&app)
     {
+        GlfwWindow::Init();
         return Platform::Initialize(std::move(app)) && Platform::Prepare();
     }
 
-    Window *UnixPlatform::CreatePlatformWindow()
+    Window *UnixPlatform::CreatePlatformWindow(WindowSettings settings)
     {
-        WindowSettings settings;
         void *handle;
 
         {
@@ -68,10 +68,7 @@ namespace engine
                 window = std::make_unique<HeadlessWindow>(*this, settings);
 
             else
-            {
-                GlfwWindow::Init();
                 window = std::make_unique<GlfwWindow>(*this, settings);
-            }
 
             handle = window->GetNativeWindow();
             m_Windows.emplace(handle, std::move(window));
