@@ -48,6 +48,17 @@ namespace engine
         float size{};
     };
 
+    class GuiViewport : public Layer
+    {
+    public:
+        GuiViewport(Application *application, ImGuiViewport *viewport);
+        void OnAttach() override;
+
+    private:
+        ImGuiViewport *m_Viewport{};
+        static int32_t s_Counter;
+    };
+
     class Gui : public Layer
     {
     public:
@@ -60,7 +71,7 @@ namespace engine
         void NewFrame(float delta_time);
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
-        void Draw(CommandBuffer &command_buffer) override;
+        void Draw(CommandBuffer &command_buffer, Window *window) override;
         void Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer);
 
         void OnEvent(Event &event) override;

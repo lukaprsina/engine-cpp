@@ -1030,6 +1030,7 @@ namespace engine
     }
 
     const std::string Gui::default_font = "Roboto-Medium";
+    int32_t GuiViewport::s_Counter = 0;
 
     Gui::Gui(Application *application,
              Window *window,
@@ -1192,16 +1193,22 @@ namespace engine
         ImGui::DestroyContext();
     }
 
-    void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
+    GuiViewport::GuiViewport(Application *application, ImGuiViewport *viewport)
+        : Layer(application, std::string("Gui ", s_Counter++)), m_Viewport(viewport)
+    {
+    }
+
+    void GuiViewport::OnAttach()
     {
         WindowSettings settings;
-        settings.width = viewport->Size.x;
-        settings.height = viewport->Size.y;
-        settings.posx = viewport->Pos.x;
-        settings.posy = viewport->Pos.y;
-        settings.decorated = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? false : true;
+        settings.width = m_Viewport->Size.x;
+        settings.height = m_Viewport->Size.y;
+        settings.posx = m_Viewport->Pos.x;
+        settings.posy = m_Viewport->Pos.y;
+        settings.decorated = (m_Viewport->Flags & ImGuiViewportFlags_NoDecoration) ? false : true;
 
-        Window *window = m_Application.GetPlatform().CreatePlatformWindow(settings);
+        Window *window = GetApp().GetPlatform().CreatePlatformWindow(settings);
+        SetWindow(window);
 
         std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
                                                              VK_PRESENT_MODE_IMMEDIATE_KHR,
@@ -1212,15 +1219,20 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
-        viewport->PlatformUserData = window;
-        viewport->PlatformHandle = static_cast<void *>(window->GetNativeWindow());
+        m_Viewport->PlatformUserData = window;
+        m_Viewport->PlatformHandle = static_cast<void *>(window->GetNativeWindow());
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        viewport->PlatformHandleRaw = glfwGetWin32Window(window->GetNativeWindow());
+        m_Viewport->PlatformHandleRaw = glfwGetWin32Window(window->GetNativeWindow());
 #endif
 
-        window->CreateSurface(m_Application.GetInstance(), m_Application.GetDevice().GetGPU());
-        window->CreateRenderContext(m_Application.GetDevice(), present_mode_priority, surface_format_priority);
+        window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
+        window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
         window->GetRenderContext().Prepare();
+    }
+
+    void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
+    {
+        m_Application.GetLayerStack().PushLayer(std::make_shared<GuiViewport>(&m_Application, viewport));
     }
 
     void Gui::ImGuiDestroyWindow(ImGuiViewport *viewport)
@@ -1351,25 +1363,6 @@ namespace engine
 #if 1 // HAS_WIN32_IME
         ENG_BIND_C_CALLBACK(platform_io.Platform_SetImeInputPos, Gui::ImGuiWin32SetImeInputPos, this)
 #endif
-        // Register main window handle (which is owned by the main application, not by us)
-        // This is mostly for simplicity and consistency, so that our code (e.g. mouse handling etc.) can use same logic for main and secondary viewports. */
-
-        /* platform_io.Platform_CreateWindow(main_viewport);
-        platform_io.Platform_DestroyWindow(main_viewport);
-        platform_io.Platform_ShowWindow(main_viewport);
-        platform_io.Platform_SetWindowPos(main_viewport, {0, 0});
-        platform_io.Platform_GetWindowPos(main_viewport);
-        platform_io.Platform_SetWindowSize(main_viewport, {0, 0});
-        platform_io.Platform_GetWindowSize(main_viewport);
-        platform_io.Platform_SetWindowFocus(main_viewport);
-        platform_io.Platform_GetWindowFocus(main_viewport);
-        platform_io.Platform_GetWindowMinimized(main_viewport);
-        platform_io.Platform_SetWindowTitle(main_viewport, "flick");
-        platform_io.Platform_RenderWindow(main_viewport, nullptr);
-        platform_io.Platform_SwapBuffers(main_viewport, nullptr);
-        platform_io.Platform_SetWindowAlpha(main_viewport, 0.0f);
-        platform_io.Platform_CreateVkSurface(main_viewport, 0, nullptr, 0);
-        platform_io.Platform_SetImeInputPos(main_viewport, {0, 0}); */
     }
 
     void Gui::ImGuiGlfwNewFrame(float delta_time)
@@ -1409,7 +1402,7 @@ namespace engine
         ImGui_ImplVulkan_Data *bd = ImGui::GetCurrentContext() ? (ImGui_ImplVulkan_Data *)ImGui::GetIO().BackendRendererUserData : NULL;
         ENG_ASSERT(bd != NULL);
         ImGui_ImplGlfw_NewFrame();
-        ImGuiGlfwNewFrame(delta_time);
+        //ImGuiGlfwNewFrame(delta_time);
         ImGui::NewFrame();
     }
 
@@ -1434,7 +1427,7 @@ namespace engine
         io.DisplaySize.y = static_cast<float>(height);
     }
 
-    void Gui::Draw(CommandBuffer &command_buffer)
+    void Gui::Draw(CommandBuffer &command_buffer, Window *platform_window)
     {
         // Vertex input state
         VkVertexInputBindingDescription vertex_input_binding{};
@@ -1493,8 +1486,22 @@ namespace engine
         // Pre-rotation
         auto &io = ImGui::GetIO();
         auto push_transform = glm::mat4(1.0f);
+        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
 
-        auto &swapchain = m_Window.GetRenderContext().GetSwapchain();
+        Window *window{nullptr};
+        ImDrawData *draw_data{nullptr};
+        for (int i = 0; i < platform_io.Viewports.Size; i++)
+        {
+            ImGuiViewport *viewport = platform_io.Viewports[i];
+            draw_data = viewport->DrawData;
+            void *window_handle = static_cast<Window *>(viewport->PlatformHandle);
+            window = &m_Application.GetPlatform().GetWindow(window_handle);
+
+            if (window->GetNativeWindow() == platform_window->GetNativeWindow())
+                break;
+        }
+
+        auto &swapchain = window->GetRenderContext().GetSwapchain();
 
         if (swapchain != nullptr)
         {
@@ -1521,7 +1528,7 @@ namespace engine
         // If a render context is used, then use the frames buffer pools to allocate GUI vertex/index data from
         if (!m_ExplicitUpdate)
         {
-            UpdateBuffers(command_buffer, m_Window.GetRenderContext().GetActiveFrame());
+            UpdateBuffers(command_buffer, window->GetRenderContext().GetActiveFrame());
         }
         else
         {
@@ -1532,18 +1539,7 @@ namespace engine
             command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
         }
 
-        // Render commands
-        ImDrawData *draw_data = ImGui::GetDrawData();
         Render(draw_data, swapchain.get(), command_buffer);
-
-        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
-        for (int i = 1; i < platform_io.Viewports.Size; i++)
-        {
-            ImGuiViewport *viewport = platform_io.Viewports[i];
-            ImDrawData *draw_data = viewport->DrawData;
-            // Render(draw_data, swapchain.get(), command_buffer);
-            Render(draw_data, m_Window.GetRenderContext().GetSwapchain().get(), command_buffer);
-        }
     }
 
     void Gui::Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer)

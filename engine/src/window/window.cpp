@@ -101,11 +101,14 @@ namespace engine
             // renders every window scene
             Layer *layer = layer_pair.second.get();
             Scene *scene = layer->GetScene();
+            if (!layer->IsInitialized())
+                continue;
+
             if (layer->GetWindow()->GetNativeWindow() == GetNativeWindow())
             {
                 if (scene)
                     scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
-                layer->Draw(command_buffer);
+                layer->Draw(command_buffer, this);
             }
         }
     }

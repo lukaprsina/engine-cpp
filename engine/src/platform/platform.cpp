@@ -101,6 +101,7 @@ namespace engine
         {
             Layer *layer = layer_pair.second.get();
             layer->OnAttach();
+            layer->m_Initialized = true;
         }
 
         return result;
