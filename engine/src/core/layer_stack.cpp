@@ -1,7 +1,8 @@
 #include "core/layer_stack.h"
 
 #include "core/application.h"
-#include "scene/scene.h" 
+#include "scene/scene.h"
+#include "platform/platform.h"
 
 namespace engine
 {
@@ -33,6 +34,13 @@ namespace engine
 				if (scene.get() == layer->GetScene())
 					scene.reset();
 			}
+		}
+
+		for (auto &window_pair : m_Application.GetPlatform().GetWindows())
+		{
+			Window *window = window_pair.second.get();
+			auto &vec = window->GetLayers();
+			vec.erase(std::remove(vec.begin(), vec.end(), layer), vec.end());
 		}
 
 		for (auto &layer_pair : m_Layers)

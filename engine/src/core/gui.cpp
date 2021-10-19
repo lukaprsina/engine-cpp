@@ -1195,10 +1195,10 @@ namespace engine
     void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
     {
         WindowSettings settings;
-        settings.width = viewport->Size.x;
-        settings.height = viewport->Size.y;
-        settings.posx = viewport->Pos.x;
-        settings.posy = viewport->Pos.y;
+        settings.width = static_cast<int32_t>(viewport->Size.x);
+        settings.height = static_cast<int32_t>(viewport->Size.y);
+        settings.posx = static_cast<int32_t>(viewport->Pos.x);
+        settings.posy = static_cast<int32_t>(viewport->Pos.y);
         settings.decorated = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? false : true;
 
         Window *window = m_Application.GetPlatform().CreatePlatformWindow(settings);
@@ -1215,7 +1215,7 @@ namespace engine
         viewport->PlatformUserData = window;
         viewport->PlatformHandle = static_cast<void *>(window->GetNativeWindow());
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        viewport->PlatformHandleRaw = glfwGetWin32Window(window->GetNativeWindow());
+        viewport->PlatformHandleRaw = glfwGetWin32Window(static_cast<GLFWwindow *>(window->GetNativeWindow()));
 #endif
 
         window->CreateSurface(m_Application.GetInstance(), m_Application.GetDevice().GetGPU());
@@ -1536,14 +1536,15 @@ namespace engine
         ImDrawData *draw_data = ImGui::GetDrawData();
         Render(draw_data, swapchain.get(), command_buffer);
 
-        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
+        /* ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
         for (int i = 1; i < platform_io.Viewports.Size; i++)
         {
             ImGuiViewport *viewport = platform_io.Viewports[i];
             ImDrawData *draw_data = viewport->DrawData;
+            Window *window = static_cast<Window *>(viewport->PlatformUserData);
             // Render(draw_data, swapchain.get(), command_buffer);
-            Render(draw_data, m_Window.GetRenderContext().GetSwapchain().get(), command_buffer);
-        }
+            Render(draw_data, window->GetRenderContext().GetSwapchain().get(), command_buffer);
+        } */
     }
 
     void Gui::Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer)
@@ -1596,6 +1597,7 @@ namespace engine
                     }
                 }
 
+                // TODO: crashes here
                 command_buffer.SetScissor(0, {scissor_rect});
                 command_buffer.DrawIndexed(cmd->ElemCount, 1, index_offset, vertex_offset, 0);
                 index_offset += cmd->ElemCount;

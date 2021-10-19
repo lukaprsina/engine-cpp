@@ -96,17 +96,13 @@ namespace engine
 
     void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target)
     {
-        for (auto &layer_pair : m_Platform.GetApp().GetLayerStack().GetLayers())
+        for (Layer *layer : m_Layers)
         {
-            // renders every window scene
-            Layer *layer = layer_pair.second.get();
             Scene *scene = layer->GetScene();
-            if (layer->GetWindow()->GetNativeWindow() == GetNativeWindow())
-            {
-                if (scene)
-                    scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
-                layer->Draw(command_buffer);
-            }
+
+            if (scene)
+                scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
+            layer->Draw(command_buffer);
         }
     }
 
