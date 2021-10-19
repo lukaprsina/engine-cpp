@@ -1,6 +1,7 @@
 #include "vulkan_api/subpasses/subpass.h"
 
 #include "vulkan_api/render_context.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/render_target.h"
 #include "scene/components/light.h"
 #include "core/layer.h"

@@ -26,7 +26,6 @@ namespace engine
 
     void ForwardSubpass::Prepare(Device &device)
     {
-
         auto view = m_Scene.GetRegistry().view<sg::Mesh>();
 
         for (auto &entity : view)
