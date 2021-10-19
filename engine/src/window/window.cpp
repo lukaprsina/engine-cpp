@@ -98,11 +98,13 @@ namespace engine
     {
         for (Layer *layer : m_Layers)
         {
+            if (!layer->IsInitialized())
+                continue;
             Scene *scene = layer->GetScene();
 
             if (scene)
                 scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
-            layer->Draw(command_buffer);
+            layer->Draw(command_buffer, this);
         }
     }
 

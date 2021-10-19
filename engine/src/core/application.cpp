@@ -150,6 +150,12 @@ namespace engine
         std::set<Scene *> scenes;
         for (auto &layer : m_LayerStack.GetLayers())
         {
+            if (!layer.second->IsInitialized())
+            {
+                layer.second->OnAttach();
+                layer.second->m_Initialized = true;
+            }
+
             layer.second->OnUpdate(delta_time);
             scenes.emplace(layer.second->GetScene());
         }
