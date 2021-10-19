@@ -6,8 +6,7 @@ namespace engine
 {
     GuiSubpass::GuiSubpass(ShaderSource &&vertex_shader,
                            ShaderSource &&fragment_shader,
-                           Scene &scene,
-                           Gui *gui)
+                           Scene &scene, Gui &gui)
         : Subpass(std::move(vertex_shader),
                   std::move(fragment_shader)),
           m_Scene(scene), m_Gui(gui)

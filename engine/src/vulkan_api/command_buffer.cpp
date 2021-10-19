@@ -2,6 +2,7 @@
 
 #include "vulkan_api/command_pool.h"
 #include "vulkan_api/subpasses/subpass.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/device.h"
 #include "vulkan_api/render_target.h"
 #include "vulkan_api/core/framebuffer.h"

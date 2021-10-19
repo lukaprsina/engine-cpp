@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vulkan_api/rendering/render_pipeline.h"
+
 ENG_DISABLE_WARNINGS()
 #include <entt/entt.hpp>
 ENG_ENABLE_WARNINGS()
@@ -39,6 +41,7 @@ namespace engine
 
         Entity CreateEntity();
         void CreateRenderPipeline(Device &device);
+        void SetRenderPipeline(std::unique_ptr<RenderPipeline> &&render_pipeline) { m_RenderPipeline = std::move(render_pipeline); }
 
         entt::registry &GetRegistry() { return m_Registry; }
 

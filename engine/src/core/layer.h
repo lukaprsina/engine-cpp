@@ -26,7 +26,6 @@ namespace engine
 		virtual void OnAttach() {}
 		virtual void OnDetach();
 		virtual void OnUpdate(float delta_time) {}
-		virtual void Draw(CommandBuffer &command_buffer, Window *window) {}
 		virtual void OnEvent(Event &event);
 		virtual bool OnWindowClose(WindowCloseEvent &event);
 		virtual bool OnResize(WindowResizeEvent &event);
@@ -50,8 +49,8 @@ namespace engine
 		friend class Platform;
 
 	private:
-		std::string m_Name{};
 		Application &m_Application;
+		std::string m_Name{};
 		Scene *m_Scene{};
 		Entity *m_Camera{};
 		Window *m_Window{};

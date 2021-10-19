@@ -41,6 +41,7 @@ namespace engine
         void Finish();
 
         Scene *LoadScene(std::string name);
+        Scene *LoadScene();
         void SetName(const std::string &name) { m_Name = name; }
         std::string GetName() const { return m_Name; }
 

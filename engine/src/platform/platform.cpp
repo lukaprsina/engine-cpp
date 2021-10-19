@@ -1,5 +1,6 @@
 #include "platform/platform.h"
 
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "events/event.h"
 #include "core/application.h"
 #include "scene/scene.h"

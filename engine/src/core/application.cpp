@@ -173,6 +173,13 @@ namespace engine
         ENG_CORE_INFO("Closing Application. (Runtime: {:.1f})", execution_time);
     }
 
+    Scene *Application::LoadScene()
+    {
+        auto scene = std::make_unique<Scene>();
+        m_Scenes.emplace_back(std::move(scene));
+        return m_Scenes.back().get();
+    }
+
     Scene *Application::LoadScene(std::string name)
     {
         GLTFLoader loader(*m_Device);

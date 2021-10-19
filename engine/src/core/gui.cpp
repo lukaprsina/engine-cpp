@@ -2,6 +2,7 @@
 
 #include "window/input.h"
 #include "platform/platform.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "window/glfw_window.h"
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/device.h"
@@ -9,6 +10,8 @@
 #include "vulkan_api/render_context.h"
 #include "vulkan_api/core/pipeline_layout.h"
 #include "renderer/shader.h"
+#include "scene/scene.h"
+#include "vulkan_api/subpasses/gui_subpass.h"
 #include "events/key_event.h"
 #include "vulkan_api/core/image.h"
 #include "vulkan_api/core/image_view.h"
@@ -1163,6 +1166,17 @@ namespace engine
         ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
+        SetScene(m_Application.LoadScene());
+        Scene *scene = GetScene();
+
+        auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
+                                                          std::move(frag_shader),
+                                                          *scene, *this);
+
+        auto render_pipeline = std::make_unique<RenderPipeline>(device);
+        render_pipeline->AddSubpass(std::move(scene_subpass));
+        scene->SetRenderPipeline(std::move(render_pipeline));
+
         std::vector<ShaderModule *> shader_modules;
         shader_modules.push_back(&device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vert_shader, {}));
         shader_modules.push_back(&device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, frag_shader, {}));
@@ -1177,7 +1191,7 @@ namespace engine
             m_IndexBuffer = std::make_unique<core::Buffer>(m_Window.GetRenderContext().GetDevice(), 1, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU);
         }
 
-        auto glfw_window = reinterpret_cast<GLFWwindow *>(m_Window.GetNativeWindow());
+        // auto glfw_window = reinterpret_cast<GLFWwindow *>(m_Window.GetNativeWindow());
         // ImGui_ImplGlfw_InitForVulkan(glfw_window, true);
         ImGuiInitGlfw();
     }
@@ -1369,7 +1383,7 @@ namespace engine
     {
         ImGuiIO &io = ImGui::GetIO();
         ImGui_ImplGlfw_Data *bd = ImGui_ImplGlfw_GetBackendData();
-        GLFWwindow *gltf_window = bd->Window;
+        // GLFWwindow *gltf_window = bd->Window;
         double current_time = glfwGetTime();
         io.DeltaTime = bd->Time > 0.0 ? (float)(current_time - bd->Time) : (float)(1.0f / 60.0f);
         bd->Time = current_time;

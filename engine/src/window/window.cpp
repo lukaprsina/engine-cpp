@@ -104,7 +104,6 @@ namespace engine
 
             if (scene)
                 scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
-            layer->Draw(command_buffer, this);
         }
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/shader.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/rendering/pipeline_state.h"
 #include "scene/components/light.h"
 #include "scene/components/transform.h"

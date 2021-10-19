@@ -1,6 +1,7 @@
 #include "window/glfw_window.h"
 
 #include "platform/platform.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/device.h"
 #include "scene/scene.h"
 #include "events/application_event.h"
@@ -178,7 +179,7 @@ namespace engine
 
         if (settings.posx != 0 && settings.posy != 0)
             glfwSetWindowPos(m_Handle, settings.posx, settings.posy);
-            
+
         glfwGetWindowPos(m_Handle, &settings.posx, &settings.posy);
 
         SetSettings(settings);

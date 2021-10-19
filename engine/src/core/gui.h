@@ -71,7 +71,7 @@ namespace engine
         void NewFrame(float delta_time);
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
-        void Draw(CommandBuffer &command_buffer, Window *window) override;
+        void Draw(CommandBuffer &command_buffer, Window *window);
         void Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer);
 
         void OnEvent(Event &event) override;

@@ -1,4 +1,6 @@
-set(ENGINE_SRC ${CMAKE_SOURCE_DIR}/engine/src  CACHE STRING "Engine source directory")
+set(ENGINE_SRC
+    ${CMAKE_SOURCE_DIR}/engine/src
+    CACHE STRING "Engine source directory")
 
 set(CORE_FILES
     # Header Files
@@ -26,8 +28,8 @@ set(COMMON_FILES
     ${ENGINE_SRC}/common/strings.cpp)
 
 set(EVENT_FILES # Header Files
-    ${ENGINE_SRC}/events/application_event.h ${ENGINE_SRC}/events/event.h ${ENGINE_SRC}/events/key_event.h
-    ${ENGINE_SRC}/events/mouse_event.h)
+    ${ENGINE_SRC}/events/application_event.h ${ENGINE_SRC}/events/event.h
+    ${ENGINE_SRC}/events/key_event.h ${ENGINE_SRC}/events/mouse_event.h)
 
 set(WINDOW_FILES
     # Header Files
@@ -49,13 +51,15 @@ set(WINDOWS_FILES
     # Header Files
     ${ENGINE_SRC}/platform/windows_platform.h
     # Source Files
-    ${ENGINE_SRC}/platform/windows_platform.cpp ${ENGINE_SRC}/window/glfw_input.cpp)
+    ${ENGINE_SRC}/platform/windows_platform.cpp
+    ${ENGINE_SRC}/window/glfw_input.cpp)
 
 set(UNIX_FILES
     # Header Files
     ${ENGINE_SRC}/platform/unix_platform.h
     # Source Files
-    ${ENGINE_SRC}/platform/unix_platform.cpp ${ENGINE_SRC}/window/glfw_input.cpp)
+    ${ENGINE_SRC}/platform/unix_platform.cpp
+    ${ENGINE_SRC}/window/glfw_input.cpp)
 
 set(VULKAN_API_FILES
     # Header files
@@ -122,6 +126,7 @@ set(VULKAN_API_FILES
     ${ENGINE_SRC}/core/layer.h
     ${ENGINE_SRC}/core/layer_stack.h
     ${ENGINE_SRC}/core/gui.h
+    ${ENGINE_SRC}/vulkan_api/subpasses/gui_subpass.h
     # Source files
     ${ENGINE_SRC}/vulkan_api/instance.cpp
     ${ENGINE_SRC}/vulkan_api/physical_device.cpp
@@ -185,10 +190,16 @@ set(VULKAN_API_FILES
     ${ENGINE_SRC}/core/layer_stack.cpp
     ${ENGINE_SRC}/entrypoint.cpp
     ${ENGINE_SRC}/core/gui.cpp
-)
+    ${ENGINE_SRC}/vulkan_api/subpasses/gui_subpass.cpp)
 
-list(APPEND ENG_PROJECT_FILES ${CORE_FILES} ${COMMON_FILES} ${WINDOW_FILES}
-                  ${PLATFORM_FILES} ${VULKAN_API_FILES})
+list(
+  APPEND
+  ENG_PROJECT_FILES
+  ${CORE_FILES}
+  ${COMMON_FILES}
+  ${WINDOW_FILES}
+  ${PLATFORM_FILES}
+  ${VULKAN_API_FILES})
 
 if(WIN32)
   list(APPEND ENG_PROJECT_FILES ${WINDOWS_FILES})
