@@ -20,6 +20,12 @@ namespace engine
         void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
                   VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 
+        std::vector<VkClearValue> &GetClearColor() { return m_ClearValue; }
+        void SetClearColor(std::vector<VkClearValue> &color) { m_ClearValue = color; }
+
+        std::vector<LoadStoreInfo> &GetLoadStore() { return m_LoadStore; }
+        void SetLoadStore(std::vector<LoadStoreInfo> &load_store) { m_LoadStore = load_store; }
+
     private:
         Device &m_Device;
         std::vector<std::unique_ptr<Subpass>> m_Subpasses{};

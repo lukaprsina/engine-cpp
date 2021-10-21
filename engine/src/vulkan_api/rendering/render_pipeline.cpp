@@ -43,7 +43,7 @@ namespace engine
             auto &subpass = m_Subpasses[i];
             subpass->UpdateRenderTargetAttachments(render_target);
 
-            if (i == 0)
+            if (m_ActiveSubpassIndex == 0)
                 command_buffer.BeginRenderPass(render_target, m_LoadStore, m_ClearValue, m_Subpasses, contents);
 
             else

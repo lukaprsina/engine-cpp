@@ -40,7 +40,7 @@ namespace engine
         virtual void ProcessEvents(){};
         virtual VkSurfaceKHR CreateSurface(Instance &instance, PhysicalDevice &physical_device) = 0;
         void Draw();
-        void Render(CommandBuffer &command_buffer, RenderTarget &render_target);
+        void Render(CommandBuffer &command_buffer, RenderTarget &render_target, Layer *layer);
         void SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const;
         virtual bool ShouldClose() const = 0;
         virtual void Destroy() = 0;
@@ -74,7 +74,7 @@ namespace engine
         std::unique_ptr<RenderContext> m_RenderContext{};
         std::vector<Scene *> m_Scenes{};
         std::vector<Layer *> m_Layers{};
-
+        std::vector<CommandBuffer *> m_CommandBuffers{};
         bool m_Dirty{false};
     };
 }

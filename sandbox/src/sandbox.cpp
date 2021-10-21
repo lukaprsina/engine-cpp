@@ -26,7 +26,6 @@ Game::Game(engine::Application *application, engine::Window *window, const std::
 
 void Game::OnAttach()
 {
-    engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
 
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -41,7 +40,6 @@ void Game::OnAttach()
     window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
     window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->CreateRenderPipeline(GetApp().GetDevice());
     AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
@@ -54,8 +52,6 @@ void Simple::OnAttach()
 {
     SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
     SetScene(GetApp().GetScenes()[1].get());
-
-    engine::Scene *scene = GetScene();
     engine::Window *window = GetWindow();
 
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -70,15 +66,16 @@ void Simple::OnAttach()
     window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
     window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
     window->GetRenderContext().Prepare();
-    scene->CreateRenderPipeline(GetApp().GetDevice());
     AddFreeCamera(window->GetRenderContext().GetSurfaceExtent(), window);
 }
 
 bool Sandbox::Prepare()
 {
     Application::Prepare();
-    LoadScene("scenes/cube.gltf");
-    LoadScene("scenes/planet.gltf");
+    engine::Scene *s1 = LoadScene("scenes/sponza/Sponza01.gltf");
+    engine::Scene *s2 = LoadScene("scenes/planet.gltf");
+    s1->CreateRenderPipeline(GetDevice());
+    s2->CreateRenderPipeline(GetDevice());
 
     engine::Window *main_window = GetPlatform().CreatePlatformWindow();
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -94,8 +91,8 @@ bool Sandbox::Prepare()
     main_window->CreateRenderContext(GetDevice(), present_mode_priority, surface_format_priority);
     main_window->GetRenderContext().Prepare();
 
-    GetLayerStack().PushLayer(std::make_shared<Game>(this, main_window, "Game"));
-    GetLayerStack().PushLayer(std::make_shared<Simple>(this, "Cube"));
+    GetLayerStack().PushLayer(std::make_shared<Game>(this, main_window, "first"));
+    GetLayerStack().PushLayer(std::make_shared<Simple>(this, "second"));
     GetLayerStack().PushLayer(std::make_shared<engine::Gui>(this, main_window));
     return true;
 }

@@ -504,7 +504,7 @@ namespace engine
         // Clear stored push constants
         m_StoredPushConstants.clear();
 
-        vkCmdNextSubpass(GetHandle(), VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdNextSubpass(m_Handle, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     VkResult CommandBuffer::Reset(ResetMode reset_mode)

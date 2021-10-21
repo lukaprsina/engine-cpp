@@ -18,6 +18,7 @@ namespace engine
     class RenderFrame;
     class Swapchain;
     class RenderContext;
+    class Gui;
 
     namespace core
     {
@@ -51,11 +52,13 @@ namespace engine
     class GuiViewport : public Layer
     {
     public:
-        GuiViewport(Application *application, ImGuiViewport *viewport);
+        GuiViewport(Application *application, Gui &gui, /* RenderPipeline *render_pipeline */ ImGuiViewport *viewport);
         void OnAttach() override;
 
     private:
         ImGuiViewport *m_Viewport{};
+        Gui &m_Gui;
+        // RenderPipeline *m_RenderPipeline;
         static int32_t s_Counter;
     };
 

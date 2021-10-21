@@ -1177,6 +1177,14 @@ namespace engine
         render_pipeline->AddSubpass(std::move(scene_subpass));
         scene->SetRenderPipeline(std::move(render_pipeline));
 
+        auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
+        clear_color[0].color = {0.0f, 0.0f, 0.0f, 0.0f};
+        scene->GetRenderPipeline()->SetClearColor(clear_color);
+
+        auto &load_store = scene->GetRenderPipeline()->GetLoadStore();
+        load_store[0].load_op = VK_ATTACHMENT_LOAD_OP_LOAD;
+        scene->GetRenderPipeline()->SetLoadStore(load_store);
+
         std::vector<ShaderModule *> shader_modules;
         shader_modules.push_back(&device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vert_shader, {}));
         shader_modules.push_back(&device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, frag_shader, {}));
@@ -1207,8 +1215,9 @@ namespace engine
         ImGui::DestroyContext();
     }
 
-    GuiViewport::GuiViewport(Application *application, ImGuiViewport *viewport)
-        : Layer(application, std::string("Gui ", s_Counter++)), m_Viewport(viewport)
+    GuiViewport::GuiViewport(Application *application, Gui &gui, /* RenderPipeline *render_pipeline */ ImGuiViewport *viewport)
+        : Layer(application, std::string("Gui ", s_Counter++)),
+          m_Viewport(viewport), m_Gui(gui) /* , m_RenderPipeline(render_pipeline) */
     {
     }
 
@@ -1242,11 +1251,25 @@ namespace engine
         window->CreateSurface(GetApp().GetInstance(), GetApp().GetDevice().GetGPU());
         window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
         window->GetRenderContext().Prepare();
+
+        ShaderSource vert_shader("imgui.vert");
+        ShaderSource frag_shader("imgui.frag");
+
+        SetScene(GetApp().LoadScene());
+        Scene *scene = GetScene();
+
+        auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
+                                                          std::move(frag_shader),
+                                                          *scene, m_Gui);
+
+        auto render_pipeline = std::make_unique<RenderPipeline>(GetApp().GetDevice());
+        render_pipeline->AddSubpass(std::move(scene_subpass));
+        scene->SetRenderPipeline(std::move(render_pipeline));
     }
 
     void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
     {
-        m_Application.GetLayerStack().PushLayer(std::make_shared<GuiViewport>(&m_Application, viewport));
+        m_Application.GetLayerStack().PushLayer(std::make_shared<GuiViewport>(&m_Application, *this, /* GetScene()->GetRenderPipeline(), */ viewport));
     }
 
     void Gui::ImGuiDestroyWindow(ImGuiViewport *viewport)

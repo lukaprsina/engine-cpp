@@ -23,5 +23,6 @@ namespace engine
 
     void GuiSubpass::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer)
     {
+        m_Gui.Draw(command_buffer, layer.GetWindow());
     }
 }

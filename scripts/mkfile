@@ -1,6 +1,8 @@
 #!/bin/bash
 
-project_path="/home/luka/dev/c++/engine/engine"
+project_path=$(pwd)/engine
+echo ${project_path}
+# project_path="/home/luka/dev/c++/engine/engine"
 source_folder="src"
 
 read_filename()
@@ -13,7 +15,7 @@ read_filename()
     if [ -d "$full_path" ]; then
         valid_path=true
     else
-        echo "Directory ${path} not found!"
+        echo "Directory ${project_path}/${source_folder}/${path} not found!"
     fi    
 }
 

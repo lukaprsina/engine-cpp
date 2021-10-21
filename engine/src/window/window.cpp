@@ -36,75 +36,78 @@ namespace engine
 
     void Window::Draw()
     {
-        auto &command_buffer = m_RenderContext->Begin();
-        command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
-
-        {
-            // Image 0 is the swapchain
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-
-            // Skip 1 as it is handled later as a depth-stencil attachment
-            for (size_t i = 2; i < views.size(); ++i)
-            {
-                command_buffer.CreateImageMemoryBarrier(views.at(i), memory_barrier);
-            }
-        }
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-            memory_barrier.src_access_mask = 0;
-            memory_barrier.dst_access_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
-        }
-
-        auto &render_target = m_RenderContext->GetActiveFrame().GetRenderTarget();
-        SetViewportAndScissor(command_buffer,
-                              render_target.GetExtent());
-
-        Render(command_buffer, render_target);
-
-        command_buffer.EndRenderPass();
-
-        {
-            ImageMemoryBarrier memory_barrier{};
-            memory_barrier.old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            memory_barrier.new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-            memory_barrier.src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-            memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-            memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-
-            command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
-        }
-
-        command_buffer.End();
-        m_RenderContext->Submit(command_buffer);
-    }
-
-    void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target)
-    {
         for (Layer *layer : m_Layers)
         {
             if (!layer->IsInitialized())
                 continue;
-            Scene *scene = layer->GetScene();
 
-            if (scene)
-                scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
+            auto &command_buffer = m_RenderContext->Begin();
+            command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+            auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
+
+            {
+                // Image 0 is the swapchain
+                ImageMemoryBarrier memory_barrier{};
+                memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+                memory_barrier.new_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                memory_barrier.src_access_mask = 0;
+                memory_barrier.dst_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+                command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
+
+                // Skip 1 as it is handled later as a depth-stencil attachment
+                for (size_t i = 2; i < views.size(); ++i)
+                {
+                    command_buffer.CreateImageMemoryBarrier(views.at(i), memory_barrier);
+                }
+            }
+
+            {
+                ImageMemoryBarrier memory_barrier{};
+                memory_barrier.old_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+                memory_barrier.new_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+                memory_barrier.src_access_mask = 0;
+                memory_barrier.dst_access_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+                memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+
+                command_buffer.CreateImageMemoryBarrier(views.at(1), memory_barrier);
+            }
+
+            auto &render_target = m_RenderContext->GetActiveFrame().GetRenderTarget();
+            SetViewportAndScissor(command_buffer,
+                                  render_target.GetExtent());
+
+            Render(command_buffer, render_target, layer);
+
+            command_buffer.EndRenderPass();
+
+            {
+                ImageMemoryBarrier memory_barrier{};
+                memory_barrier.old_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                memory_barrier.new_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+                memory_barrier.src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+                memory_barrier.src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                memory_barrier.dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+                command_buffer.CreateImageMemoryBarrier(views.at(0), memory_barrier);
+            }
+
+            command_buffer.End();
+            m_CommandBuffers.emplace_back(&command_buffer);
         }
+        m_RenderContext->Submit(m_CommandBuffers);
+        m_CommandBuffers.clear();
+    }
+
+    void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target, Layer *layer)
+    {
+        Scene *scene = layer->GetScene();
+
+        if (scene)
+            scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
     }
 
     void Window::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const

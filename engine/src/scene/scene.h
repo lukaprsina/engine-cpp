@@ -42,6 +42,7 @@ namespace engine
         Entity CreateEntity();
         void CreateRenderPipeline(Device &device);
         void SetRenderPipeline(std::unique_ptr<RenderPipeline> &&render_pipeline) { m_RenderPipeline = std::move(render_pipeline); }
+        RenderPipeline *GetRenderPipeline() { return m_RenderPipeline.get(); }
 
         entt::registry &GetRegistry() { return m_Registry; }
 
