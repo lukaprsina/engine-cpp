@@ -1,7 +1,5 @@
 #pragma once
 
-#include "vulkan_api/rendering/render_pipeline.h"
-
 ENG_DISABLE_WARNINGS()
 #include <entt/entt.hpp>
 ENG_ENABLE_WARNINGS()
@@ -36,14 +34,7 @@ namespace engine
         ~Scene();
 
         void Update(float delta_time);
-        void Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
-                  VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
-
         Entity CreateEntity();
-        void CreateRenderPipeline(Device &device);
-        void SetRenderPipeline(std::unique_ptr<RenderPipeline> &&render_pipeline) { m_RenderPipeline = std::move(render_pipeline); }
-        RenderPipeline *GetRenderPipeline() { return m_RenderPipeline.get(); }
-
         entt::registry &GetRegistry() { return m_Registry; }
 
         std::vector<std::unique_ptr<Entity>> &GetLights() { return m_Lights; }
@@ -67,6 +58,5 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> m_Meshes;
         std::vector<std::unique_ptr<Entity>> m_Cameras;
         std::vector<std::unique_ptr<sg::Submesh>> m_Submeshes;
-        std::unique_ptr<RenderPipeline> m_RenderPipeline{};
     };
 }

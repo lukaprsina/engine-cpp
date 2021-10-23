@@ -16,6 +16,7 @@ namespace engine
     class Device;
     class Scene;
     class RenderTarget;
+    class RenderPipeline;
     class CommandBuffer;
     class Gui;
 
@@ -50,6 +51,7 @@ namespace engine
         Device &GetDevice() { return *m_Device; }
         LayerStack &GetLayerStack() { return m_LayerStack; }
         std::vector<std::unique_ptr<Scene>> &GetScenes() { return m_Scenes; }
+        std::vector<std::unique_ptr<RenderPipeline>> &GetRenderPipelines() { return m_RenderPipelines; }
 
         void SetUsage(const std::string &usage) { m_Usage = usage; }
         std::string GetUsage() { return m_Usage; }
@@ -82,6 +84,7 @@ namespace engine
         std::unique_ptr<Instance> m_Instance{};
         std::unique_ptr<Device> m_Device{};
         std::vector<std::unique_ptr<Scene>> m_Scenes{};
+        std::vector<std::unique_ptr<RenderPipeline>> m_RenderPipelines{};
 
         std::unordered_map<const char *, bool> m_DeviceExtensions{};
         std::unordered_map<const char *, bool> m_InstanceExtensions{};

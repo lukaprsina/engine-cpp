@@ -43,27 +43,6 @@ namespace engine
         }
     }
 
-    void Scene::CreateRenderPipeline(Device &device)
-    {
-        ShaderSource vert_shader("base.vert");
-        ShaderSource frag_shader("base.frag");
-
-        auto scene_subpass = std::make_unique<ForwardSubpass>(std::move(vert_shader),
-                                                              std::move(frag_shader),
-                                                              *this);
-
-        m_RenderPipeline = std::make_unique<RenderPipeline>(device);
-        m_RenderPipeline->AddSubpass(std::move(scene_subpass));
-    }
-
-    void Scene::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer, RenderTarget &render_target,
-                     VkSubpassContents contents)
-    {
-        if (m_RenderPipeline)
-            m_RenderPipeline->Draw(render_context, layer, command_buffer,
-                                   render_target);
-    }
-
     Entity Scene::CreateEntity()
     {
         Entity entity{m_Registry.create(), this};

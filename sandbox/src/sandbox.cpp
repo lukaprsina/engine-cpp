@@ -2,14 +2,14 @@
 
 #include "core/log.h"
 #include "vulkan_api/render_context.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 #include "vulkan_api/device.h"
 #include "renderer/shader.h"
 #include "scene/gltf_loader.h"
-#include "vulkan_api/rendering/render_pipeline.h"
 #include "scene/scene.h"
+#include "renderer/shader.h"
 #include "window/glfw_window.h"
 #include "vulkan_api/subpasses/forward_subpass.h"
-#include "vulkan_api/rendering/render_pipeline.h"
 #include "core/gui.h"
 
 Sandbox::Sandbox(engine::Platform *platform)
@@ -22,6 +22,7 @@ Game::Game(engine::Application *application, engine::Window *window, const std::
 {
     SetWindow(window);
     SetScene(GetApp().GetScenes()[0].get());
+    SetRenderPipeline(GetApp().GetRenderPipelines()[0].get());
 }
 
 void Game::OnAttach()
@@ -46,12 +47,13 @@ void Game::OnAttach()
 Simple::Simple(engine::Application *application, const std::string &name)
     : Layer(application, name)
 {
+    SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
+    SetScene(GetApp().GetScenes()[1].get());
+    SetRenderPipeline(GetApp().GetRenderPipelines()[0].get());
 }
 
 void Simple::OnAttach()
 {
-    SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
-    SetScene(GetApp().GetScenes()[1].get());
     engine::Window *window = GetWindow();
 
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -74,8 +76,17 @@ bool Sandbox::Prepare()
     Application::Prepare();
     engine::Scene *s1 = LoadScene("scenes/sponza/Sponza01.gltf");
     engine::Scene *s2 = LoadScene("scenes/planet.gltf");
-    s1->CreateRenderPipeline(GetDevice());
-    s2->CreateRenderPipeline(GetDevice());
+
+    engine::ShaderSource vert_shader("base.vert");
+    engine::ShaderSource frag_shader("base.frag");
+
+    auto scene_subpass = std::make_unique<engine::ForwardSubpass>(std::move(vert_shader),
+                                                                  std::move(frag_shader),
+                                                                  *s1);
+
+    auto render_pipeline = std::make_unique<engine::RenderPipeline>(GetDevice());
+    render_pipeline->AddSubpass(std::move(scene_subpass));
+    GetRenderPipelines().emplace_back(std::move(render_pipeline));
 
     engine::Window *main_window = GetPlatform().CreatePlatformWindow();
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -93,6 +104,6 @@ bool Sandbox::Prepare()
 
     GetLayerStack().PushLayer(std::make_shared<Game>(this, main_window, "first"));
     GetLayerStack().PushLayer(std::make_shared<Simple>(this, "second"));
-    GetLayerStack().PushLayer(std::make_shared<engine::Gui>(this, main_window));
+    // GetLayerStack().PushLayer(std::make_shared<engine::Gui>(this, main_window));
     return true;
 }

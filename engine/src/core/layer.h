@@ -1,6 +1,7 @@
 #pragma once
 
 #include "events/event.h"
+#include "vulkan_api/rendering/render_pipeline.h"
 
 namespace engine
 {
@@ -37,11 +38,14 @@ namespace engine
 		void SetScene(Scene *scene);
 		Scene *GetScene() { return m_Scene; }
 
-		void SetWindow(Window *Window);
+		void SetWindow(Window *window);
 		Window *GetWindow() { return m_Window; }
 
-		void SetCamera(Entity *Camera);
+		void SetCamera(Entity *camera) { m_Camera = camera; }
 		Entity *GetCamera() { return m_Camera; }
+
+		void SetRenderPipeline(RenderPipeline *render_pipeline) { m_RenderPipeline = render_pipeline; }
+		RenderPipeline *GetRenderPipeline() { return m_RenderPipeline; }
 
 		bool IsInitialized() { return m_Initialized; }
 
@@ -54,6 +58,7 @@ namespace engine
 		Scene *m_Scene{};
 		Entity *m_Camera{};
 		Window *m_Window{};
+		RenderPipeline *m_RenderPipeline{};
 
 		bool m_Initialized{false};
 	};

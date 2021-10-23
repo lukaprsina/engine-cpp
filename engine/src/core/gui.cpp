@@ -1166,7 +1166,7 @@ namespace engine
         ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
-        SetScene(m_Application.LoadScene());
+        /* SetScene(m_Application.LoadScene());
         Scene *scene = GetScene();
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
@@ -1183,7 +1183,7 @@ namespace engine
 
         auto &load_store = scene->GetRenderPipeline()->GetLoadStore();
         load_store[0].load_op = VK_ATTACHMENT_LOAD_OP_LOAD;
-        scene->GetRenderPipeline()->SetLoadStore(load_store);
+        scene->GetRenderPipeline()->SetLoadStore(load_store); */
 
         std::vector<ShaderModule *> shader_modules;
         shader_modules.push_back(&device.GetResourceCache().RequestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vert_shader, {}));
@@ -1252,7 +1252,7 @@ namespace engine
         window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
         window->GetRenderContext().Prepare();
 
-        ShaderSource vert_shader("imgui.vert");
+        /* ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
         SetScene(GetApp().LoadScene());
@@ -1264,7 +1264,7 @@ namespace engine
 
         auto render_pipeline = std::make_unique<RenderPipeline>(GetApp().GetDevice());
         render_pipeline->AddSubpass(std::move(scene_subpass));
-        scene->SetRenderPipeline(std::move(render_pipeline));
+        scene->SetRenderPipeline(std::move(render_pipeline)); */
     }
 
     void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)

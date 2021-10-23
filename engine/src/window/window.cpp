@@ -105,9 +105,7 @@ namespace engine
     void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target, Layer *layer)
     {
         Scene *scene = layer->GetScene();
-
-        if (scene)
-            scene->Draw(*m_RenderContext, *layer, command_buffer, render_target);
+        layer->GetRenderPipeline()->Draw(*m_RenderContext, *layer, command_buffer, render_target);
     }
 
     void Window::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const
