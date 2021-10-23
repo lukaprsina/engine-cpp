@@ -1166,7 +1166,7 @@ namespace engine
         ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
-        /* SetScene(m_Application.LoadScene());
+        SetScene(m_Application.LoadScene());
         Scene *scene = GetScene();
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
@@ -1175,9 +1175,10 @@ namespace engine
 
         auto render_pipeline = std::make_unique<RenderPipeline>(device);
         render_pipeline->AddSubpass(std::move(scene_subpass));
-        scene->SetRenderPipeline(std::move(render_pipeline));
+        scene->GetRenderPipelines().emplace_back(std::move(render_pipeline));
+        SetRenderPipeline(GetScene()->GetRenderPipelines().back().get());
 
-        auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
+        /* auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
         clear_color[0].color = {0.0f, 0.0f, 0.0f, 0.0f};
         scene->GetRenderPipeline()->SetClearColor(clear_color);
 
@@ -1252,11 +1253,11 @@ namespace engine
         window->CreateRenderContext(GetApp().GetDevice(), present_mode_priority, surface_format_priority);
         window->GetRenderContext().Prepare();
 
-        /* ShaderSource vert_shader("imgui.vert");
-        ShaderSource frag_shader("imgui.frag");
+        Scene *scene = GetApp().LoadScene();
+        SetScene(scene);
 
-        SetScene(GetApp().LoadScene());
-        Scene *scene = GetScene();
+        ShaderSource vert_shader("imgui.vert");
+        ShaderSource frag_shader("imgui.frag");
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
                                                           std::move(frag_shader),
@@ -1264,7 +1265,8 @@ namespace engine
 
         auto render_pipeline = std::make_unique<RenderPipeline>(GetApp().GetDevice());
         render_pipeline->AddSubpass(std::move(scene_subpass));
-        scene->SetRenderPipeline(std::move(render_pipeline)); */
+        scene->GetRenderPipelines().emplace_back(std::move(render_pipeline));
+        SetRenderPipeline(GetScene()->GetRenderPipelines().back().get());
     }
 
     void Gui::ImGuiCreateWindow(ImGuiViewport *viewport)
