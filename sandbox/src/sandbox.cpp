@@ -22,7 +22,7 @@ Game::Game(engine::Application *application, engine::Window *window, const std::
 {
     SetWindow(window);
     SetScene(GetApp().GetScenes()[0].get());
-    SetRenderPipeline(GetApp().GetRenderPipelines()[0].get());
+    SetRenderPipeline(GetScene()->GetRenderPipelines()[0].get());
 }
 
 void Game::OnAttach()
@@ -49,7 +49,7 @@ Simple::Simple(engine::Application *application, const std::string &name)
 {
     SetWindow(GetApp().GetPlatform().CreatePlatformWindow());
     SetScene(GetApp().GetScenes()[1].get());
-    SetRenderPipeline(GetApp().GetRenderPipelines()[0].get());
+    SetRenderPipeline(GetScene()->GetRenderPipelines()[0].get());
 }
 
 void Simple::OnAttach()
@@ -86,7 +86,8 @@ bool Sandbox::Prepare()
 
     auto render_pipeline = std::make_unique<engine::RenderPipeline>(GetDevice());
     render_pipeline->AddSubpass(std::move(scene_subpass));
-    GetRenderPipelines().emplace_back(std::move(render_pipeline));
+    s1->GetRenderPipelines().emplace_back(std::move(render_pipeline));
+    s2->GetRenderPipelines().emplace_back(std::move(render_pipeline));
 
     engine::Window *main_window = GetPlatform().CreatePlatformWindow();
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,

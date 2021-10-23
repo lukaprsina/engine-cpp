@@ -11,6 +11,7 @@ namespace engine
     class RenderPipeline;
     class Device;
     class RenderContext;
+    class RenderPipeline;
     class CommandBuffer;
     class RenderTarget;
     class Layer;
@@ -45,6 +46,7 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> &GetMeshes() { return m_Meshes; }
         std::vector<std::unique_ptr<Entity>> &GetCameras() { return m_Cameras; }
         std::vector<std::unique_ptr<sg::Submesh>> &GetSubmeshes() { return m_Submeshes; }
+        std::vector<std::unique_ptr<RenderPipeline>> &GetRenderPipelines() { return m_RenderPipelines; }
 
     private:
         std::string m_Name{"Unnamed scene"};
@@ -58,5 +60,6 @@ namespace engine
         std::vector<std::unique_ptr<Entity>> m_Meshes;
         std::vector<std::unique_ptr<Entity>> m_Cameras;
         std::vector<std::unique_ptr<sg::Submesh>> m_Submeshes;
+        std::vector<std::unique_ptr<RenderPipeline>> m_RenderPipelines;
     };
 }
