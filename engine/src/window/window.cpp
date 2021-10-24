@@ -36,11 +36,15 @@ namespace engine
 
     void Window::Draw()
     {
+        bool dirty = false;
         for (Layer *layer : m_Layers)
         {
-            if (!layer->IsInitialized())
+            Scene *scene = layer->GetScene();
+            RenderPipeline *pipeline = layer->GetRenderPipeline();
+            if (!layer->IsInitialized() || !scene || !pipeline)
                 continue;
 
+            dirty = true;
             auto &command_buffer = m_RenderContext->Begin();
             command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
             auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
@@ -98,14 +102,18 @@ namespace engine
             command_buffer.End();
             m_CommandBuffers.emplace_back(&command_buffer);
         }
-        m_RenderContext->Submit(m_CommandBuffers);
+        if (dirty)
+            m_RenderContext->Submit(m_CommandBuffers);
         m_CommandBuffers.clear();
     }
 
     void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target, Layer *layer)
     {
         Scene *scene = layer->GetScene();
-        layer->GetRenderPipeline()->Draw(*m_RenderContext, *layer, command_buffer, render_target);
+        RenderPipeline *pipeline = layer->GetRenderPipeline();
+
+        if (pipeline)
+            pipeline->Draw(*m_RenderContext, *layer, command_buffer, render_target);
     }
 
     void Window::SetViewportAndScissor(CommandBuffer &command_buffer, const VkExtent2D &extent) const
