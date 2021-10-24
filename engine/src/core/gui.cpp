@@ -1166,7 +1166,7 @@ namespace engine
         ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
-        SetScene(m_Application.LoadScene());
+        /* SetScene(m_Application.LoadScene());
         Scene *scene = GetScene();
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
@@ -1175,10 +1175,9 @@ namespace engine
 
         auto render_pipeline = std::make_unique<RenderPipeline>(device);
         render_pipeline->AddSubpass(std::move(scene_subpass));
-        scene->GetRenderPipelines().emplace_back(std::move(render_pipeline));
-        SetRenderPipeline(GetScene()->GetRenderPipelines().back().get());
+        scene->SetRenderPipeline(std::move(render_pipeline));
 
-        /* auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
+        auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
         clear_color[0].color = {0.0f, 0.0f, 0.0f, 0.0f};
         scene->GetRenderPipeline()->SetClearColor(clear_color);
 
@@ -1243,6 +1242,7 @@ namespace engine
                                                                  {VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
                                                                  {VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR}});
 
+        // TODO: doesn't register
         m_Viewport->PlatformUserData = window;
         m_Viewport->PlatformHandle = static_cast<void *>(window->GetNativeWindow());
 #ifdef VK_USE_PLATFORM_WIN32_KHR
@@ -1534,57 +1534,58 @@ namespace engine
             ImGuiViewport *viewport = platform_io.Viewports[i];
             draw_data = viewport->DrawData;
             void *window_handle = static_cast<Window *>(viewport->PlatformHandle);
+            if (!window_handle)
+                continue;
+
             window = &m_Application.GetPlatform().GetWindow(window_handle);
 
-            if (window->GetNativeWindow() == platform_window->GetNativeWindow())
-                break;
-        }
+            auto &swapchain = window->GetRenderContext().GetSwapchain();
 
-        auto &swapchain = window->GetRenderContext().GetSwapchain();
+            if (swapchain != nullptr)
+            {
+                auto &transform = swapchain->GetProperties().pre_transform;
 
-        if (swapchain != nullptr)
-        {
-            auto &transform = swapchain->GetProperties().pre_transform;
+                glm::vec3 rotation_axis = glm::vec3(0.0f, 0.0f, 1.0f);
+                if (transform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
+                    push_transform = glm::rotate(push_transform, glm::radians(90.0f), rotation_axis);
 
-            glm::vec3 rotation_axis = glm::vec3(0.0f, 0.0f, 1.0f);
-            if (transform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
-                push_transform = glm::rotate(push_transform, glm::radians(90.0f), rotation_axis);
+                else if (transform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
+                    push_transform = glm::rotate(push_transform, glm::radians(270.0f), rotation_axis);
 
-            else if (transform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
-                push_transform = glm::rotate(push_transform, glm::radians(270.0f), rotation_axis);
+                else if (transform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
+                    push_transform = glm::rotate(push_transform, glm::radians(180.0f), rotation_axis);
+            }
 
-            else if (transform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
-                push_transform = glm::rotate(push_transform, glm::radians(180.0f), rotation_axis);
-        }
+            // GUI coordinate space to screen space
+            push_transform = glm::translate(push_transform, glm::vec3(-1.0f, -1.0f, 0.0f));
+            push_transform = glm::scale(push_transform, glm::vec3(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y, 0.0f));
 
-        // GUI coordinate space to screen space
-        push_transform = glm::translate(push_transform, glm::vec3(-1.0f, -1.0f, 0.0f));
-        push_transform = glm::scale(push_transform, glm::vec3(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y, 0.0f));
+            // Push constants
+            command_buffer.PushConstants(push_transform);
 
-        // Push constants
-        command_buffer.PushConstants(push_transform);
+            // If a render context is used, then use the frames buffer pools to allocate GUI vertex/index data from
+            if (!m_ExplicitUpdate)
+            {
+                // TODO: revert to previous commit
+                UpdateBuffers(command_buffer, window->GetRenderContext().GetActiveFrame());
+            }
+            else
+            {
+                std::vector<std::reference_wrapper<const core::Buffer>> buffers;
+                buffers.push_back(*m_VertexBuffer);
+                command_buffer.BindVertexBuffers(0, buffers, {0});
 
-        // If a render context is used, then use the frames buffer pools to allocate GUI vertex/index data from
-        if (!m_ExplicitUpdate)
-        {
-            UpdateBuffers(command_buffer, window->GetRenderContext().GetActiveFrame());
-        }
-        else
-        {
-            std::vector<std::reference_wrapper<const core::Buffer>> buffers;
-            buffers.push_back(*m_VertexBuffer);
-            command_buffer.BindVertexBuffers(0, buffers, {0});
+                command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+            }
 
-            command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+            Render(draw_data, swapchain.get(), command_buffer);
         }
 
         int32_t vertex_offset = 0;
         uint32_t index_offset = 0;
 
         if (!draw_data || draw_data->CmdListsCount == 0)
-        {
             return;
-        }
 
         for (int32_t i = 0; i < draw_data->CmdListsCount; i++)
         {
