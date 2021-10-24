@@ -31,7 +31,7 @@ namespace engine
 
         virtual Window *CreatePlatformWindow(WindowSettings settings = WindowSettings()) = 0;
         Window &GetWindow(void *handle) { return *m_Windows.at(handle); }
-        std::unordered_map<void *, std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
+        std::map<void *, std::unique_ptr<Window>> &GetWindows() { return m_Windows; }
         Application &GetApp() const { return *m_App; }
         virtual const char *GetSurfaceExtension() = 0;
 
@@ -50,7 +50,7 @@ namespace engine
     protected:
         std::string m_Name{};
         std::unique_ptr<Application> m_App{};
-        std::unordered_map<void *, std::unique_ptr<Window>> m_Windows{};
+        std::map<void *, std::unique_ptr<Window>> m_Windows{};
         std::vector<void *> m_ClosedWindows{};
         std::vector<Layer *> m_Layers;
         Timer m_Timer{};

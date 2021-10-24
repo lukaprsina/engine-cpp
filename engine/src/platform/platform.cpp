@@ -116,9 +116,9 @@ namespace engine
         {
             m_App->Step();
 
-            for (auto &window_pair : m_Windows)
+            for (auto i = m_Windows.rbegin(); i != m_Windows.rend(); i++)
             {
-                auto &window = window_pair.second;
+                auto &window = (*i).second;
                 window->Draw();
                 window->ProcessEvents();
             }

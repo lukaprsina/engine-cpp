@@ -74,7 +74,7 @@ void Simple::OnAttach()
 bool Sandbox::Prepare()
 {
     Application::Prepare();
-    engine::Scene *s1 = LoadScene("scenes/sponza/Sponza01.gltf");
+    /* engine::Scene *s1 = LoadScene("scenes/sponza/Sponza01.gltf");
     engine::Scene *s2 = LoadScene("scenes/planet.gltf");
 
     {
@@ -100,7 +100,7 @@ bool Sandbox::Prepare()
         auto render_pipeline = std::make_unique<engine::RenderPipeline>(GetDevice());
         render_pipeline->AddSubpass(std::move(scene_subpass));
         s2->GetRenderPipelines().emplace_back(std::move(render_pipeline));
-    }
+    } */
 
     engine::Window *main_window = GetPlatform().CreatePlatformWindow();
     std::vector<VkPresentModeKHR> present_mode_priority({VK_PRESENT_MODE_FIFO_KHR,
@@ -116,8 +116,8 @@ bool Sandbox::Prepare()
     main_window->CreateRenderContext(GetDevice(), present_mode_priority, surface_format_priority);
     main_window->GetRenderContext().Prepare();
 
-    GetLayerStack().PushLayer(std::make_shared<Game>(this, main_window, "first"));
-    GetLayerStack().PushLayer(std::make_shared<Simple>(this, "second"));
+    // GetLayerStack().PushLayer(std::make_shared<Game>(this, main_window, "first"));
+    // GetLayerStack().PushLayer(std::make_shared<Simple>(this, "second"));
     GetLayerStack().PushLayer(std::make_shared<engine::Gui>(this, main_window));
     return true;
 }

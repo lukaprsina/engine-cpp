@@ -36,8 +36,9 @@ namespace engine
 
     void Window::Draw()
     {
-        for (Layer *layer : m_Layers)
+        for (auto i = m_Layers.rbegin(); i != m_Layers.rend(); i++)
         {
+            Layer *layer = *i;
             if (!layer->IsInitialized())
                 continue;
 
@@ -104,7 +105,6 @@ namespace engine
 
     void Window::Render(CommandBuffer &command_buffer, RenderTarget &render_target, Layer *layer)
     {
-        Scene *scene = layer->GetScene();
         layer->GetRenderPipeline()->Draw(*m_RenderContext, *layer, command_buffer, render_target);
     }
 

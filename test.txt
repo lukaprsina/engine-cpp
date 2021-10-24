@@ -1,0 +1,47 @@
+FrameRender(wd, ImGui::GetDrawData());
+    vkAcquireNextImageKHR
+    vkWaitForFences
+    vkResetFences
+    vkResetCommandPool
+    vkBeginCommandBuffer
+    vkCmdBeginRenderPass
+    ImGui_ImplVulkanH_Frame *fd = &wd->Frames[wd->FrameIndex];
+    ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+        ImGui_ImplVulkan_SetupRenderState
+            vkCmdBindPipeline
+            vkCmdBindDescriptorSets
+            vkCmdBindVertexBuffers
+            vkCmdBindIndexBuffer
+            vkCmdSetViewport
+            vkCmdPushConstants
+            vkCmdPushConstants
+    vkCmdEndRenderPass
+    vkEndCommandBuffer
+    vkQueueSubmit
+
+RenderPlatformWindowsDefault
+    for (i = 1 viewports)
+        ImGui_ImplVulkan_RenderWindow(ImGuiViewport *viewport, void *)
+            vkAcquireNextImageKHR
+            vkWaitForFences
+            vkResetCommandPool
+            vkBeginCommandBuffer
+            vkCmdBeginRenderPass
+            ImGui_ImplVulkan_RenderDrawData
+                vkMapMemory(vertex)
+                vkMapMemory(index)
+                memcpy
+                memcpy
+                vkFlushMappedMemoryRanges
+                vkUnmapMemory
+                vkUnmapMemory
+                ImGui_ImplVulkan_SetupRenderState
+                    ...
+                for every cmd_list
+                    for every command buffer
+                        vkCmdSetScissor
+                        vkCmdDrawIndexed
+            vkCmdEndRenderPass
+            vkEndCommandBuffer
+            vkResetFences
+            vkQueueSubmit

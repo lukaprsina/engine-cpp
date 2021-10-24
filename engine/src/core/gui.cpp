@@ -1578,22 +1578,6 @@ namespace engine
             command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
         }
 
-        Render(draw_data, swapchain.get(), command_buffer);
-
-        /* ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
-        for (int i = 1; i < platform_io.Viewports.Size; i++)
-        {
-            ImGuiViewport *viewport = platform_io.Viewports[i];
-            ImDrawData *draw_data = viewport->DrawData;
-            Window *window = static_cast<Window *>(viewport->PlatformUserData);
-            // Render(draw_data, swapchain.get(), command_buffer);
-            Render(draw_data, window->GetRenderContext().GetSwapchain().get(), command_buffer);
-        } */
-    }
-
-    void Gui::Render(ImDrawData *draw_data, Swapchain *swapchain, CommandBuffer &command_buffer)
-    {
-        auto &io = ImGui::GetIO();
         int32_t vertex_offset = 0;
         uint32_t index_offset = 0;
 
