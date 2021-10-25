@@ -1166,18 +1166,19 @@ namespace engine
         ShaderSource vert_shader("imgui.vert");
         ShaderSource frag_shader("imgui.frag");
 
-        /* SetScene(m_Application.LoadScene());
+        SetScene(m_Application.LoadScene());
         Scene *scene = GetScene();
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
                                                           std::move(frag_shader),
                                                           *scene, *this);
 
-        auto render_pipeline = std::make_unique<RenderPipeline>(device);
+        auto render_pipeline = std::make_unique<RenderPipeline>(GetApp().GetDevice());
         render_pipeline->AddSubpass(std::move(scene_subpass));
-        scene->SetRenderPipeline(std::move(render_pipeline));
+        scene->GetRenderPipelines().emplace_back(std::move(render_pipeline));
+        SetRenderPipeline(GetScene()->GetRenderPipelines().back().get());
 
-        auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
+        /* auto &clear_color = scene->GetRenderPipeline()->GetClearColor();
         clear_color[0].color = {0.0f, 0.0f, 0.0f, 0.0f};
         scene->GetRenderPipeline()->SetClearColor(clear_color);
 
@@ -1466,10 +1467,181 @@ namespace engine
         io.DisplaySize.y = static_cast<float>(height);
     }
 
-    void Gui::Draw(CommandBuffer &command_buffer, Layer *layer);
-    void Gui::DrawOwned(CommandBuffer &command_buffer, Layer *layer);
-    void Gui::Render(CommandBuffer &command_buffer, ImDrawData *draw_data);
-    /* void Gui::Draw(CommandBuffer &command_buffer, Window *platform_window)
+    void Gui::Draw(CommandBuffer &command_buffer, Layer *layer)
+    {
+        // Vertex input state
+        VkVertexInputBindingDescription vertex_input_binding{};
+        vertex_input_binding.stride = ToUint32_t(sizeof(ImDrawVert));
+
+        // Location 0: Position
+        VkVertexInputAttributeDescription pos_attr{};
+        pos_attr.format = VK_FORMAT_R32G32_SFLOAT;
+        pos_attr.offset = ToUint32_t(offsetof(ImDrawVert, pos));
+
+        // Location 1: UV
+        VkVertexInputAttributeDescription uv_attr{};
+        uv_attr.location = 1;
+        uv_attr.format = VK_FORMAT_R32G32_SFLOAT;
+        uv_attr.offset = ToUint32_t(offsetof(ImDrawVert, uv));
+
+        // Location 2: Color
+        VkVertexInputAttributeDescription col_attr{};
+        col_attr.location = 2;
+        col_attr.format = VK_FORMAT_R8G8B8A8_UNORM;
+        col_attr.offset = ToUint32_t(offsetof(ImDrawVert, col));
+
+        VertexInputState vertex_input_state{};
+        vertex_input_state.bindings = {vertex_input_binding};
+        vertex_input_state.attributes = {pos_attr, uv_attr, col_attr};
+
+        command_buffer.GetPipelineState().SetVertexInputState(vertex_input_state);
+
+        // Blend state
+        ColorBlendAttachmentState color_attachment{};
+        color_attachment.blend_enable = VK_TRUE;
+        color_attachment.color_write_mask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
+        color_attachment.src_color_blend_factor = VK_BLEND_FACTOR_SRC_ALPHA;
+        color_attachment.dst_color_blend_factor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_attachment.src_alpha_blend_factor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+
+        ColorBlendState blend_state{};
+        blend_state.attachments = {color_attachment};
+
+        command_buffer.GetPipelineState().SetColorBlendState(blend_state);
+
+        RasterizationState rasterization_state{};
+        rasterization_state.cull_mode = VK_CULL_MODE_NONE;
+        command_buffer.GetPipelineState().SetRasterizationState(rasterization_state);
+
+        DepthStencilState depth_state{};
+        depth_state.depth_test_enable = VK_FALSE;
+        depth_state.depth_write_enable = VK_FALSE;
+        command_buffer.GetPipelineState().SetDepthStencilState(depth_state);
+
+        // Bind pipeline layout
+        command_buffer.GetPipelineState().SetPipelineLayout(*m_PipelineLayout);
+
+        command_buffer.GetResourceBindingState().BindImage(*m_FontImageView, *m_Sampler, 0, 0, 0);
+
+        // Pre-rotation
+        auto &io = ImGui::GetIO();
+        auto push_transform = glm::mat4(1.0f);
+        ImGuiPlatformIO &platform_io = ImGui::GetPlatformIO();
+
+        Window *window{nullptr};
+        ImDrawData *draw_data{nullptr};
+        for (int i = 0; i < platform_io.Viewports.Size; i++)
+        {
+            ImGuiViewport *viewport = platform_io.Viewports[i];
+            draw_data = viewport->DrawData;
+            void *window_handle = static_cast<Window *>(viewport->PlatformHandle);
+            if (!window_handle)
+                continue;
+            window = &m_Application.GetPlatform().GetWindow(window_handle);
+
+            if (window->GetNativeWindow() == layer->GetWindow()->GetNativeWindow())
+                break;
+        }
+
+        auto &swapchain = window->GetRenderContext().GetSwapchain();
+
+        if (swapchain != nullptr)
+        {
+            auto &transform = swapchain->GetProperties().pre_transform;
+
+            glm::vec3 rotation_axis = glm::vec3(0.0f, 0.0f, 1.0f);
+            if (transform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
+                push_transform = glm::rotate(push_transform, glm::radians(90.0f), rotation_axis);
+
+            else if (transform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
+                push_transform = glm::rotate(push_transform, glm::radians(270.0f), rotation_axis);
+
+            else if (transform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
+                push_transform = glm::rotate(push_transform, glm::radians(180.0f), rotation_axis);
+        }
+
+        // GUI coordinate space to screen space
+        push_transform = glm::translate(push_transform, glm::vec3(-1.0f, -1.0f, 0.0f));
+        push_transform = glm::scale(push_transform, glm::vec3(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y, 0.0f));
+
+        // Push constants
+        command_buffer.PushConstants(push_transform);
+
+        // If a render context is used, then use the frames buffer pools to allocate GUI vertex/index data from
+        if (!m_ExplicitUpdate)
+        {
+            UpdateBuffers(command_buffer, draw_data, window->GetRenderContext().GetActiveFrame());
+        }
+        else
+        {
+            std::vector<std::reference_wrapper<const core::Buffer>> buffers;
+            buffers.push_back(*m_VertexBuffer);
+            command_buffer.BindVertexBuffers(0, buffers, {0});
+            command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        }
+
+        int32_t vertex_offset = 0;
+        uint32_t index_offset = 0;
+
+        if (!draw_data || draw_data->CmdListsCount == 0)
+            return;
+
+        for (int32_t i = 0; i < draw_data->CmdListsCount; i++)
+        {
+            const ImDrawList *cmd_list = draw_data->CmdLists[i];
+            for (int32_t j = 0; j < cmd_list->CmdBuffer.Size; j++)
+            {
+                const ImDrawCmd *cmd = &cmd_list->CmdBuffer[j];
+                VkRect2D scissor_rect;
+                scissor_rect.offset.x = std::max(static_cast<int32_t>(cmd->ClipRect.x), 0);
+                scissor_rect.offset.y = std::max(static_cast<int32_t>(cmd->ClipRect.y), 0);
+                scissor_rect.extent.width = static_cast<uint32_t>(cmd->ClipRect.z - cmd->ClipRect.x);
+                scissor_rect.extent.height = static_cast<uint32_t>(cmd->ClipRect.w - cmd->ClipRect.y);
+
+                // Adjust for pre-rotation if necessary
+                if (swapchain != nullptr)
+                {
+                    auto &transform = swapchain->GetProperties().pre_transform;
+                    if (transform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
+                    {
+                        scissor_rect.offset.x = static_cast<uint32_t>(io.DisplaySize.y - cmd->ClipRect.w);
+                        scissor_rect.offset.y = static_cast<uint32_t>(cmd->ClipRect.x);
+                        scissor_rect.extent.width = static_cast<uint32_t>(cmd->ClipRect.w - cmd->ClipRect.y);
+                        scissor_rect.extent.height = static_cast<uint32_t>(cmd->ClipRect.z - cmd->ClipRect.x);
+                    }
+                    else if (transform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
+                    {
+                        scissor_rect.offset.x = static_cast<uint32_t>(io.DisplaySize.x - cmd->ClipRect.z);
+                        scissor_rect.offset.y = static_cast<uint32_t>(io.DisplaySize.y - cmd->ClipRect.w);
+                        scissor_rect.extent.width = static_cast<uint32_t>(cmd->ClipRect.z - cmd->ClipRect.x);
+                        scissor_rect.extent.height = static_cast<uint32_t>(cmd->ClipRect.w - cmd->ClipRect.y);
+                    }
+                    else if (transform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
+                    {
+                        scissor_rect.offset.x = static_cast<uint32_t>(cmd->ClipRect.y);
+                        scissor_rect.offset.y = static_cast<uint32_t>(io.DisplaySize.x - cmd->ClipRect.z);
+                        scissor_rect.extent.width = static_cast<uint32_t>(cmd->ClipRect.w - cmd->ClipRect.y);
+                        scissor_rect.extent.height = static_cast<uint32_t>(cmd->ClipRect.z - cmd->ClipRect.x);
+                    }
+                }
+
+                command_buffer.SetScissor(0, {scissor_rect});
+                command_buffer.DrawIndexed(cmd->ElemCount, 1, index_offset, vertex_offset, 0);
+                index_offset += cmd->ElemCount;
+            }
+            vertex_offset += cmd_list->VtxBuffer.Size;
+        }
+    }
+
+    void Gui::DrawOwned(CommandBuffer &command_buffer, Layer *layer)
+    {
+    }
+
+    void Gui::Render(CommandBuffer &command_buffer, ImDrawData *draw_data)
+    {
+    }
+
+    /* void Draw(CommandBuffer &command_buffer, Window *platform_window)
     {
         // Vertex input state
         VkVertexInputBindingDescription vertex_input_binding{};
@@ -1636,22 +1808,16 @@ namespace engine
         }
     } */
 
-    void Gui::UpdateBuffers(CommandBuffer &command_buffer, RenderFrame &render_frame)
+    void Gui::UpdateBuffers(CommandBuffer &command_buffer, ImDrawData *draw_data, RenderFrame &render_frame)
     {
-        ImDrawData *draw_data = ImGui::GetDrawData();
-
         if (!draw_data)
-        {
             return;
-        }
 
         size_t vertex_buffer_size = draw_data->TotalVtxCount * sizeof(ImDrawVert);
         size_t index_buffer_size = draw_data->TotalIdxCount * sizeof(ImDrawIdx);
 
         if ((vertex_buffer_size == 0) || (index_buffer_size == 0))
-        {
             return;
-        }
 
         std::vector<uint8_t> vertex_data(vertex_buffer_size);
         std::vector<uint8_t> index_data(index_buffer_size);

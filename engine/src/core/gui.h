@@ -128,6 +128,6 @@ namespace engine
         int ImGuiGlfwCreateVkSurface(ImGuiViewport *vp, ImU64 vk_inst, const void *vk_allocators, ImU64 *out_vk_surface);
         void ImGuiWin32SetImeInputPos(ImGuiViewport *viewport, ImVec2 position);
 
-        void UpdateBuffers(CommandBuffer &command_buffer, RenderFrame &render_frame);
+        void UpdateBuffers(CommandBuffer &command_buffer, ImDrawData *draw_data, RenderFrame &render_frame);
     };
 }

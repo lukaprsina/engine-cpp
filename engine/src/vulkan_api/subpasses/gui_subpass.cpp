@@ -23,11 +23,9 @@ namespace engine
 
     void GuiSubpass::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer)
     {
-        if (m_Owned)
-        {
-        }
-        // m_Gui.DrawOwned(command_buffer, layer.GetWindow());
-        else
-            m_Gui.Draw(command_buffer, layer.GetWindow());
+        /* if (m_Owned)
+            m_Gui.DrawOwned(command_buffer, layer.GetWindow());
+        else */
+        m_Gui.Draw(command_buffer, &layer);
     }
 }
