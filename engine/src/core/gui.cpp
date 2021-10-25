@@ -1261,7 +1261,7 @@ namespace engine
 
         auto scene_subpass = std::make_unique<GuiSubpass>(std::move(vert_shader),
                                                           std::move(frag_shader),
-                                                          *scene, m_Gui);
+                                                          *scene, m_Gui, true);
 
         auto render_pipeline = std::make_unique<RenderPipeline>(GetApp().GetDevice());
         render_pipeline->AddSubpass(std::move(scene_subpass));
@@ -1466,7 +1466,10 @@ namespace engine
         io.DisplaySize.y = static_cast<float>(height);
     }
 
-    void Gui::Draw(CommandBuffer &command_buffer, Window *platform_window)
+    void Gui::Draw(CommandBuffer &command_buffer, Layer *layer);
+    void Gui::DrawOwned(CommandBuffer &command_buffer, Layer *layer);
+    void Gui::Render(CommandBuffer &command_buffer, ImDrawData *draw_data);
+    /* void Gui::Draw(CommandBuffer &command_buffer, Window *platform_window)
     {
         // Vertex input state
         VkVertexInputBindingDescription vertex_input_binding{};
@@ -1631,7 +1634,7 @@ namespace engine
             }
             vertex_offset += cmd_list->VtxBuffer.Size;
         }
-    }
+    } */
 
     void Gui::UpdateBuffers(CommandBuffer &command_buffer, RenderFrame &render_frame)
     {

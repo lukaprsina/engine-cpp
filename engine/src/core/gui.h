@@ -74,7 +74,9 @@ namespace engine
         void NewFrame(float delta_time);
         void OnUpdate(float delta_time) override;
         void Resize(const uint32_t width, const uint32_t height) const;
-        void Draw(CommandBuffer &command_buffer, Window *window);
+        void Draw(CommandBuffer &command_buffer, Layer *layer);
+        void DrawOwned(CommandBuffer &command_buffer, Layer *layer);
+        void Render(CommandBuffer &command_buffer, ImDrawData *draw_data);
 
         void OnEvent(Event &event) override;
         bool OnKeyPressed(KeyPressedEvent &event);

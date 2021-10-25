@@ -6,10 +6,10 @@ namespace engine
 {
     GuiSubpass::GuiSubpass(ShaderSource &&vertex_shader,
                            ShaderSource &&fragment_shader,
-                           Scene &scene, Gui &gui)
+                           Scene &scene, Gui &gui, bool owned)
         : Subpass(std::move(vertex_shader),
                   std::move(fragment_shader)),
-          m_Scene(scene), m_Gui(gui)
+          m_Scene(scene), m_Gui(gui), m_Owned(owned)
     {
     }
 
@@ -23,6 +23,11 @@ namespace engine
 
     void GuiSubpass::Draw(RenderContext &render_context, Layer &layer, CommandBuffer &command_buffer)
     {
-        m_Gui.Draw(command_buffer, layer.GetWindow());
+        if (m_Owned)
+        {
+        }
+        // m_Gui.DrawOwned(command_buffer, layer.GetWindow());
+        else
+            m_Gui.Draw(command_buffer, layer.GetWindow());
     }
 }

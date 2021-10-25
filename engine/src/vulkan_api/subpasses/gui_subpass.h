@@ -11,7 +11,7 @@ namespace engine
     public:
         GuiSubpass(ShaderSource &&vertex_shader,
                    ShaderSource &&fragment_shader,
-                   Scene &scene, Gui &gui);
+                   Scene &scene, Gui &gui, bool owned = false);
         ~GuiSubpass();
 
         virtual void Prepare(Device &device) override;
@@ -20,5 +20,6 @@ namespace engine
     private:
         Scene &m_Scene;
         Gui &m_Gui;
+        bool m_Owned;
     };
 }
