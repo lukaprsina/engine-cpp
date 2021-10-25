@@ -1577,8 +1577,6 @@ namespace engine
 
                 command_buffer.BindIndexBuffer(*m_IndexBuffer, 0, VK_INDEX_TYPE_UINT16);
             }
-
-            Render(draw_data, swapchain.get(), command_buffer);
         }
 
         int32_t vertex_offset = 0;

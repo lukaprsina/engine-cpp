@@ -42,7 +42,6 @@ namespace engine
             if (!layer->IsInitialized())
                 continue;
 
-            dirty = true;
             auto &command_buffer = m_RenderContext->Begin();
             command_buffer.Begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
             auto &views = m_RenderContext->GetActiveFrame().GetRenderTarget().GetViews();
