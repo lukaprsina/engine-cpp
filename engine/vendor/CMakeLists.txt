@@ -149,8 +149,8 @@ create_dependency(
   "include"
   LIB
   "spdlog"
-  PACKAGE
-  "spdlog"
+  #PACKAGE
+  #"spdlog"
   PUBLIC)
 
 # vma

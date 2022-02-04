@@ -234,6 +234,7 @@ if(MSVC)
   target_compile_options(engine PRIVATE /W3 /WX)
 else()
   target_compile_options(engine PRIVATE -Wall) # -Weffc++)
+  #target_link_libraries(engine PUBLIC -static-libgcc -static-libc -static-libstdc++)
 endif()
 
 if(ENG_SHIPPING)
